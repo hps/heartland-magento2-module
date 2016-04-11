@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+* HPS_Heartland default payment configuration
+*
+* @category    HPS
+* @package     HPS_Heartland
+* @author      Charles Simmons <charles.simmons@e-hps.com>
+* @copyright   HPS (http://heartland.us)
+* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+*/
+-->
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Magento/Payment/etc/payment.xsd">
+    <methods>
+        <method name="hps_heartland">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+    </methods>
+</payment>

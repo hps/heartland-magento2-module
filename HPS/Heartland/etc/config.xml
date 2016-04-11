@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+* HPS_Heartland default configuration
+*
+* @category    HPS
+* @package     HPS_Heartland
+* @author      Charles Simmons <charles.simmons@e-hps.com>
+* @copyright   HPS (http://heartland.us)
+* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Magento/Store/etc/config.xsd">
+    <default>
+        <payment>
+            <hps_heartland>
+                <active>0</active>
+                <model>HPS\Heartland\Model\Payment</model>
+                <payment_action>authorize_capture</payment_action>
+                <title>Heartland</title>
+                <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <cctypes>AE,VI,MC,DI,JCB</cctypes>
+                <allowspecific>0</allowspecific>
+                <min_order_total>0.50</min_order_total>
+            </hps_heartland>
+        </payment>
+    </default>
+</config>
