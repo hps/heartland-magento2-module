@@ -62,12 +62,15 @@ This will echo out the path
 ## Configure your store:
 
 Open Store Configuration
+
 ![image](configNav.png)
+
 Expand Sales and navigate to Payment Methods.
 
 ![image](pMethod.png)
 
 Fill out the form as per the instructions on the screen. Please be aware that you can change the title to anything you would like to appear on your checkout page for the consumer to see.
+
 ![image](cHeartland.png)
 
 ### Support or Contact
