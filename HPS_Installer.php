@@ -330,6 +330,8 @@ class UserInfo
      */
     static function inGroup($uid, $uid)
     {
+        print_r(posix_getpwuid((int)$uid)['name']);
+        print_r(posix_getgrgid($uid)['members']);
         return (bool)in_array(posix_getpwuid((int)$uid)['name'], posix_getgrgid($uid)['members']);
     }
 
