@@ -1,7 +1,7 @@
 <?php
-unlink('HPS_Heartland.log');
-unlink('HPS_Install.sh');
-unlink('HPS_Installer.php');
+@unlink('HPS_Heartland.log');
+@unlink('HPS_Install.sh');
+@unlink('HPS_Installer.php');
 set_time_limit(0);
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
@@ -221,7 +221,7 @@ echo 'All checks passed.';
 echo "\n";
 //echo "To complete please execute 'sh HPS_Install.sh'  ";
 echo "\n";
-exec('sh HPS_Install.sh');
+exec($bashScript);
 exit;
 
 
