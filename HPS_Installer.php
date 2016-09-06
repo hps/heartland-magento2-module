@@ -1,5 +1,7 @@
 <?php
 unlink('HPS_Heartland.log');
+unlink('HPS_Install.sh');
+unlink('HPS_Installer.php');
 set_time_limit(0);
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
@@ -121,86 +123,7 @@ See manualInstall.txt in this directory
     ;
 }
 echo "\n";
-/* need to capture the magento connect creds /var/www/html/magento2/var/composer_home/auth.json
- * Perform Cleanup on existing errand install
- *
- *
- *
- * */
-/*
-echo "Looking for specific instalations of HPS\n";
-if (file_exists($magentoBaseDir . '/app/code/HPS')) {
-    echo "Deleting current HPS\n";
-
-    echo "Found " . $magentoBaseDir . '/app/code/HPS' . "\n";
-    echo "Disabling  HPS_Heartland\n";
-    passthru('php ' . $magentoCommandLine . ' module:disable HPS_Heartland');
-    echo "deleting " . $magentoBaseDir . "/app/code/HPS\n";
-    exec('rm -rf ' . $magentoBaseDir . '/app/code/HPS');
-    echo "deleted \n";
-}
-/*
- * Git and install
- * */
-
-// remove the heartland-magento2-module folder if it already exists
-/*
-exec('rm -rf ' . $gitRepoFolder);
-
-// verify its gone
-if (file_exists($gitRepoFolder)) {
-    die($gitRepoFolder . ' could not be deleted. Please Connect yo your server and delete this folder manually and then retry');
-}
-
-echo "Downloading ... Getting a fresh copy \n";
-passthru('git clone https://github.com/hps/heartland-magento2-module.git ');
-//make the code folder
-@mkdir($magentoCodeFolder);
-// move HPS folder to the code folder
-rename($gitRepoFolder . DIRECTORY_SEPARATOR . 'HPS', $magentoCodeFolder . DIRECTORY_SEPARATOR . 'HPS');
-
-
-if (!file_exists($magentoCodeFolder . DIRECTORY_SEPARATOR . 'HPS')) {
-    die($magentoCodeFolder . DIRECTORY_SEPARATOR . 'HPS' . ' could not be created. The most likely cause is that ' . $cug . ' does not have permission to write to that directory.');
-}
-// remove the heartland-magento2-module folder
-exec('rm -rf ' . $gitRepoFolder);
-echo "\n";
-$bashScript = 'clear
-echo Emptying cache locations and generated files
-echo "/var/cache/*"
-rm -rf ' . $magentoBaseDir . '/var/cache/*
-echo "/var/page_cache/*"
-rm -rf ' . $magentoBaseDir . '/var/page_cache/*
-echo "/var/generation/*"
-rm -rf ' . $magentoBaseDir . '/var/generation/*
-echo "/var/di"
-rm -rf ' . $magentoBaseDir . '/var/di
-echo "/pub/static/adminhtml"
-rm -rf ' . $magentoBaseDir . '/pub/static/adminhtml
-echo "/pub/static/frontend"
-rm -rf ' . $magentoBaseDir . '/pub/static/frontend
-echo "/var/report/*"
-rm -rf ' . $magentoBaseDir . '/var/report/*
-cd ' . $magentoBaseDir . '
-echo "Working Dir:" && pwd
-echo "Getting dependencies for the HPS plugin"
-composer require hps/heartland-php && composer update
-echo "magento cache:clean"
-php ' . $magentoBaseDir . '/bin/magento cache:clean
-echo "magento module:enable HPS_Heartland"
-php ' . $magentoBaseDir . '/bin/magento module:enable HPS_Heartland
-echo "magento setup:upgrade"
-php ' . $magentoBaseDir . '/bin/magento setup:upgrade
-echo "magento setup:di:compile"
-php ' . $magentoBaseDir . '/bin/magento setup:di:compile
-echo "magento setup:static-content:deploy"
-php ' . $magentoBaseDir . '/bin/magento setup:static-content:deploy
-echo "Done"
-
-echo "Dont forget to navigate to your admin pannel and complete your configuration of the Heartland plug-in"
-';*/
-
+sleep(20);
 
 $bashScript = <<<BSH
 curdir=\$(pwd)
@@ -289,8 +212,6 @@ php \${Magento2} -V
 php \${Magento2} info:adminuri
 echo "If you had issues, Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
 BSH;
-unlink('HPS_Install.sh');
-unlink('HPS_Installer.php');
 file_put_contents('HPS_Install.sh',$bashScript);
 
 exec('clear');
