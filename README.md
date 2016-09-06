@@ -47,9 +47,8 @@ Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.co
 
 ##### Because there are not yet any 2.0.x deployments in play, we will elect to go to the latest system requirements
 
-There are now 3 options for installing our heartland-magento2-module.
+There are now 2 options for installing our heartland-magento2-module.
 
-* 
 * [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
 Just SSH to your server as a user part of the web servers group and call this line 
 ```

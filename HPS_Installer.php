@@ -82,7 +82,7 @@ file_put_contents('HPS_Heartland.log','['.date('c')."] - Your current server Inf
 echo "Your current server Information: " . $LinuxOSInfo->getDistribDescription();
 echo "\n";
 
-file_put_contents('HPS_Heartland.log','['.date('c')."] - PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater', FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')."] - PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater'. "\r\n", FILE_APPEND);
 echo "PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater';
 echo "\n";
 if (!$minVersion) {
@@ -155,15 +155,16 @@ if [ \${Magento2} ] ; then
     rm -rf \${Magento2Base}/vendor/HPS 2>> \${curdir}/HPS_Heartland.log
     #mkdir \$Magento2Base/app/code 2>> \${curdir}/HPS_Heartland.log
 
-    echo "Moving the HPS_Heartland"
-    echo "[\$(date --rfc-3339=seconds)] - Moving the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "Moving the HPS_Heartland repo files to \${Magento2Base}/app/code/HPS"
+    echo "[\$(date --rfc-3339=seconds)] - Moving the HPS_Heartland repo files to \${Magento2Base}/app/code/HPS" >> \${curdir}/HPS_Heartland.log
     cp -Ra heartland-magento2-module/HPS \${Magento2Base}/app/code/HPS 2>> \${curdir}/HPS_Heartland.log
 
     echo "Delete the download folder the HPS_Heartland"
     echo "[\$(date --rfc-3339=seconds)] - Delete the download folder the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
     rm -rf heartland-magento2-module 2>> \${curdir}/HPS_Heartland.log
 
-    echo "[\$(date --rfc-3339=seconds)] - Getting dependencies for  HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Getting dependencies for HPS_Heartland composer require hps/heartland-php"
+    echo "[\$(date --rfc-3339=seconds)] - Getting dependencies for HPS_Heartland composer require hps/heartland-php" >> \${curdir}/HPS_Heartland.log
     cd \${Magento2Base}
     composer require hps/heartland-php  2>> \${curdir}/HPS_Heartland.log
 
@@ -207,6 +208,8 @@ else
     echo "[\$(date --rfc-3339=seconds)] - Please submit an issue https://github.com/hps/heartland-magento2-module/issues" >> \${curdir}/HPS_Heartland.log
 fi
 echo Log file found in ${curdir}/HPS_Heartland.log
+echo If problems were encountered please post the log file with your issue
+echo Please also attach all log files from \${Magento2Base}/var/log
 php \${Magento2} -V
 php \${Magento2} info:adminuri
 echo "If you had issues, Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
@@ -218,6 +221,7 @@ echo 'All checks passed.';
 echo "\n";
 echo "To complete please execute 'sh HPS_Install.sh'  ";
 echo "\n";
+exec('sh HPS_Install.sh');
 exit;
 
 
@@ -261,8 +265,6 @@ class UserInfo
      */
     static function inGroup($uid1, $uid2)
     {
-        print_r(posix_getpwuid((int)$uid1)['name']);
-        print_r(posix_getgrgid($uid2)['members']);
         return (bool)in_array(posix_getpwuid((int)$uid1)['name'], posix_getgrgid($uid2)['members']);
     }
 
