@@ -11,7 +11,6 @@ We have laid out some basic requirements that you should absolutely have before 
 * Experience in debugging if problems arise.
 * SSH access to server as file system owner of web directory
 * Keys for [Magento connect](https://marketplace.magento.com/customer/accessKeys/list/)
-    
 * Keys for your developer or live [Heartland account](https://developer.heartlandpaymentsystems.com/Account/KeysAndCredentials)
      Once you have created an account or signed in you can view available keys by navigating to Menu->API Keys & Credentials. It is not necessary to have a live merchant account to have working certification keys.
 
@@ -39,15 +38,23 @@ With a Heartland integration:
 If you're still with us, you have decided that this sounds like something you want to be an early adopter. Remember you must SSH into your server as the web directory owner.
 
 #### Installation:
-Please review [Magento 2.1.1 updated requirements](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements.html) While it was never clear that a WAMP stack was ever supported, Magento 2.1.1 now officially only supports a Linux x86-64 deployment.
-While the documentation suggests that setting up a swap file if you have less than 2 GB, we found that there were failures during the basic Magento 2 installation when the server had less than 2 GB. While Magento2 documentation on [versioning](http://devdocs.magento.com/guides/v2.1/architecture/versioning.html) indicates the difference between 2.0.x and 2.1.x should be backward compatible changes 2.1.x no longer allows php 5.5.22 or greater.
+Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements.html) 
+
+* While it was unclear if a WAMP stack was ever supported, Magento 2.1.1 now officially only supports a Linux x86-64 deployment.
+* While the documentation suggests that setting up a swap file if you have less than 2 GB, we found that there were failures during the basic Magento 2 installation when the server had less than 2 GB. 
+* While Magento2 documentation on [versioning](http://devdocs.magento.com/guides/v2.1/architecture/versioning.html) indicates the difference between 2.0.x and 2.1.x should be backward compatible changes 2.1.x no longer allows php 5.5.22 or greater.
 [2.0.x](http://devdocs.magento.com/guides/v2.0/install-gde/system-requirements.html) vs [2.1.x](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html)
 
 ##### Because there are not yet any 2.0.x deployments in play, we will elect to go to the latest system requirements
 
-There are now 2 options for installing our heartland-magento2-module.
+There are now 3 options for installing our heartland-magento2-module.
 
-* [PHP script] (HPS_Installer.php) Just SSH to your server and call this line `php -f HPS_Installer.php` from any directory on your server as long as you execute as a user part of the web servers group
+* 
+* [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
+Just SSH to your server as a user part of the web servers group and call this line 
+```
+wget https://raw.githubusercontent.com/hps/heartland-magento2-module/Magento-2-1-1-updates/HPS_Installer.php && php HPS_Installer.php && sh HPS_Install.sh
+```
 * Manual
 
 ##### Manual Installation:
