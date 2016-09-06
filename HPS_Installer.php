@@ -97,7 +97,7 @@ if ($magentoCommandLine === '') {
 echo "\nYou are running " . exec('php ' . $magentoCommandLine . ' -V') . " found in: ";
 echo $magentoBaseDir;
 echo "\n";
-echo 'MEMORY CHECK';
+echo 'MEMORY CHECK: ' . $meminfo;
 echo "\n";
 if ($meminfo < MAGENTO_RECOMMENDED_MEMORY) {
     file_put_contents('manualInstall.txt',$manualBashScript);
@@ -197,7 +197,7 @@ echo "Starting" > HPS_Heartland.log
 clear
 echo "Looking for your Magento2 directory this may be fast or take a few minutes"
 echo "Starting" > HPS_Heartland.log
-Magento2=${magentoBaseDir}
+Magento2=${magentoCommandLine}
 echo \${Magento2} >> HPS_Heartland.log;
 Magento2Version=$(php \${Magento2} -V) 2>> HPS_Heartland.log
 
@@ -208,7 +208,7 @@ if [ \${Magento2} ] ; then
     echo "Found \$Magento2";
     echo "Found \$Magento2" >> HPS_Heartland.log;
 
-    Magento2Base=\${Magento2%%\/bin\/magento}
+    Magento2Base=${magentoBaseDir}
 
     echo "Magento Base Directory Found: \$Magento2Base"
     echo "Magento Base Directory Found: \$Magento2Base" >> HPS_Heartland.log
@@ -284,7 +284,9 @@ file_put_contents('HPS_Install.sh',$bashScript);
 
 exec('clear');
 echo 'All checks passed.';
+echo "\n";
 echo "To complete please execute 'sh HPS_Install.sh'  ";
+echo "\n";
 exit;
 
 
