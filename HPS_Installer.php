@@ -9,7 +9,7 @@ error_reporting(-1);
 exec('clear');
 /*
  * This script will attempt to auto generate a Bash script specific to your Magento 2.1 instalation that you can use to install the Heartland Plugin
- *
+ * This script is experimental and while we don't expect any issues it is always advisable to use on a test system before putting anything in place in production
  *
  */
 file_put_contents('HPS_Heartland.log','['.date('c').'] - Automated install'. "\r\n");
@@ -216,7 +216,6 @@ echo "If you had issues, Please submit an issue https://github.com/hps/heartland
 BSH;
 file_put_contents('HPS_Install.sh',$bashScript);
 
-exec('clear');
 echo 'All checks passed.';
 echo "\n";
 echo "To complete please execute 'sh HPS_Install.sh'  ";

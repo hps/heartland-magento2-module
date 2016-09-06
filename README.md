@@ -38,7 +38,7 @@ With a Heartland integration:
 If you're still with us, you have decided that this sounds like something you want to be an early adopter. Remember you must SSH into your server as the web directory owner.
 
 #### Installation:
-Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements.html) 
+Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements.html). It is critical that your installation meets all of these before continuing
 
 * While it was unclear if a WAMP stack was ever supported, Magento 2.1.1 now officially only supports a Linux x86-64 deployment.
 * While the documentation suggests that setting up a swap file if you have less than 2 GB, we found that there were failures during the basic Magento 2 installation when the server had less than 2 GB. 
@@ -52,13 +52,16 @@ There are now 2 options for installing our heartland-magento2-module.
 * [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
 Just SSH to your server as a user part of the web servers group and call this line 
 ```
-wget https://raw.githubusercontent.com/hps/heartland-magento2-module/Magento-2-1-1-updates/HPS_Installer.php && php -f HPS_Installer.php && sh HPS_Install.sh
+wget https://raw.githubusercontent.com/hps/heartland-magento2-module/HPS_Installer.php && php -f HPS_Installer.php && sh HPS_Install.sh
 ```
 * Manual
 
 ##### Manual Installation:
+Clone this repo
+`git clone https://github.com/hps/heartland-magento2-module.git`
 From your base Magento2 directory -> app -> code (you may have to create this directory) [Magento2 Documentation](http://devdocs.magento.com/guides/v2.1/architecture/archi_perspectives/components/modules/mod_intro.html). 
-
+Install Dependencies with Composer
+`composer require hps/heartland-php`
 Copy the `HPS` directory from this repository to your `app/code` directory. From the base Magento2 directory (instructions assume Ubuntu 14+)
 ```
     cd ${Magento2Instalation}
@@ -73,7 +76,8 @@ Copy the `HPS` directory from this repository to your `app/code` directory. From
 The following commands should work from your Magento 2 installation directory .
 ```
     php bin/magento cache:clean
-    php bin/magento setup:upgrade
+    php bin/magento module:enable HPS_Heartland
+    php bin/magento setup:upgrade  --keep-generated
     php bin/magento setup:di:compile
     php bin/magento setup:static-content:deploy
 ```
