@@ -195,8 +195,96 @@ echo "Dont forget to navigate to your admin pannel and complete your configurati
 $bashScript = <<<BSH
 curdir=\$(pwd)
 echo \${curdir}/
-BSH;
+echo "Looking for your Magento2 directory this may be fast or take a few minutes"
+echo "Starting" > \${curdir}/HPS_Heartland.log
+clear
+echo "Looking for your Magento2 directory this may be fast or take a few minutes"
+echo "Starting" > HPS_Heartland.log
+Magento2=${magentoCommandLine}
+echo \${Magento2} >> \${curdir}/HPS_Heartland.log
+Magento2Version=$(php \${Magento2} -V) 2>> \${curdir}/HPS_Heartland.log
 
+echo "Starting HPS_Heartland install on \${Magento2Version}"
+echo "Starting HPS_Heartland install on \${Magento2Version}" >> \${curdir}/HPS_Heartland.log
+
+if [ \${Magento2} ] ; then
+    echo "Found \$Magento2";
+    echo "Found \$Magento2" >> \${curdir}/HPS_Heartland.log
+
+    Magento2Base=${magentoBaseDir}
+
+    echo "Magento Base Directory Found: \$Magento2Base"
+    echo "Magento Base Directory Found: \$Magento2Base" >> \${curdir}/HPS_Heartland.log
+
+    echo "Downloading HPS_Heartland from github"
+    echo "Downloading HPS_Heartland from github" >> \${curdir}/HPS_Heartland.log
+    git clone -b Magento-2-1-1-updates https://github.com/hps/heartland-magento2-module.git  2>> \${curdir}/HPS_Heartland.log
+
+    echo "Creating the Dir \${Magento2Base}/app/code "
+    echo "Creating the Dir \${Magento2Base}/app/code " >> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/app/code/HPS 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/vendor/HPS 2>> \${curdir}/HPS_Heartland.log
+    #mkdir \$Magento2Base/app/code 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Moving the HPS_Heartland"
+    echo "Moving the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    cp -Ra heartland-magento2-module/HPS \${Magento2Base}/app/code/HPS 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Delete the download folder the HPS_Heartland"
+    echo "Delete the download folder the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    rm -rf heartland-magento2-module 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Getting dependencies for  HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    cd \${Magento2Base}
+    composer require hps/heartland-php  2>> \${curdir}/HPS_Heartland.log
+
+    echo "Clearing all cache"
+    echo "Clearing all cache" >> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/var/cache/* 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/var/page_cache/* 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/var/generation/* 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/var/di 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/pub/static/adminhtml 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/pub/static/frontend 2>> \${curdir}/HPS_Heartland.log
+    rm -rf \${Magento2Base}/var/report/* 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Execute cache:clean"
+    echo "Execute cache:clean" >> \${curdir}/HPS_Heartland.log
+    php \${Magento2} cache:clean 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Execute module:enable HPS_Heartland"
+    echo "Execute module:enable HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    php \${Magento2} module:enable HPS_Heartland 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Executing setup:upgrade --keep-generated"
+    echo "Executing setup:upgrade --keep-generated" >> \${curdir}/HPS_Heartland.log
+    php \${Magento2} setup:upgrade --keep-generated 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Executing setup:di:compile"
+    echo "Executing setup:di:compile" >> \${curdir}/HPS_Heartland.log
+    php \${Magento2} setup:di:compile 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Executing setup:static-content:deploy"
+    echo "Executing setup:static-content:deploy" >> \${curdir}/HPS_Heartland.log
+    php \${Magento2} setup:static-content:deploy 2>> \${curdir}/HPS_Heartland.log
+
+    echo "Done Installing HPS_Heartland"
+    echo "Done Installing HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+else
+    echo "Sorry we could not automate the process of installing our HPS_Heartland plug-in"
+    echo "Sorry we could not automate the process of installing our HPS_Heartland plug-in" >> \${curdir}/HPS_Heartland.log
+
+    echo "Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
+    echo "Please submit an issue https://github.com/hps/heartland-magento2-module/issues" >> \${curdir}/HPS_Heartland.log
+exit
+fi
+echo Log file found in ${curdir}/HPS_Heartland.log
+php \${Magento2} -V
+php \${Magento2} info:adminuri
+BSH;
+unlink('HPS_Install.sh');
+unlink('HPS_Heartland.log');
+unlink('HPS_Installer.php');
 file_put_contents('HPS_Install.sh',$bashScript);
 
 exec('clear');
