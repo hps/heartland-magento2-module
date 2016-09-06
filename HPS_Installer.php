@@ -123,7 +123,6 @@ See manualInstall.txt in this directory
     ;
 }
 echo "\n";
-sleep(20);
 
 $bashScript = <<<BSH
 curdir=\$(pwd)
