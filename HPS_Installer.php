@@ -207,7 +207,7 @@ else
     echo "Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
     echo "[\$(date --rfc-3339=seconds)] - Please submit an issue https://github.com/hps/heartland-magento2-module/issues" >> \${curdir}/HPS_Heartland.log
 fi
-echo Log file found in ${curdir}/HPS_Heartland.log
+echo Log file found in \$curdir/HPS_Heartland.log
 echo If problems were encountered please post the log file with your issue
 echo Please also attach all log files from \${Magento2Base}/var/log
 php \${Magento2} -V
