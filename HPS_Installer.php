@@ -82,7 +82,7 @@ file_put_contents('HPS_Heartland.log','['.date('c')."] - Your current server Inf
 echo "Your current server Information: " . $LinuxOSInfo->getDistribDescription();
 echo "\n";
 
-file_put_contents('HPS_Heartland.log','['.date('c')."] - PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater'. "\r\n", FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')."] - PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater' . "\r\n", FILE_APPEND);
 echo "PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater';
 echo "\n";
 if (!$minVersion) {
@@ -219,7 +219,7 @@ file_put_contents('HPS_Install.sh',$bashScript);
 exec('clear');
 echo 'All checks passed.';
 echo "\n";
-echo "To complete please execute 'sh HPS_Install.sh'  ";
+//echo "To complete please execute 'sh HPS_Install.sh'  ";
 echo "\n";
 exec('sh HPS_Install.sh');
 exit;
