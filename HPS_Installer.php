@@ -225,7 +225,7 @@ if [ \${Magento2} ] ; then
 
     echo "Moving the HPS_Heartland"
     echo "Moving the HPS_Heartland" >> HPS_Heartland.log
-    cp -Ra heartland-magento2-module/HPS \${Magento2Base}/vendor/HPS 2>> HPS_Heartland.log
+    cp -Ra heartland-magento2-module/HPS \${Magento2Base}/app/code/HPS 2>> HPS_Heartland.log
 
     echo "Delete the download folder the HPS_Heartland"
     echo "Delete the download folder the HPS_Heartland" >> HPS_Heartland.log
