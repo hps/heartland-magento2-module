@@ -193,7 +193,7 @@ echo "Dont forget to navigate to your admin pannel and complete your configurati
 ';*/
 
 $bashScript = <<<BSH
-curdir=$(pwd)
+curdir=\$(pwd)
 echo "Looking for your Magento2 directory this may be fast or take a few minutes"
 echo "Starting" > \${curdir}/HPS_Heartland.log
 clear
