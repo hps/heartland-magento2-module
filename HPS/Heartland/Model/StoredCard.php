@@ -7,6 +7,7 @@
  */
 
 namespace HPS\Heartland\Model;
+
 use \HPS\Heartland\Helper\Customer;
 use \HPS\Heartland\Helper\Db;
 
@@ -24,73 +25,75 @@ class StoredCard
      * @return bool
      * @throws \Exception
      */
-    public static function getToken($id){
+    public static function getToken($id)
+    {
         $MuToken = false;
-        //if( is_int($id) ){
-            if (Customer::isLoggedIn()) {
-                $conn = Db::db_connect();
-                $select = $conn->select()
-                    ->from(
-                        ['o' => 'hps_heartland_storedcard']
-                    )
-                    ->where('o.customer_id   = ?', (int) Customer::getCustID())
-                    ->where('o.storedcard_id = ?', (int) $id);
-                $data = (array) $conn->fetchAll($select);
-                self::validate($data);
-                if (count($data) && key_exists('token_value',$data[0])){
-                    $MuToken = $data[0]['token_value'];
-                }
-            }else{
-                throw new \Exception(__( 'No valid User Logged On!! Cannot get saved card.' ));
+        if (Customer::isLoggedIn()) {
+            $conn = Db::db_connect();
+            $select = $conn->select()
+                ->from(
+                    ['o' => 'hps_heartland_storedcard']
+                )
+                ->where('o.customer_id   = ?', (int)Customer::getCustID())
+                ->where('o.storedcard_id = ?', (int)$id);
+            $data = (array)$conn->fetchAll($select);
+            self::validate($data);
+            if (count($data) && key_exists('token_value', $data[0])) {
+                $MuToken = $data[0]['token_value'];
             }
-        //}
+        }
         return $MuToken;
     }
 
-    public static function deleteStoredCards($id){
+    public static function deleteStoredCards($id)
+    {
         if (Customer::isLoggedIn()) {
             $conn = Db::db_connect();
             $conn->delete('hps_heartland_storedcard', array(
-                'customer_id = ?' => (int) Customer::getCustID(),
-                'storedcard_id = ?' => (int) $id
+                'customer_id = ?' => (int)Customer::getCustID(),
+                'storedcard_id = ?' => (int)$id
             ));
-        }else{
-            throw new \Exception(__( 'No valid User Logged On!! Cannot save card.' ));
+        } else {
+            throw new \Exception(__('No valid User Logged On!! Cannot save card.'));
         }
     }
+
     /**
      * @return array
      *
      *
      * @throws \Exception
      */
-    public static function getStoredCards(){
+    public static function getStoredCards()
+    {
         $data = [];
 
         if (Customer::isLoggedIn()) {
             $conn = Db::db_connect();
             $select = $conn->select()
-                ->from (
+                ->from(
                     ['o' => 'hps_heartland_storedcard']
                 )
-                ->where ('o.customer_id = ?', (int) Customer::getCustID());
-            $data = (array) $conn->fetchAll($select);
+                ->where('o.customer_id = ?', (int)Customer::getCustID());
+            $data = (array)$conn->fetchAll($select);
             self::validate($data);
-        }else{
-            throw new \Exception(__( 'No valid User Logged On!! Cannot get saved cards.' ));
+        } else {
+            throw new \Exception(__('No valid User Logged On!! Cannot get saved cards.'));
         }
-        return (array) $data;
+        return (array)$data;
     }
-    public static function getCanStoreCards(){
+
+    public static function getCanStoreCards()
+    {
         $retVal = (int)0;
         if (Customer::isLoggedIn()) {
-            $conn = Db::db_connect ();
-            $select = $conn->select ()
-                ->from (
+            $conn = Db::db_connect();
+            $select = $conn->select()
+                ->from(
                     ['o' => 'core_config_data']
                 )
-                ->where ('o.path = ?', (string)'payment/hps_heartland/save_cards');
-            $data = (array)$conn->fetchAll ($select);
+                ->where('o.path = ?', (string)'payment/hps_heartland/save_cards');
+            $data = (array)$conn->fetchAll($select);
 
             $retVal = (int)$data[0]['value'];
         }
@@ -106,7 +109,8 @@ class StoredCard
      *
      * @throws \Exception
      */
-    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year){
+    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year)
+    {
         /*$args = func_get_args();
         foreach ($args as $argName=>$arg) {
             if ( preg_match('/[\W]/', $arg) !== 1){
@@ -118,15 +122,15 @@ class StoredCard
                     'storedcard_id' => '',
                     'dt' => date("Y-m-d H:i:s"),
                     'customer_id' => Customer::getCustID(),
-                    'token_value' => (string) $token,
-                    'cc_type' => (string) $cc_type,
-                    'cc_last4' => (string) $last4,
-                    'cc_exp_month' => (string) $cc_exp_month,
-                    'cc_exp_year' => (string) $cc_exp_year,
+                    'token_value' => (string)$token,
+                    'cc_type' => (string)$cc_type,
+                    'cc_last4' => (string)$last4,
+                    'cc_exp_month' => (string)$cc_exp_month,
+                    'cc_exp_year' => (string)$cc_exp_year,
                 )
             );
-        }else{
-            throw new \Exception(__( 'No valid User Logged On!! Cannot save card.' ));
+        } else {
+            throw new \Exception(__('No valid User Logged On!! Cannot save card.'));
         }
     }
 
@@ -136,17 +140,18 @@ class StoredCard
      * @return bool
      * @throws \Exception
      */
-    private static function validate($data){
+    private static function validate($data)
+    {
 
         // some very basic validation.
         //simply dont want invalid arrays of data
         foreach ($data as $item) {
-            if (preg_match ('/[\D]/', $item['storedcard_id']) === 1) {
-                throw new \Exception(__ ('storedcard_id does not have a valid value.'));
+            if (preg_match('/[\D]/', $item['storedcard_id']) === 1) {
+                throw new \Exception(__('storedcard_id does not have a valid value.'));
             }
             foreach ($item as $columnName => $columnValue) {
-                if ($columnValue === null || $columnValue === '' || preg_match ('/[^\w\s\-\:]/', $columnValue) === 1) {
-                    throw new \Exception(__ ($columnName . ' Column does not have a valid value for ' . $item['storedcard_id']));
+                if ($columnValue === null || $columnValue === '' || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
+                    throw new \Exception(__($columnName . ' Column does not have a valid value for ' . $item['storedcard_id']));
                 }
             }
         }

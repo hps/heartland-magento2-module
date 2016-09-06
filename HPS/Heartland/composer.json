@@ -8,7 +8,8 @@
         }
     },
     "require": {
-        "php": "~5.5.0|~5.6.0|~7.0.0",
+        "php": "~5.6.0|~7.0.0",
+        "hps/heartland-php": "^2.8",
         "magento/module-config": "100.0.*",
         "magento/module-store": "100.0.*",
         "magento/module-checkout": "100.0.*",
