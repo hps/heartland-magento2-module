@@ -334,11 +334,11 @@ class UserInfo
      * @param $uid
      * @return bool
      */
-    static function inGroup($uid, $uid)
+    static function inGroup($uid1, $uid2)
     {
-        print_r(posix_getpwuid((int)$uid)['name']);
-        print_r(posix_getgrgid($uid)['members']);
-        return (bool)in_array(posix_getpwuid((int)$uid)['name'], posix_getgrgid($uid)['members']);
+        print_r(posix_getpwuid((int)$uid1)['name']);
+        print_r(posix_getgrgid($uid2)['members']);
+        return (bool)in_array(posix_getpwuid((int)$uid1)['name'], posix_getgrgid($uid2)['members']);
     }
 
     /**
