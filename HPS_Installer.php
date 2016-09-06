@@ -219,9 +219,8 @@ file_put_contents('HPS_Install.sh',$bashScript);
 exec('clear');
 echo 'All checks passed.';
 echo "\n";
-//echo "To complete please execute 'sh HPS_Install.sh'  ";
+echo "To complete please execute 'sh HPS_Install.sh'  ";
 echo "\n";
-exec($bashScript);
 exit;
 
 
