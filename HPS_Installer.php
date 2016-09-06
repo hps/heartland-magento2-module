@@ -192,6 +192,7 @@ echo "Done"
 echo "Dont forget to navigate to your admin pannel and complete your configuration of the Heartland plug-in"
 ';*/
 
+
 $bashScript = <<<BSH
 curdir=\$(pwd)
 echo \${curdir}/
@@ -292,7 +293,7 @@ echo 'All checks passed.';
 echo "\n";
 echo "To complete please execute 'sh HPS_Install.sh'  ";
 echo "\n";
-exit; 
+exit;
 
 
 function findFile($path)
