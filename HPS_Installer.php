@@ -97,6 +97,8 @@ if ($magentoCommandLine === '') {
 echo "\nYou are running " . exec('php ' . $magentoCommandLine . ' -V') . " found in: ";
 echo $magentoBaseDir;
 echo "\n";
+echo 'MEMORY CHECK';
+echo "\n";
 if ($meminfo < MAGENTO_RECOMMENDED_MEMORY) {
     file_put_contents('manualInstall.txt',$manualBashScript);
     echo "Please note that you do not have the recommended physical memory
@@ -195,7 +197,7 @@ echo "Starting" > HPS_Heartland.log
 clear
 echo "Looking for your Magento2 directory this may be fast or take a few minutes"
 echo "Starting" > HPS_Heartland.log
-Magento2=$(find / -path "*/bin/magento" -not -path "*/vendor/*/*/*/magento" 2>/dev/null) 2>> HPS_Heartland.log
+Magento2=${magentoBaseDir}
 echo \${Magento2} >> HPS_Heartland.log;
 Magento2Version=$(php \${Magento2} -V) 2>> HPS_Heartland.log
 
