@@ -290,7 +290,6 @@ php \${Magento2} info:adminuri
 echo "If you had issues, Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
 BSH;
 unlink('HPS_Install.sh');
-unlink('HPS_Heartland.log');
 unlink('HPS_Installer.php');
 file_put_contents('HPS_Install.sh',$bashScript);
 
