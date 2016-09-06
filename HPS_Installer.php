@@ -12,14 +12,14 @@ exec('clear');
  *
  *
  */
-file_put_contents('HPS_Heartland.log','['.date('c').' - Automated install');
+file_put_contents('HPS_Heartland.log','['.date('c').' - Automated install'. "\n");
 if (PHP_SAPI !== 'cli') {
     echo 'HPS_Installer must be run as a CLI application';
     //echo '<pre>';
     exit(1);
 }
 
-file_put_contents('HPS_Heartland.log','['.date('c').' - OS = ' . PHP_OS, FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c').' - OS = ' . PHP_OS. "\n", FILE_APPEND);
 if (PHP_OS !== 'Linux') {
     exit("This installer and Magento 2.1 are only supported on Linux Distros\nhttp://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html");
 }
@@ -74,11 +74,11 @@ php ' . $magentoBaseDir . '/bin/magento setup:static-content:deploy
 
 
 
-file_put_contents('HPS_Heartland.log','['.date('c')." - Current user = " . $cug, FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')." - Current user = " . $cug. "\n", FILE_APPEND);
 echo("Current user " . $cug);
 echo "\n";
 
-file_put_contents('HPS_Heartland.log','['.date('c')." - Your current server Information: " . $LinuxOSInfo->getDistribDescription(), FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')." - Your current server Information: " . $LinuxOSInfo->getDistribDescription(). "\n", FILE_APPEND);
 echo "Your current server Information: " . $LinuxOSInfo->getDistribDescription();
 echo "\n";
 
@@ -89,7 +89,7 @@ if (!$minVersion) {
     exit;
 }
 
-file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLineOwnerInGroup = " . $magentoCommandLineOwnerInGroup, FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLineOwnerInGroup = " . $magentoCommandLineOwnerInGroup. "\n", FILE_APPEND);
 if(!$magentoCommandLineOwnerInGroup){
     echo "The user account you are executing this script as({$cug}) is not part of the Magento 2.1 filesystems group({$magentoCommandLineOwnerGroup})
 Please be aware that you can only perform plugin operations as the Magento 2.1 filesystem owner or as a member of that group
@@ -98,7 +98,7 @@ This script cannot continue";
 }
 
 echo "\n";
-file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLine = " . $magentoCommandLine, FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLine = " . $magentoCommandLine. "\n", FILE_APPEND);
 if ($magentoCommandLine === '') {
     die("Could not reliably determine your Magento install path. \n
     Please ensure that this script is in or above the magento install. \n
@@ -109,7 +109,7 @@ echo $magentoBaseDir;
 echo "\n";
 echo 'MEMORY CHECK: ' . $meminfo;
 echo "\n";
-file_put_contents('HPS_Heartland.log','['.date('c')." - MEMORY CHECK: " . $meminfo, FILE_APPEND);
+file_put_contents('HPS_Heartland.log','['.date('c')." - MEMORY CHECK: " . $meminfo . "\n", FILE_APPEND);
 if ($meminfo < MAGENTO_RECOMMENDED_MEMORY) {
     file_put_contents('manualInstall.txt',$manualBashScript);
     echo "Please note that you do not have the recommended physical memory
