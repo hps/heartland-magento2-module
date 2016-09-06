@@ -1,4 +1,5 @@
 <?php
+unlink('HPS_Heartland.log');
 set_time_limit(0);
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
@@ -9,12 +10,14 @@ exec('clear');
  *
  *
  */
+file_put_contents('HPS_Heartland.log','['.date('c').' - Automated install');
 if (PHP_SAPI !== 'cli') {
     echo 'HPS_Installer must be run as a CLI application';
     //echo '<pre>';
     exit(1);
 }
 
+file_put_contents('HPS_Heartland.log','['.date('c').' - OS = ' . PHP_OS, FILE_APPEND);
 if (PHP_OS !== 'Linux') {
     exit("This installer and Magento 2.1 are only supported on Linux Distros\nhttp://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html");
 }
@@ -69,18 +72,22 @@ php ' . $magentoBaseDir . '/bin/magento setup:static-content:deploy
 
 
 
+file_put_contents('HPS_Heartland.log','['.date('c')." - Current user = " . $cug, FILE_APPEND);
 echo("Current user " . $cug);
 echo "\n";
 
+file_put_contents('HPS_Heartland.log','['.date('c')." - Your current server Information: " . $LinuxOSInfo->getDistribDescription(), FILE_APPEND);
 echo "Your current server Information: " . $LinuxOSInfo->getDistribDescription();
 echo "\n";
 
+file_put_contents('HPS_Heartland.log','['.date('c')." - PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater', FILE_APPEND);
 echo "PHP Version: " . PHP_VERSION . ' Which ' . ($minVersion ? 'fulfills' : 'does not fullfill') . ' the minimum requirement of 5.6.00 or greater';
 echo "\n";
 if (!$minVersion) {
     exit;
 }
 
+file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLineOwnerInGroup = " . $magentoCommandLineOwnerInGroup, FILE_APPEND);
 if(!$magentoCommandLineOwnerInGroup){
     echo "The user account you are executing this script as({$cug}) is not part of the Magento 2.1 filesystems group({$magentoCommandLineOwnerGroup})
 Please be aware that you can only perform plugin operations as the Magento 2.1 filesystem owner or as a member of that group
@@ -89,6 +96,7 @@ This script cannot continue";
 }
 
 echo "\n";
+file_put_contents('HPS_Heartland.log','['.date('c')." - magentoCommandLine = " . $magentoCommandLine, FILE_APPEND);
 if ($magentoCommandLine === '') {
     die("Could not reliably determine your Magento install path. \n
     Please ensure that this script is in or above the magento install. \n
@@ -99,6 +107,7 @@ echo $magentoBaseDir;
 echo "\n";
 echo 'MEMORY CHECK: ' . $meminfo;
 echo "\n";
+file_put_contents('HPS_Heartland.log','['.date('c')." - MEMORY CHECK: " . $meminfo, FILE_APPEND);
 if ($meminfo < MAGENTO_RECOMMENDED_MEMORY) {
     file_put_contents('manualInstall.txt',$manualBashScript);
     echo "Please note that you do not have the recommended physical memory
@@ -196,51 +205,48 @@ echo "Dont forget to navigate to your admin pannel and complete your configurati
 $bashScript = <<<BSH
 curdir=\$(pwd)
 echo \${curdir}/
-echo "Looking for your Magento2 directory this may be fast or take a few minutes"
-echo "Starting" > \${curdir}/HPS_Heartland.log
 clear
 echo "Looking for your Magento2 directory this may be fast or take a few minutes"
-echo "Starting" > HPS_Heartland.log
+echo [\$(date --rfc-3339=seconds)] - Starting Automated Install >> \${curdir}/HPS_Heartland.log
 Magento2=${magentoCommandLine}
-echo \${Magento2} >> \${curdir}/HPS_Heartland.log
+echo [\$(date --rfc-3339=seconds)] - \${Magento2} >> \${curdir}/HPS_Heartland.log
 Magento2Version=$(php \${Magento2} -V) 2>> \${curdir}/HPS_Heartland.log
 
 echo "Starting HPS_Heartland install on \${Magento2Version}"
-echo "Starting HPS_Heartland install on \${Magento2Version}" >> \${curdir}/HPS_Heartland.log
 
 if [ \${Magento2} ] ; then
     echo "Found \$Magento2";
-    echo "Found \$Magento2" >> \${curdir}/HPS_Heartland.log
+    echo [\$(date --rfc-3339=seconds)] - Found \$Magento2 >> \${curdir}/HPS_Heartland.log
 
     Magento2Base=${magentoBaseDir}
 
     echo "Magento Base Directory Found: \$Magento2Base"
-    echo "Magento Base Directory Found: \$Magento2Base" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Magento Base Directory Found: \$Magento2Base" >> \${curdir}/HPS_Heartland.log
 
     echo "Downloading HPS_Heartland from github"
-    echo "Downloading HPS_Heartland from github" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Downloading HPS_Heartland from github" >> \${curdir}/HPS_Heartland.log
     git clone -b Magento-2-1-1-updates https://github.com/hps/heartland-magento2-module.git  2>> \${curdir}/HPS_Heartland.log
 
     echo "Creating the Dir \${Magento2Base}/app/code "
-    echo "Creating the Dir \${Magento2Base}/app/code " >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Creating the Dir \${Magento2Base}/app/code " >> \${curdir}/HPS_Heartland.log
     rm -rf \${Magento2Base}/app/code/HPS 2>> \${curdir}/HPS_Heartland.log
     rm -rf \${Magento2Base}/vendor/HPS 2>> \${curdir}/HPS_Heartland.log
     #mkdir \$Magento2Base/app/code 2>> \${curdir}/HPS_Heartland.log
 
     echo "Moving the HPS_Heartland"
-    echo "Moving the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Moving the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
     cp -Ra heartland-magento2-module/HPS \${Magento2Base}/app/code/HPS 2>> \${curdir}/HPS_Heartland.log
 
     echo "Delete the download folder the HPS_Heartland"
-    echo "Delete the download folder the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Delete the download folder the HPS_Heartland" >> \${curdir}/HPS_Heartland.log
     rm -rf heartland-magento2-module 2>> \${curdir}/HPS_Heartland.log
 
-    echo "Getting dependencies for  HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Getting dependencies for  HPS_Heartland" >> \${curdir}/HPS_Heartland.log
     cd \${Magento2Base}
     composer require hps/heartland-php  2>> \${curdir}/HPS_Heartland.log
 
     echo "Clearing all cache"
-    echo "Clearing all cache" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Clearing all cache" >> \${curdir}/HPS_Heartland.log
     rm -rf \${Magento2Base}/var/cache/* 2>> \${curdir}/HPS_Heartland.log
     rm -rf \${Magento2Base}/var/page_cache/* 2>> \${curdir}/HPS_Heartland.log
     rm -rf \${Magento2Base}/var/generation/* 2>> \${curdir}/HPS_Heartland.log
@@ -250,7 +256,7 @@ if [ \${Magento2} ] ; then
     rm -rf \${Magento2Base}/var/report/* 2>> \${curdir}/HPS_Heartland.log
 
     echo "Execute cache:clean"
-    echo "Execute cache:clean" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Execute cache:clean" >> \${curdir}/HPS_Heartland.log
     php \${Magento2} cache:clean 2>> \${curdir}/HPS_Heartland.log
 
     echo "Execute module:enable HPS_Heartland"
@@ -258,30 +264,30 @@ if [ \${Magento2} ] ; then
     php \${Magento2} module:enable HPS_Heartland 2>> \${curdir}/HPS_Heartland.log
 
     echo "Executing setup:upgrade --keep-generated"
-    echo "Executing setup:upgrade --keep-generated" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Executing setup:upgrade --keep-generated" >> \${curdir}/HPS_Heartland.log
     php \${Magento2} setup:upgrade --keep-generated 2>> \${curdir}/HPS_Heartland.log
 
     echo "Executing setup:di:compile"
-    echo "Executing setup:di:compile" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Executing setup:di:compile" >> \${curdir}/HPS_Heartland.log
     php \${Magento2} setup:di:compile 2>> \${curdir}/HPS_Heartland.log
 
     echo "Executing setup:static-content:deploy"
-    echo "Executing setup:static-content:deploy" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Executing setup:static-content:deploy" >> \${curdir}/HPS_Heartland.log
     php \${Magento2} setup:static-content:deploy 2>> \${curdir}/HPS_Heartland.log
 
     echo "Done Installing HPS_Heartland"
-    echo "Done Installing HPS_Heartland" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Done Installing HPS_Heartland" >> \${curdir}/HPS_Heartland.log
 else
     echo "Sorry we could not automate the process of installing our HPS_Heartland plug-in"
-    echo "Sorry we could not automate the process of installing our HPS_Heartland plug-in" >> \${curdir}/HPS_Heartland.log
+    echo "[\$(date --rfc-3339=seconds)] - Sorry we could not automate the process of installing our HPS_Heartland plug-in" >> \${curdir}/HPS_Heartland.log
 
     echo "Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
-    echo "Please submit an issue https://github.com/hps/heartland-magento2-module/issues" >> \${curdir}/HPS_Heartland.log
-exit
+    echo "[\$(date --rfc-3339=seconds)] - Please submit an issue https://github.com/hps/heartland-magento2-module/issues" >> \${curdir}/HPS_Heartland.log
 fi
 echo Log file found in ${curdir}/HPS_Heartland.log
 php \${Magento2} -V
 php \${Magento2} info:adminuri
+echo "If you had issues, Please submit an issue https://github.com/hps/heartland-magento2-module/issues"
 BSH;
 unlink('HPS_Install.sh');
 unlink('HPS_Heartland.log');
