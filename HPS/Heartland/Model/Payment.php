@@ -229,7 +229,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // \HPS\Heartland\Model\Payment::chargeToken
         $response = $this->chargeToken( $chargeService, $suToken, $validCardHolder, $details, $amount);
         if (is_string($response)) {
-            throw new \Magento\Framework\Validator\Exception(__('Payment error.' . $response));
+            //throw new \Magento\Framework\Validator\Exception(__('Payment error.' . $response));
+            $this->log($response, 'COULD NOT PROCESS TRANSACTION!!');
         } else {
             // even if the MUPT save fails the transaction should still complete so we execute this step first
             // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
@@ -239,12 +240,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
             $this->log($response,'setStatus ');
             /** @var \Magento\Sales\Model\Order\Payment $payment */
-            $payment->setStatus($response->responseText)
-                ->setTransactionId($response->transactionId)
-                ->setIsTransactionClosed(false)
-                ->setCcLast4($CcL4)
-                ->setAdditionalInformation($response->authorizationCode)
-                ->setAmount($amount);
+            @$payment->setStatus($response->responseText);
+            $payment->setTransactionId($response->transactionId);
+            $payment->setIsTransactionClosed(false);
+            $payment->setCcLast4($CcL4);
+            $payment->setAdditionalInformation($response->authorizationCode);
+            $payment->setAmount($amount);
             if ($payment->isCaptureFinal($amount)) {
                 $payment->setShouldCloseParentTransaction(true);
             }
@@ -540,6 +541,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @return null
      */
     public function log($param, $txt = ''){
-        //return $this->_logger->log(100,$txt . print_r($param,true));
+         try {
+             getenv('MAGE_MODE') == 'developer' ? $this->_logger->log(100,$txt . print_r($param,true)):'';
+         }
+         catch(\Exception $e){
+         }
     }
 }
