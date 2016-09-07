@@ -147,7 +147,7 @@ if [ \${Magento2} ] ; then
 
     echo "Downloading HPS_Heartland from github"
     echo "[\$(date --rfc-3339=seconds)] - Downloading HPS_Heartland from github" >> \${curdir}/HPS_Heartland.log
-    git clone -b Magento-2-1-1-updates https://github.com/hps/heartland-magento2-module.git  2>> \${curdir}/HPS_Heartland.log
+    git clone -b Magento-2-1-1-scripted-installation https://github.com/hps/heartland-magento2-module.git  2>> \${curdir}/HPS_Heartland.log
 
     echo "Creating the Dir \${Magento2Base}/app/code "
     echo "[\$(date --rfc-3339=seconds)] - Creating the Dir \${Magento2Base}/app/code " >> \${curdir}/HPS_Heartland.log
