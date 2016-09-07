@@ -24,18 +24,7 @@ class InstallSchema implements InstallSchemaInterface
         // Check if the table already exists
         if ($installer->getConnection()->isTableExists($tableName) != true) {
 
-
-
-            /*we also need to get the vendor files to the correct location
-            Apparently Magento 2 will not copy files using composer unless its refered to in the root composer.json
-            or unless composer is run manually*/
-
-
-            $baseDir = \HPS\Heartland\Helper\Data::getRoot();
-            exec( 'cd ' . $baseDir . ' && composer require hps/heartland-php', $output);
-            /**/
-
-            // Create tutorial_simplenews table
+            //
             $table = $installer->getConnection()
                 ->newTable($tableName)
                 ->addColumn(
