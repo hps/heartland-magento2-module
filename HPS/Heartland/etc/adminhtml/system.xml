@@ -31,7 +31,7 @@
                     </field>
 
                     <group id="heartland_required" translate="label" showInDefault="1" showInWebsite="1" sortOrder="5">
-                        <comment><![CDATA[<a href="https://developer.heartlandpaymentsystems.com/SecureSubmit/Account/SignIn" target="_blank">Click here to sign up for SecureSubmit account]]></comment>
+                        <comment><![CDATA[<a href="https://developer.heartlandpaymentsystems.com/Account/Register" target="_blank">Click here to sign up for SecureSubmit account]]></comment>
                         <label>Heartland SecureSubmit Settings</label>
                         <attribute type="expanded">1</attribute>
                         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
