@@ -23,27 +23,23 @@ class StoredCard
      *
      * @return bool
      * @throws \Exception
-     */
+     */    
     public static function getToken($id){
         $MuToken = false;
-        //if( is_int($id) ){
-            if (Customer::isLoggedIn()) {
-                $conn = Db::db_connect();
-                $select = $conn->select()
-                    ->from(
-                        ['o' => 'hps_heartland_storedcard']
-                    )
-                    ->where('o.customer_id   = ?', (int) Customer::getCustID())
-                    ->where('o.storedcard_id = ?', (int) $id);
-                $data = (array) $conn->fetchAll($select);
-                self::validate($data);
-                if (count($data) && key_exists('token_value',$data[0])){
-                    $MuToken = $data[0]['token_value'];
-                }
-            }else{
-                throw new \Exception(__( 'No valid User Logged On!! Cannot get saved card.' ));
+        if (Customer::isLoggedIn()) {
+            $conn = Db::db_connect();
+            $select = $conn->select()
+                ->from(
+                    ['o' => 'hps_heartland_storedcard']
+                )
+                ->where('o.customer_id   = ?', (int)Customer::getCustID())
+                ->where('o.storedcard_id = ?', (int)$id);
+            $data = (array)$conn->fetchAll($select);
+            self::validate($data);
+            if (count($data) && key_exists('token_value', $data[0])) {
+                $MuToken = $data[0]['token_value'];
             }
-        //}
+        }
         return $MuToken;
     }
 
