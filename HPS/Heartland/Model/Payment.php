@@ -17,6 +17,7 @@ use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 use \HPS\Heartland\Helper\Data as HPS_DATA;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
+use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
 
 /**
  * Class Payment
@@ -30,7 +31,16 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      *
      */
     const CODE = 'hps_heartland';
-
+    /** Maps the HPS transaction type indicators to the Magento word strings
+     * @array $transactionTypeMap
+     */
+    protected $transactionTypeMap
+        = [\HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
+           \HpsTransactionType::CAPTURE   => Transaction::TYPE_ORDER,
+           \HpsTransactionType::CHARGE    => Transaction::TYPE_CAPTURE,
+           \HpsTransactionType::REFUND    => Transaction::TYPE_REFUND,
+           \HpsTransactionType::REVERSE   => Transaction::TYPE_VOID,
+           \HpsTransactionType::VOID      => Transaction::TYPE_VOID,];
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
@@ -343,7 +353,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
              * objects
              */
-            if ($action !== \HpsTransactionType::CHARGE) {
+            if ($action !== \HpsTransactionType::CAPTURE) {
                 $order = $payment->getOrder();
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
@@ -518,11 +528,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     public
     function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         $this->log(func_get_args(), 'HPS\Heartland\Model\Payment refund Method Called:  ');
-        $transactionId = $payment->getParentTransactionId();
-        $chargeService = $this->getHpsCreditService();
-        // \HpsCreditService::refund
-        $chargeService->refund($amount, 'usd', $transactionId);
-        $payment->setTransactionId($transactionId . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)->setParentTransactionId($transactionId)->setIsTransactionClosed(1)->setShouldCloseParentTransaction(1);
         $this->log('', 'HPS\Heartland\Model\Payment refund Method Called:  Done');
 
         return $this;
@@ -560,16 +565,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
          * @var null|float                                                                          $authAmount
          *
          */
-        $action          = null;
         $chargeService   = $this->getHpsCreditService();
         $errorMsg        = false;
         $validCardHolder = null;
         $authResponse    = null;
         $response        = null;
         $details         = null;
-        $currency        = null;
+        $currency        = HPS_DATA::getCurrencyCode();
         $authAmount      = null;
-        $cardData        = explode('-', $payment->getTransactionId())[0];
+        $cardData        = $payment->getParentTransactionId();
 
         try {
             switch ($action) {
@@ -590,6 +594,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                         = 'An error occured. ' . __FILE__ . ':' . __LINE__ . ' There is no method for action: ' . $action . '. not implemented';
 
             }
+
+            $transactionId = $payment->getParentTransactionId();
+            $chargeService = $this->getHpsCreditService();
+            // \HpsCreditService::refund
+            $chargeService->refund($amount, 'usd', $transactionId);
+            $payment->setTransactionId($transactionId . '-' . Transaction::TYPE_REFUND);
+            $payment->setParentTransactionId($transactionId);
+            $payment->setIsTransactionClosed(1);
+            $payment->setShouldCloseParentTransaction(1);
         }
         catch (\HpsInvalidRequestException $e) {
             $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
