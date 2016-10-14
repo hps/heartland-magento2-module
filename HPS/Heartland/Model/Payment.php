@@ -15,6 +15,8 @@ namespace HPS\Heartland\Model;
 
 use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 use \HPS\Heartland\Helper\Data as HPS_DATA;
+use \Magento\Framework\Exception\LocalizedException;
+use \Magento\Framework\Phrase;
 
 /**
  * Class Payment
@@ -252,7 +254,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      */
     public
     function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        //\Magento\Sales\Model\Order\Payment\Interceptor::getTransactionId
+        /**
+         * @var \Magento\Sales\Model\Order\Payment\Interceptor $payment
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
+         */
         $this->log($payment->getTransactionId(), 'TransactionID lookup Capture Method Called: ');
 
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
@@ -275,6 +280,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     function _payment(\Magento\Payment\Model\InfoInterface $payment, $amount, $action) {
 
 
+        /**
+         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address                                                  $order
+         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface|\Magento\Sales\Api\Data\OrderInterface $payment
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
+         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
+         */
         /*
          * initialize any locals
          */
@@ -332,8 +344,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
              * objects
              */
             if ($action !== \HpsTransactionType::CHARGE) {
+                $order = $payment->getOrder();
                 // \HpsCardHolder
-                $validCardHolder = $this->getHpsCardHolder($payment->getOrder()->getBillingAddress());
+                $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
                 // \HPS\Heartland\Model\Payment::$_token_value
                 $suToken
                     = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
@@ -411,16 +424,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                                                            : false);
                     break;
                 default:
-                    throw new \Magento\Framework\Exception\LocalizedException($action . ' not implemented');
+                    throw new LocalizedException(new Phrase(__($action . ' not implemented')));
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
-            // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
+
+            /**
+             * @method \Magento\Payment\Model\Method\AbstractMethod getInfoInstance()
+             * @var \Magento\Payment\Model\InfoInterface $info
+             *
+             */
             $info = $this->getInfoInstance();
             $CcL4 = $info->getCcNumber();
             //$this->log($payment,'$payment ');
 
             $this->log($response, 'setStatus ');
-            /** @var \Magento\Sales\Model\Order\Payment $payment */
             @$payment->setStatus($response->responseText);
             $payment->setTransactionId($response->transactionId);
             $payment->setIsTransactionClosed(false);
@@ -479,8 +496,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
             // \Psr\Log\LoggerInterface::error
             $this->_logger->error($response,
                                   'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
-            throw new \Magento\Framework\Exception\LocalizedException('Payment failure. Please contact site owner to
-            complete this transaction');
+            throw new LocalizedException(new Phrase(__('Payment failure. Please contact site owner to
+            complete this transaction')));
         }
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
 
@@ -505,16 +522,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
         $chargeService = $this->getHpsCreditService();
         // \HpsCreditService::refund
         $chargeService->refund($amount, 'usd', $transactionId);
-        $payment->setTransactionId($transactionId . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)
-            ->setParentTransactionId($transactionId)
-            ->setIsTransactionClosed(1)
-            ->setShouldCloseParentTransaction(1);
+        $payment->setTransactionId($transactionId . '-' . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND)->setParentTransactionId($transactionId)->setIsTransactionClosed(1)->setShouldCloseParentTransaction(1);
         $this->log('', 'HPS\Heartland\Model\Payment refund Method Called:  Done');
 
         return $this;
     }
 
-    public function void(\Magento\Payment\Model\InfoInterface $payment) {
+    public
+    function void(\Magento\Payment\Model\InfoInterface $payment) {
         return parent::void($payment); // TODO: Change the autogenerated stub
     }
 
@@ -522,32 +537,89 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     /** Process funds back to the consumer. this is the opposit of what \HPS\Heartland\Model\Payment::_payment does
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param null                                 $amount
-     * @param null                                 $newAmount
+     * @param null|float                           $amount
+     * @param null|float                           $newAmount
      */
-    private function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null){
-        $action = null;
-
-        /*
-         * initialize any locals
+    private
+    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null) {
+        /**
+         * @var  \HpsCreditCard|\HpsTokenData|int                                                   $cardData
+         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address           $order
+         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
+         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
+         * @var \HpsCreditService                                                                   $chargeService
+         * @var string                                                                              $errorMsg
+         * @var \HpsCardHolder|null                                                                 $validCardHolder
+         * @var \HpsReportTransactionDetails|null                                                   $authResponse
+         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                           $response
+         * @var null|\HpsTransactionDetails                                                         $details
+         * @var int                                                                                 $action
+         * @var string                                                                              $currency
+         * @var null|float                                                                          $authAmount
+         *
          */
-        /** @type string $errorMsg */
-        $errorMsg = false;
-        /** @type int $existingTransactionId */
-        $existingTransactionId = 0;
-        /** @type \HpsTokenData|null $suToken */
-        $suToken = null;
-        /** @type \HpsCardHolder|null $validCardHolder */
+        $action          = null;
+        $chargeService   = $this->getHpsCreditService();
+        $errorMsg        = false;
         $validCardHolder = null;
-        /** @type \HpsReportTransactionDetails|null $authResponse */
-        $authResponse = null;
-        /** @type \HpsAuthorization|\HpsCharge|\HpsReportTransactionDetails|null $response */
-        $response = null;
+        $authResponse    = null;
+        $response        = null;
+        $details         = null;
+        $currency        = null;
+        $authAmount      = null;
+        $cardData        = explode('-', $payment->getTransactionId())[0];
+
+        try {
+            switch ($action) {
+                case (\HpsTransactionType::VOID):
+                    $response = $chargeService->void($cardData);
+                    break;
+                case (\HpsTransactionType::REVERSE):
+                    $response = $chargeService->reverse($cardData, $amount, $currency, $details, $authAmount);
+                    break;
+                case (\HpsTransactionType::REFUND):
+                    $order           = $payment->getOrder();
+                    $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
+                    $response        = $chargeService->refund($amount, $currency, $cardData, $validCardHolder,
+                                                              $details);
+                    break;
+                default:
+                    $errorMsg
+                        = 'An error occured. ' . __FILE__ . ':' . __LINE__ . ' There is no method for action: ' . $action . '. not implemented';
+
+            }
+        }
+        catch (\HpsInvalidRequestException $e) {
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
+            ' . $e->getMessage();
+        }
+        catch (\HpsAuthenticationException $e) {
+            $errorMsg
+                = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
+                contact Heartland: ' . $e->getMessage();
+        }
+        catch (\HpsGatewayException $e) {
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
+                contact Heartland:  ' . $e->getMessage();
+        }
+        catch (\HpsException $e) {
+            $errorMsg
+                = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
+        }
+        if ($errorMsg) {
+            throw new LocalizedException(new Phrase(__($errorMsg)));
+        }
+
+        return $response;
+    }
+
+    private
+    function porticoTransaction() {
 
     }
-    private function porticoTransaction(){
 
-    }
     /**
      * Validate payment method information object
      *
