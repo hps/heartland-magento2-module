@@ -87,9 +87,13 @@ class Data extends AbstractHelper
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_DIRECTORY_LIST)->getRoot();
     }
     public static function getBaseUrl()    {
-        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();;
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();
     }
 
-
-
+    public static function getCurrencyCode() {
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getCurrentCurrency()->getCode();
+    }
 }
+
+
+
