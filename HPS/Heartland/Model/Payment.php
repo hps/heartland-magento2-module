@@ -46,7 +46,7 @@ class Payment
            \HpsTransactionType::CAPTURE   => Transaction::TYPE_ORDER,
            \HpsTransactionType::CHARGE    => Transaction::TYPE_CAPTURE,
            \HpsTransactionType::REFUND    => Transaction::TYPE_REFUND,
-           \HpsTransactionType::REVERSE   => Transaction::TYPE_VOID,
+           \HpsTransactionType::REVERSE   => Transaction::TYPE_REFUND,
            \HpsTransactionType::VOID      => Transaction::TYPE_VOID,];
     /**
      * @var \Magento\Framework\App\RequestInterface
@@ -651,7 +651,7 @@ class Payment
         $this->log($response, 'setStatus ');
         // magic method \Magento\Framework\DataObject::__call
         @$payment->setStatus($response->responseText);
-        $payment->setTransactionId($response->transactionId);
+        $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
         $payment->setIsTransactionClosed(false);
         $payment->setCcLast4($CcL4);
         $payment->setAdditionalInformation($response->authorizationCode);
