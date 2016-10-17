@@ -112,7 +112,7 @@ class Payment
     /**
      * @var array
      */
-    protected $_heartlandConfigFields
+    protected $_heartlandConfigFields 
         = ['developerId'   => '000000',
            'versionNumber' => '0000',];
 
@@ -171,7 +171,7 @@ class Payment
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
     }
-        
+
     /**
      * Performs an auth only which does not set the transaction to actually settle and charge a consumer card
      * See \HpsCreditService::authorize
