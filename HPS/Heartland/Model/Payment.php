@@ -550,6 +550,60 @@ class Payment
         return (int) $this->_save_token_value;
     }
 
+    /** returns additional_data element of paymentMethod
+     *
+     * @return array
+     */
+    private
+    function getAdditionalData()
+    {
+
+        static $data = [];
+        if (count($data) < 1) {
+            $data = (array) $this->getPaymentMethod();
+        }
+
+        return $this->elementFromArray($data, 'additional_data');
+    }
+
+    /** returns an element of associative array of data submitted via HTTP POST paymentMethod
+     *
+     * @return array
+     */
+    private
+    function getPaymentMethod()
+    {
+        /**
+         * @var array $data
+         * Holds submited JSOn data in a PHP associative array
+         */
+        static $data = [];
+        if (count($data) < 1) {
+            $data = (array) HPS_Data::jsonData();
+        }
+        $this->log($data, 'HPS\Heartland\Model\Payment getPaymentMethod Method Called:  ');
+
+        return $this->elementFromArray($data, 'paymentMethod');
+    }
+
+    /** evaluates if an element exists and returns it
+     *
+     * @param $data
+     * @param $element
+     *
+     * @return array
+     */
+    private
+    function elementFromArray($data, $element)
+    {
+        $r = [];
+        if (key_exists($element, $data)) {
+            $r = (array) $data[ $element ];
+        }
+
+        return $r;
+    }
+
     /**
      * @param \Magento\Sales\Api\Data\OrderAddressInterface|\Magento\Sales\Model\Order\Address|null $billing
      *
@@ -574,52 +628,6 @@ class Payment
         $cardHolder->email = trim(filter_var($billing->getEmail(), FILTER_SANITIZE_EMAIL));
 
         return $cardHolder;
-    }
-
-    /**
-     * this method sets the instance  \HpsTokenData::$tokenValue
-     * If the \HPS\Heartland\Model\Payment::$_token_value that is sent is an integer only then we assume it is a
-     * primary key for hps_heartland_storedcard and perform a lookup
-     *
-     * @param \HpsTokenData $suToken
-     *
-     * @return \HpsTokenData
-     *
-     * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
-     */
-    private
-    function getToken(\HpsTokenData $suToken)
-    {
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
-        $this->getTokenValue();
-        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
-            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
-        }
-        //First identify if we have a singleuse token in memory already
-        if (!$this->validateSuToken() && !$this->validateMuToken()) {
-            $this->_token_value = (string) '';
-        }
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
-
-        // \HPS\Heartland\Model\Payment::$_token_value
-        $suToken->tokenValue = $this->_token_value; //$this->getSuToken();// this just gets the passed token value
-        return $suToken;
-    }
-
-    /** returns additional_data element of paymentMethod
-     *
-     * @return array
-     */
-    private
-    function getAdditionalData()
-    {
-
-        static $data = [];
-        if (count($data) < 1) {
-            $data = (array) $this->getPaymentMethod();
-        }
-
-        return $this->elementFromArray($data, 'additional_data');
     }
 
     /**
@@ -666,6 +674,36 @@ class Payment
     }
 
     /**
+     * this method sets the instance  \HpsTokenData::$tokenValue
+     * If the \HPS\Heartland\Model\Payment::$_token_value that is sent is an integer only then we assume it is a
+     * primary key for hps_heartland_storedcard and perform a lookup
+     *
+     * @param \HpsTokenData $suToken
+     *
+     * @return \HpsTokenData
+     *
+     * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
+     */
+    private
+    function getToken(\HpsTokenData $suToken)
+    {
+        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
+        $this->getTokenValue();
+        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
+            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
+        }
+        //First identify if we have a singleuse token in memory already
+        if (!$this->validateSuToken() && !$this->validateMuToken()) {
+            $this->_token_value = (string) '';
+        }
+        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
+
+        // \HPS\Heartland\Model\Payment::$_token_value
+        $suToken->tokenValue = $this->_token_value; //$this->getSuToken();// this just gets the passed token value
+        return $suToken;
+    }
+
+    /**
      * gets/assigns $this->_token_value from post data
      */
     private
@@ -707,44 +745,6 @@ class Payment
     function validateMuToken()
     {
         return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);
-    }
-
-    /** returns an element of associative array of data submitted via HTTP POST paymentMethod
-     *
-     * @return array
-     */
-    private
-    function getPaymentMethod()
-    {
-        /**
-         * @var array $data
-         * Holds submited JSOn data in a PHP associative array
-         */
-        static $data = [];
-        if (count($data) < 1) {
-            $data = (array) HPS_Data::jsonData();
-        }
-        $this->log($data, 'HPS\Heartland\Model\Payment getPaymentMethod Method Called:  ');
-
-        return $this->elementFromArray($data, 'paymentMethod');
-    }
-
-    /** evaluates if an element exists and returns it
-     *
-     * @param $data
-     * @param $element
-     *
-     * @return array
-     */
-    private
-    function elementFromArray($data, $element)
-    {
-        $r = [];
-        if (key_exists($element, $data)) {
-            $r = (array) $data[ $element ];
-        }
-
-        return $r;
     }
 
     /**
