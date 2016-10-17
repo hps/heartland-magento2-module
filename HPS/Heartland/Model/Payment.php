@@ -24,6 +24,7 @@ use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
  * \HPS\Heartland\Model\Payment
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @package HPS\Heartland\Model
  */
 class Payment extends \Magento\Payment\Model\Method\Cc {
@@ -114,8 +115,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @var array
      */
     protected $_heartlandConfigFields
-        = ['developerId'             => '000000',
-           'versionNumber'            => '0000',];
+        = ['developerId'   => '000000',
+           'versionNumber' => '0000',];
 
     /**
      * Payment constructor.
@@ -172,12 +173,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Address $billing
+     * @param \Magento\Sales\Api\Data\OrderAddressInterface|\Magento\Sales\Model\Order\Address|null $billing
      *
      * @return \HpsCardHolder
      */
     private
-    function getHpsCardHolder(\Magento\Sales\Model\Order\Address $billing) {
+    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
         $cardHolder = new \HpsCardHolder();
 
         // \Magento\Sales\Model\Order\Address::getName
@@ -196,15 +197,16 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Address $billing
+     * @param \Magento\Sales\Api\Data\OrderAddressInterface|\Magento\Sales\Model\Order\Address|null $billing
      *
      * @return \HpsAddress
      */
     private
-    function getHpsAddress(\Magento\Sales\Model\Order\Address $billing) {
-        $address          = new \HpsAddress();
+    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
+        $address = new \HpsAddress();
+        // \Magento\Sales\Model\Order\Address::getStreetLine
         $address->address = $billing->getStreetLine(1) . ' ' . $billing->getStreetLine(2);
-        //\Magento\Sales\Model\Order\Address::getCity
+        // \Magento\Sales\Model\Order\Address::getCity
         $address->city = $billing->getCity();
         // \Magento\Sales\Model\Order\Address::getCity
         $address->state = $billing->getRegion();
@@ -225,8 +227,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * See \HpsCreditService::authorize
      * called by \Magento\Sales\Model\Order\Payment\Operations\AuthorizeOperation::authorize
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float                                $amount
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
+     * @param float                                                                               $amount
      *
      * @api
      * @return \HPS\Heartland\Model\Payment        $this
@@ -244,8 +246,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * potentially reduce any hold on the card over the amount of the capture and then \CreditService::capture
      * called by \Magento\Sales\Model\Order\Payment\Operations\CaptureOperation::capture
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float                                $amount
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
+     * @param float                                                                               $amount
      *
      * @api
      * @return \HPS\Heartland\Model\Payment        $this
@@ -253,10 +255,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      */
     public
     function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        /**
-         * @var \Magento\Sales\Model\Order\Payment\Interceptor $payment
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
-         */
         $this->log($payment->getTransactionId(), 'TransactionID lookup Capture Method Called: ');
 
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
@@ -267,95 +265,119 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * a transaction is constructed from the post data and the results are handled
      * the caller
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float                                $amount
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
+     * @param float                                                                               $requestedAmount
      *
-     * @param \HpsTransactionType|int              $action
+     * @param \HpsTransactionType|int                                                             $paymentAction
      *
      * @return \HPS\Heartland\Model\Payment        $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private
-    function _payment(\Magento\Payment\Model\InfoInterface $payment, $amount, $action) {
+    function _payment(\Magento\Payment\Model\InfoInterface $payment, $requestedAmount = 0.00, $paymentAction
+    = \HpsTransactionType::CHARGE) {
 
 
         /**
-         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address                                                  $order
-         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface|\Magento\Sales\Api\Data\OrderInterface $payment
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
-         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
+         * @var  \HpsCreditCard|\HpsTokenData|int                                         $parentPaymentID
+         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address $order
+         * @var \HpsCreditService                                                         $chargeService
+         * @var string                                                                    $errorMsg
+         * @var \HpsCardHolder|null                                                       $validCardHolder
+         * @var \HpsReportTransactionDetails|null                                         $reportTxnDetail
+         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                 $response
+         * @var null|\HpsTransactionDetails                                               $details
+         * @var int                                                                       $paymentAction
+         * @var string                                                                    $currency
+         * @var null|float                                                                $authAmount
+         *
          */
-        /*
-         * initialize any locals
-         */
-        /** @type string $errorMsg */
-        $errorMsg = false;
-        /** @type int $existingTransactionId */
-        $existingTransactionId = 0;
-        /** @type \HpsTokenData|null $suToken */
-        $suToken = null;
-        /** @type \HpsCardHolder|null $validCardHolder */
-        $validCardHolder = null;
-        /** @type \HpsReportTransactionDetails|null $authResponse */
-        $authResponse = null;
-        /** @type \HpsAuthorization|\HpsCharge|\HpsReportTransactionDetails|null $response */
-        $response = null;
-
         try {
 
 
+            $chargeService   = $this->getHpsCreditService();
+            $errorMsg        = false;
+            $validCardHolder = null;
+            $reportTxnDetail = null;
+            $response        = null;
+            $details         = null;
+            $currency        = HPS_DATA::getCurrencyCode();
+            $authAmount      = null;
+            /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
+             * transaction
+             * ID */
+            $parentPaymentID = $payment->getParentTransactionId();
+            $suToken         = null;
+            $validCardHolder = null;
+            $reportTxnDetail = null;
+            $response        = null;
+            $canSaveToken    = $this->saveMuToken()
+                ? true
+                : false;
+
             $this->log(func_num_args(), 'HPS\Heartland\Model\Payment Capture Method Called: ');
-            $chargeService = $this->getHpsCreditService();
 
             /*
              * The below logic serves to determine if we need to authorise and capture or just add the transaction to
              *  the batch
              */
-            if ($action === \HpsTransactionType::CHARGE) {
 
-                $existingTransactionId = explode('-', $payment->getTransactionId())[0];
+            if ($parentPaymentID && is_integer($parentPaymentID)) {
+                $reportTxnDetail = $chargeService->get($parentPaymentID);
+                if ($paymentAction === \HpsTransactionType::CHARGE) {
 
-                if ($existingTransactionId && is_integer($existingTransactionId)) {
-
-                    $authResponse = $chargeService->get($existingTransactionId);
-
-                    if ($authResponse->transactionStatus != 'A'
-                        || $amount > $authResponse->authorizedAmount
-                        || $authResponse->transactionType !== \HpsTransactionType::AUTHORIZE
+                    if ($reportTxnDetail->transactionStatus != 'A'
+                        || $requestedAmount > $reportTxnDetail->authorizedAmount
+                        || $reportTxnDetail->transactionType !== \HpsTransactionType::AUTHORIZE
                     ) {
-
                         // new auth is requred
                         throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be captured. The amount is either larger than Authorized (%s) or
                     the authorisation for this transaction is no longer valid. A new authorisation is required',
-                                                                                     $existingTransactionId,
-                                                                                     $authResponse->authorizedAmount));
+                                                                                     $parentPaymentID,
+                                                                                     $reportTxnDetail->authorizedAmount));
                     } // validated acceptable authorization
-
                     // set to do a capture
-                    $action = \HpsTransactionType::CAPTURE;
-                }// end of verifying that we have something that looks like  transaction ID to use
+                    $paymentAction = \HpsTransactionType::CAPTURE;
+                }
+                if ($paymentAction === \HpsTransactionType::VOID) {
 
-            }
+                    if ($reportTxnDetail->transactionStatus != 'A'
+                        || $requestedAmount > $reportTxnDetail->settlementAmount
+                        || $reportTxnDetail->transactionType !== \HpsTransactionType::AUTHORIZE
+                    ) {
+                        // new auth is requred
+                        throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be captured. The amount is either larger than Authorized (%s) or
+                    the authorisation for this transaction is no longer valid. A new authorisation is required',
+                                                                                     $parentPaymentID,
+                                                                                     $reportTxnDetail->authorizedAmount));
+                    } // validated acceptable authorization
+                    // set to do a capture
+                    $paymentAction = \HpsTransactionType::CAPTURE;
+                }
+            }// end of verifying that we have something that looks like  transaction ID to use
 
             /*
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
              * objects
              */
-            if ($action !== \HpsTransactionType::CAPTURE) {
+            if ($paymentAction === \HpsTransactionType::AUTHORIZE
+                || $paymentAction === \HpsTransactionType::CAPTURE
+                || $paymentAction === \HpsTransactionType::REFUND
+            ) {
                 $order = $payment->getOrder();
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
-                // \HPS\Heartland\Model\Payment::$_token_value
-                $suToken
-                    = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
-                // \HPS\Heartland\Model\Payment::chargeToken
+                if ($paymentAction !== \HpsTransactionType::REFUND) {
+                    // \HPS\Heartland\Model\Payment::$_token_value
+                    $suToken
+                        = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
+                }
             }
- 
+
             /*
              * execute the portic messages related to the specified action
              */
-            switch ($action) {
+            switch ($paymentAction) {
                 /*
                  * \HpsTransactionType::AUTHORIZE places a hold on the card and requests an approval from the Card
                  * Issuer
@@ -368,12 +390,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  * the typical use case for this transaction is if a product is ordered and not immediately shipped
                  */
                 case (\HpsTransactionType::AUTHORIZE): // Portico CreditAuth \HpsTransactionType::AUTHORIZE
-                    //authorize($amount, $currency, $cardOrToken, $cardHolder = null, $requestMultiUseToken = false, $details = null, $txnDescriptor = null, $allowPartialAuth = false, $cpcReq = false)
-                    $response = $chargeService->authorize(\HpsInputValidation::checkAmount($amount),
-                                                          HPS_DATA::getCurrencyCode(), $suToken, $validCardHolder,
-                                                          $this->saveMuToken()
-                                                              ? true
-                                                              : false);
+                    $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount), $currency,
+                                                          $suToken, $validCardHolder, $canSaveToken);
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -382,16 +400,16 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  * NOTE::: Only one capture is supported  on an authorisation. by our gateway. a new authorization
                  * will be necesary for follow up partial captures
                  */
-                case (\HpsTransactionType::CAPTURE):
+                case (\HpsTransactionType::CAPTURE): // Portico CreditAddtoBatch \HpsTransactionType::CAPTURE
                     /*
                      * reduce the \HpsAuthorization::$authorizedAmount HpsReversal if \HpsAuthorization::$authorizedAmount is greator than \HPS\Heartland\Model\amount
                      *
                      */
                     try {
-                        if (\HpsInputValidation::checkAmount($authResponse->authorizedAmount) > \HpsInputValidation::checkAmount($amount)) {
-                            $chargeService->reverse($existingTransactionId,
-                                                    \HpsInputValidation::checkAmount($authResponse->authorizedAmount),
-                                                    HPS_DATA::getCurrencyCode(), null, $amount);
+                        if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) > \HpsInputValidation::checkAmount($requestedAmount)) {
+                            $chargeService->reverse($parentPaymentID,
+                                                    \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
+                                                    HPS_DATA::getCurrencyCode(), null, $requestedAmount);
                         }
                     }
                     catch (\Exception $e) {
@@ -402,7 +420,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                     /*
                      * Capture the sale
                      */
-                    $response = $chargeService->capture($existingTransactionId, $amount);
+                    $response = $chargeService->capture($parentPaymentID, $requestedAmount);
 
                     /*
                      * at this stage if additional captures are needed  new authorizations are required
@@ -416,34 +434,45 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  * Digital media sales which are immediately delivered are an ideal use case for this transaction
                  */
                 case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
-                    $response = $chargeService->charge(\HpsInputValidation::checkAmount($amount),
+                    $response = $chargeService->charge(\HpsInputValidation::checkAmount($requestedAmount),
                                                        HPS_DATA::getCurrencyCode(), $suToken, $validCardHolder,
-                                                       $this->saveMuToken()
-                                                           ? true
-                                                           : false);
+                                                       $canSaveToken);
+                    break;
+                /**
+                 * Reverses the full amount and removes any related capture from the batch*/
+                case (\HpsTransactionType::VOID): // Portico CreditVoid \HpsTransactionType::VOID
+                    $response = $chargeService->void($parentPaymentID);
+                    break;
+                case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
+                    $response = $chargeService->reverse($parentPaymentID, $requestedAmount, $currency, $details,
+                                                        $authAmount);
+                    break;
+                case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
+                    $response = $chargeService->refund($requestedAmount, $currency, $parentPaymentID, $validCardHolder,
+                                                       $details);
                     break;
                 default:
-                    throw new LocalizedException(new Phrase(__($action . ' not implemented')));
+                    throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
 
-            /**
-             * @method \Magento\Payment\Model\Method\AbstractMethod getInfoInstance()
-             * @var \Magento\Payment\Model\InfoInterface $info
-             *
-             */
+            // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
             $info = $this->getInfoInstance();
+            // magic method \Magento\Framework\DataObject::__call
             $CcL4 = $info->getCcNumber();
             //$this->log($payment,'$payment ');
 
             $this->log($response, 'setStatus ');
+            // magic method \Magento\Framework\DataObject::__call
             @$payment->setStatus($response->responseText);
             $payment->setTransactionId($response->transactionId);
             $payment->setIsTransactionClosed(false);
             $payment->setCcLast4($CcL4);
             $payment->setAdditionalInformation($response->authorizationCode);
-            $payment->setAmount($amount);
-            if ($payment->isCaptureFinal($amount)) {
+
+            // magic method \Magento\Framework\DataObject::__call
+            $payment->setAmount($requestedAmount);
+            if ($payment->isCaptureFinal($requestedAmount)) {
                 $payment->setShouldCloseParentTransaction(true);
             }
             if (isset($suToken->tokenValue)) {
@@ -455,7 +484,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                 ->setTransactionId($response->transactionId)
                 ->setIsTransactionClosed(0);*/
             try {
-                if (((bool) $this->saveMuToken()) && isset($response->tokenData) && $response->tokenData->tokenValue) {
+                if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
                     // \HPS\Heartland\Model\StoredCard::setStoredCards
                     HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue, strtolower($info->getCcType()),
                                                      $CcL4, $this->getAdditionalData()['cc_exp_month'],
