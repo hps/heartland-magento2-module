@@ -28,7 +28,8 @@ use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @package HPS\Heartland\Model
  */
-class Payment extends \Magento\Payment\Model\Method\Cc {
+class Payment
+    extends \Magento\Payment\Model\Method\Cc {
     /**
      *
      */
@@ -132,7 +133,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @param array                                                $data
      */
     public
-    function __construct(\Magento\Framework\Model\Context $context, \Magento\Framework\Registry $registry,
+    function __construct(\Magento\Framework\Model\Context $context,
+                         \Magento\Framework\Registry $registry,
                          \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
                          \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
                          \Magento\Payment\Helper\Data $paymentData,
@@ -140,10 +142,22 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                          \Magento\Payment\Model\Method\Logger $logger,
                          \Magento\Framework\Module\ModuleListInterface $moduleList,
                          \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-                         \Magento\Directory\Model\CountryFactory $countryFactory, \HpsServicesConfig $config,
-                         array $data = array()) {
-        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig,
-                            $logger, $moduleList, $localeDate, null, null, $data);
+                         \Magento\Directory\Model\CountryFactory $countryFactory,
+                         \HpsServicesConfig $config,
+                         array $data = [])
+    {
+        parent::__construct($context,
+                            $registry,
+                            $extensionFactory,
+                            $customAttributeFactory,
+                            $paymentData,
+                            $scopeConfig,
+                            $logger,
+                            $moduleList,
+                            $localeDate,
+                            null,
+                            null,
+                            $data);
         // \HPS\Heartland\Model\countryFactory
         // \HPS\Heartland\Model\Payment::$_countryFactory
         $this->_countryFactory = $countryFactory;
@@ -171,7 +185,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public
-    function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->log($payment->getTransactionId(), 'TID Auth Method Called: ');
 
         return $this->_payment($payment, $amount, \HpsTransactionType::AUTHORIZE);
@@ -187,7 +202,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @return null
      */
     private
-    function log($param, $txt = '') {
+    function log($param, $txt = '')
+    {
         try {
             getenv('MAGE_MODE') == 'developer'
                 ? $this->_logger->log(100, $txt . print_r($param, true))
@@ -212,8 +228,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private
-    function _payment(\Magento\Payment\Model\InfoInterface $payment, $requestedAmount = 0.00, $paymentAction
-    = \HpsTransactionType::CHARGE) {
+    function _payment(\Magento\Payment\Model\InfoInterface $payment,
+                      $requestedAmount = 0.00,
+                      $paymentAction
+                      = \HpsTransactionType::CHARGE)
+    {
 
         // Sanitize
         $requestedAmount = \HpsInputValidation::checkAmount($requestedAmount);
@@ -286,7 +305,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                         // new auth is requred
                         throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be
                         Voided. The amount is either larger than Authorized ("%s") or the authorisation for this
-                        transaction is no longer Active. ', $parentPaymentID, $reportTxnDetail->authorizedAmount));
+                        transaction is no longer Active. ',
+                                                                                     $parentPaymentID,
+                                                                                     $reportTxnDetail->authorizedAmount));
                     } // validated acceptable authorization
 
                     // refunds are only appropriate if the transaction is no longer active
@@ -337,8 +358,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  * the typical use case for this transaction is if a product is ordered and not immediately shipped
                  */
                 case (\HpsTransactionType::AUTHORIZE): // Portico CreditAuth \HpsTransactionType::AUTHORIZE
-                    $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount), $currency,
-                                                          $suToken, $validCardHolder, $canSaveToken);
+                    $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount),
+                                                          $currency,
+                                                          $suToken,
+                                                          $validCardHolder,
+                                                          $canSaveToken);
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -356,11 +380,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                         if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) > \HpsInputValidation::checkAmount($requestedAmount)) {
                             $chargeService->reverse($parentPaymentID,
                                                     \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
-                                                    HPS_DATA::getCurrencyCode(), null, $requestedAmount);
+                                                    HPS_DATA::getCurrencyCode(),
+                                                    null,
+                                                    $requestedAmount);
                         }
                     }
                     catch (\Exception $e) {
-                        $this->log($e->getCode(), 'Reversal error. Logged only the capture proceeded normally
+                        $this->log($e->getCode(),
+                                   'Reversal error. Logged only the capture proceeded normally
                         unless an error was generated by that call: ' . $e->getMessage());
 
                     }
@@ -382,7 +409,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  */
                 case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
                     $response = $chargeService->charge(\HpsInputValidation::checkAmount($requestedAmount),
-                                                       HPS_DATA::getCurrencyCode(), $suToken, $validCardHolder,
+                                                       HPS_DATA::getCurrencyCode(),
+                                                       $suToken,
+                                                       $validCardHolder,
                                                        $canSaveToken);
                     break;
                 /**
@@ -392,11 +421,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                     break;
                 case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
                     $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
-                    $response      = $chargeService->reverse($parentPaymentID, $requestedAmount, $currency, $details,
+                    $response      = $chargeService->reverse($parentPaymentID,
+                                                             $requestedAmount,
+                                                             $currency,
+                                                             $details,
                                                              $newAuthAmount);
                     break;
                 case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
-                    $response = $chargeService->refund($requestedAmount, $currency, $parentPaymentID, $validCardHolder,
+                    $response = $chargeService->refund($requestedAmount,
+                                                       $currency,
+                                                       $parentPaymentID,
+                                                       $validCardHolder,
                                                        $details);
                     break;
                 default:
@@ -434,8 +469,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
             try {
                 if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
                     // \HPS\Heartland\Model\StoredCard::setStoredCards
-                    HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue, strtolower($info->getCcType()),
-                                                     $CcL4, $this->getAdditionalData()['cc_exp_month'],
+                    HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
+                                                     strtolower($info->getCcType()),
+                                                     $CcL4,
+                                                     $this->getAdditionalData()['cc_exp_month'],
                                                      $this->getAdditionalData()['cc_exp_year']);
                 }/**/
             }
@@ -485,7 +522,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @return \HpsCreditService
      */
     private
-    function getHpsCreditService() {
+    function getHpsCreditService()
+    {
         // \HPS\Heartland\Model\Payment::$_heartlandApi
         // \HpsCreditService::__construct
         return new \HpsCreditService($this->_heartlandApi);
@@ -500,7 +538,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      *
      */
     private
-    function saveMuToken() {
+    function saveMuToken()
+    {
         $data                    = $this->getAdditionalData();
         $this->_save_token_value = 0;
         if (array_key_exists('_save_token_value', $data)) {
@@ -511,12 +550,69 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
         return (int) $this->_save_token_value;
     }
 
+    /**
+     * @param \Magento\Sales\Api\Data\OrderAddressInterface|\Magento\Sales\Model\Order\Address|null $billing
+     *
+     * @return \HpsCardHolder
+     */
+    private
+    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
+    {
+        $cardHolder = new \HpsCardHolder();
+        // \Magento\Sales\Model\Order\Address::getName
+        //$splitName = explode(' ', $billing->getName());
+        // \HpsConsumer::$firstName
+        $cardHolder->firstName = $this->__sanitize($billing->getFirstname());
+        // \HpsConsumer::$lastName
+        $cardHolder->lastName = $this->__sanitize($billing->getLastname());
+        // \HpsConsumer::$address
+        $cardHolder->address = $this->getHpsAddress($billing);
+        // \Magento\Sales\Model\Order\Address::getTelephone
+        // \HpsConsumer::$phone
+        $cardHolder->phone = \HpsInputValidation::cleanPhoneNumber($billing->getTelephone());
+
+        $cardHolder->email = trim(filter_var($billing->getEmail(), FILTER_SANITIZE_EMAIL));
+
+        return $cardHolder;
+    }
+
+    /**
+     * this method sets the instance  \HpsTokenData::$tokenValue
+     * If the \HPS\Heartland\Model\Payment::$_token_value that is sent is an integer only then we assume it is a
+     * primary key for hps_heartland_storedcard and perform a lookup
+     *
+     * @param \HpsTokenData $suToken
+     *
+     * @return \HpsTokenData
+     *
+     * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
+     */
+    private
+    function getToken(\HpsTokenData $suToken)
+    {
+        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
+        $this->getTokenValue();
+        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
+            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
+        }
+        //First identify if we have a singleuse token in memory already
+        if (!$this->validateSuToken() && !$this->validateMuToken()) {
+            $this->_token_value = (string) '';
+        }
+        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
+
+        // \HPS\Heartland\Model\Payment::$_token_value
+        $suToken->tokenValue = $this->_token_value; //$this->getSuToken();// this just gets the passed token value
+        return $suToken;
+    }
+
     /** returns additional_data element of paymentMethod
      *
      * @return array
      */
     private
-    function getAdditionalData() {
+    function getAdditionalData()
+    {
 
         static $data = [];
         if (count($data) < 1) {
@@ -526,12 +622,100 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
         return $this->elementFromArray($data, 'additional_data');
     }
 
+    /**
+     * Takes anything presented strips begining and ending whitespace and returns only string with no special characters
+     *
+     * @param $data
+     *
+     * @return string
+     */
+    private
+    function __sanitize($data)
+    {
+        return trim(filter_var(@print_r($data, true), FILTER_SANITIZE_STRING));
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
+     *
+     * @return \HpsAddress
+     */
+    private
+    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
+    {
+        $address = new \HpsAddress();
+        // \Magento\Sales\Model\Order\Address::getStreetLine
+        /** @var \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
+         * @method  \Magento\Sales\Model\Order\Address getStreetLine($number) */
+        $address->address
+            = $this->__sanitize(implode(' ', $billing->getStreet()));
+        // \Magento\Sales\Model\Order\Address::getCity
+        $address->city = $this->__sanitize($billing->getCity());
+        // \Magento\Sales\Model\Order\Address::getCity
+        $address->state = $this->__sanitize($billing->getRegion());
+        // \Magento\Sales\Model\Order\Address::getPostcode
+        $address->zip = \HpsInputValidation::cleanZipCode($billing->getPostcode());
+        // \HPS\Heartland\Model\Payment::$_countryFactory
+        // \Magento\Directory\Model\CountryFactory::create
+        // \Magento\Directory\Model\Country::loadByCode
+        // \Magento\Sales\Model\Order\Address::getCountryId
+        // \Magento\Directory\Model\Country::getName
+        $address->country = $this->_countryFactory->create()->loadByCode($billing->getCountryId())->getName();
+
+        return $address;
+    }
+
+    /**
+     * gets/assigns $this->_token_value from post data
+     */
+    private
+    function getTokenValue()
+    {
+        static $data = [];
+        if (count($data) < 1) {
+            $data = (array) $this->getAdditionalData();
+        }
+        $r = '';
+        if (key_exists('token_value', $data)) {
+            $r = (string) $data['token_value'];
+        }
+        // ensure that the string is clean and has not leading or trailing whitespace
+        $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
+    }
+
+    /**
+     * Performs regex based validation on the single-use token
+     *
+     * @return bool
+     */
+    private
+    function validateSuToken()
+    {
+        return (bool) (preg_match('/^su[\w]{5,253}$/',
+                                  (string) $this->_token_value) === 1); //supt_5EvfbSaBCj9r9HLlP3CauZ5t
+    }
+
+    /**
+     * Just verifies the current token is not blank
+     * multi-use tokens are always non blank strings
+     * these get stored in hps_heartland_storedcard
+     * by app/code/HPS/Heartland/Model/StoredCard.php
+     *
+     * @return bool
+     */
+    private
+    function validateMuToken()
+    {
+        return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);
+    }
+
     /** returns an element of associative array of data submitted via HTTP POST paymentMethod
      *
      * @return array
      */
     private
-    function getPaymentMethod() {
+    function getPaymentMethod()
+    {
         /**
          * @var array $data
          * Holds submited JSOn data in a PHP associative array
@@ -553,7 +737,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @return array
      */
     private
-    function elementFromArray($data, $element) {
+    function elementFromArray($data, $element)
+    {
         $r = [];
         if (key_exists($element, $data)) {
             $r = (array) $data[ $element ];
@@ -563,139 +748,18 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     }
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderAddressInterface|\Magento\Sales\Model\Order\Address|null $billing
-     *
-     * @return \HpsCardHolder
-     */
-    private
-    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
-        $cardHolder = new \HpsCardHolder();
-        // \Magento\Sales\Model\Order\Address::getName
-        //$splitName = explode(' ', $billing->getName());
-        // \HpsConsumer::$firstName
-        $cardHolder->firstName = $this->__sanitize($billing->getFirstname());
-        // \HpsConsumer::$lastName
-        $cardHolder->lastName = $this->__sanitize($billing->getLastname());
-        // \HpsConsumer::$address
-        $cardHolder->address = $this->getHpsAddress($billing);
-        // \Magento\Sales\Model\Order\Address::getTelephone
-        // \HpsConsumer::$phone
-        $cardHolder->phone = \HpsInputValidation::cleanPhoneNumber($billing->getTelephone());
-
-        $cardHolder->email = trim(filter_var($billing->getEmail(), FILTER_SANITIZE_EMAIL));
-
-        return $cardHolder;
-    }
-
-    /**
-     * Takes anything presented strips begining and ending whitespace and returns only string with no special characters
-     *
-     * @param $data
-     *
-     * @return string
-     */
-    private
-    function __sanitize($data) {
-        return trim(filter_var(@print_r($data, true), FILTER_SANITIZE_STRING));
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
-     *
-     * @return \HpsAddress
-     */
-    private
-    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
-        $address = new \HpsAddress();
-        // \Magento\Sales\Model\Order\Address::getStreetLine
-        /** @var \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
-         * @method  \Magento\Sales\Model\Order\Address getStreetLine($number) */
-        $address->address
-            = $this->__sanitize(implode(' ',$billing->getStreet()));
-        // \Magento\Sales\Model\Order\Address::getCity
-        $address->city = $this->__sanitize($billing->getCity());
-        // \Magento\Sales\Model\Order\Address::getCity
-        $address->state = $this->__sanitize($billing->getRegion());
-        // \Magento\Sales\Model\Order\Address::getPostcode
-        $address->zip = \HpsInputValidation::cleanZipCode($billing->getPostcode());
-        // \HPS\Heartland\Model\Payment::$_countryFactory
-        // \Magento\Directory\Model\CountryFactory::create
-        // \Magento\Directory\Model\Country::loadByCode
-        // \Magento\Sales\Model\Order\Address::getCountryId
-        // \Magento\Directory\Model\Country::getName
-        $address->country = $this->_countryFactory->create()->loadByCode($billing->getCountryId())->getName();
-
-        return $address;
-    }
-
-    /**
-     * this method sets the instance  \HpsTokenData::$tokenValue
-     * If the \HPS\Heartland\Model\Payment::$_token_value that is sent is an integer only then we assume it is a
-     * primary key for hps_heartland_storedcard and perform a lookup
-     *
-     * @param \HpsTokenData $suToken
-     *
-     * @return \HpsTokenData
-     *
-     * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
-     */
-    private
-    function getToken(\HpsTokenData $suToken) {
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
-        $this->getTokenValue();
-        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
-            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
-        }
-        //First identify if we have a singleuse token in memory already
-        if (!$this->validateSuToken() && !$this->validateMuToken()) {
-            $this->_token_value = (string) '';
-        }
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
-
-        // \HPS\Heartland\Model\Payment::$_token_value
-        $suToken->tokenValue = $this->_token_value; //$this->getSuToken();// this just gets the passed token value
-        return $suToken;
-    }
-
-    /**
-     * gets/assigns $this->_token_value from post data
-     */
-    private
-    function getTokenValue() {
-        static $data = [];
-        if (count($data) < 1) {
-            $data = (array) $this->getAdditionalData();
-        }
-        $r = '';
-        if (key_exists('token_value', $data)) {
-            $r = (string) $data['token_value'];
-        }
-        // ensure that the string is clean and has not leading or trailing whitespace
-        $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
-    }
-
-    /**
-     * Performs regex based validation on the single-use token
+     * @param string $currencyCode
      *
      * @return bool
      */
-    private
-    function validateSuToken() {
-        return (bool) (preg_match('/^su[\w]{5,253}$/',
-                                  (string) $this->_token_value) === 1); //supt_5EvfbSaBCj9r9HLlP3CauZ5t
-    }
+    public
+    function canUseForCurrency($currencyCode)
+    {
+        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
+            return false;
+        }
 
-    /**
-     * Just verifies the current token is not blank
-     * multi-use tokens are always non blank strings
-     * these get stored in hps_heartland_storedcard
-     * by app/code/HPS/Heartland/Model/StoredCard.php
-     *
-     * @return bool
-     */
-    private
-    function validateMuToken() {
-        return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);
+        return true;
     }
 
     /**
@@ -711,10 +775,26 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public
-    function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->log($payment->getTransactionId(), 'TransactionID lookup Capture Method Called: ');
 
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface|null $quote
+     *
+     * @return bool
+     */
+    public
+    function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    {
+        if (!$this->getConfigData('private_key')) {
+            return false;
+        }
+
+        return parent::isAvailable($quote);
     }
 
     /**
@@ -727,16 +807,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @return \HPS\Heartland\Model\Payment         $this
      */
     public
-    function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->log(func_get_args(), 'HPS\Heartland\Model\Payment refund Method Called:  ');
         $this->log('', 'HPS\Heartland\Model\Payment refund Method Called:  Done');
 
         return $this;
-    }
-
-    public
-    function void(\Magento\Payment\Model\InfoInterface $payment) {
-        return parent::void($payment); // TODO: Change the autogenerated stub
     }
 
     /**
@@ -748,7 +824,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public
-    function validate() {
+    function validate()
+    {
         // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
         $this->log('validate', '\HPS\Heartland\Model\Payment::validate');
         $info     = $this->getInfoInstance();
@@ -759,11 +836,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
-        $ccTypeConversion = array('visa'       => 'VI',
-                                  'mastercard' => 'MC',
-                                  'amex'       => 'AE',
-                                  'discover'   => 'DI',
-                                  'jcb'        => 'JCB',);
+        $ccTypeConversion = ['visa'       => 'VI',
+                             'mastercard' => 'MC',
+                             'amex'       => 'AE',
+                             'discover'   => 'DI',
+                             'jcb'        => 'JCB',];
         $this->log(strtolower($info->getCcType()), '\HPS\Heartland\Model\Payment::validate ');
         $this->log(strtolower($info->getCcType()), 'CCtype ');
         if (in_array($ccTypeConversion[ strtolower($info->getCcType()) ], $availableTypes)) {
@@ -801,36 +878,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @return bool
      */
     public
-    function validateCcNum($ccNumber) { // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
+    function validateCcNum($ccNumber)
+    { // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
         return preg_match('/^[\d]{4}$/', $ccNumber) === 1;
     }
 
-    /**
-     * @param \Magento\Quote\Api\Data\CartInterface|null $quote
-     *
-     * @return bool
-     */
     public
-    function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null) {
-        if (!$this->getConfigData('private_key')) {
-            return false;
-        }
-
-        return parent::isAvailable($quote);
-    }
-
-    /**
-     * @param string $currencyCode
-     *
-     * @return bool
-     */
-    public
-    function canUseForCurrency($currencyCode) {
-        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-            return false;
-        }
-
-        return true;
+    function void(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        return parent::void($payment); // TODO: Change the autogenerated stub
     }
 
     /** Process funds back to the consumer. this is the opposit of what \HPS\Heartland\Model\Payment::_payment does
@@ -840,7 +896,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @param null|float                           $newAmount
      */
     private
-    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null) {
+    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null)
+    {
         /**
          * @var  \HpsCreditCard|\HpsTokenData|int                                                   $cardData
          * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address           $order
@@ -880,7 +937,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                 case (\HpsTransactionType::REFUND):
                     $order           = $payment->getOrder();
                     $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
-                    $response        = $chargeService->refund($amount, $currency, $cardData, $validCardHolder,
+                    $response        = $chargeService->refund($amount,
+                                                              $currency,
+                                                              $cardData,
+                                                              $validCardHolder,
                                                               $details);
                     break;
                 default:
@@ -923,12 +983,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
     }
 
     private
-    function porticoTransaction() {
+    function porticoTransaction()
+    {
 
     }
 
     private
-    function userNotification() {
+    function userNotification()
+    {
 
     }
 }
