@@ -289,7 +289,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
          * @var null|\HpsTransactionDetails                                               $details
          * @var int                                                                       $paymentAction
          * @var string                                                                    $currency
-         * @var null|float                                                                $authAmount
+         * @var null|float                                                                $newAuthAmount
          *
          */
         try {
@@ -302,7 +302,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
             $response        = null;
             $details         = null;
             $currency        = HPS_DATA::getCurrencyCode();
-            $authAmount      = null;
+            $newAuthAmount      = null;
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
@@ -343,16 +343,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
                     if ($reportTxnDetail->transactionStatus != 'A'
                         || $requestedAmount > $reportTxnDetail->settlementAmount
-                        || $reportTxnDetail->transactionType !== \HpsTransactionType::AUTHORIZE
                     ) {
                         // new auth is requred
-                        throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be captured. The amount is either larger than Authorized (%s) or
-                    the authorisation for this transaction is no longer valid. A new authorisation is required',
-                                                                                     $parentPaymentID,
-                                                                                     $reportTxnDetail->authorizedAmount));
+                        throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be
+                        Voided. The amount is either larger than Authorized ("%s") or the authorisation for this
+                        transaction is no longer Active. ', $parentPaymentID, $reportTxnDetail->authorizedAmount));
                     } // validated acceptable authorization
-                    // set to do a capture
-                    $paymentAction = \HpsTransactionType::CAPTURE;
+
+                    if ($requestedAmount < $reportTxnDetail->settlementAmount) {
+                        $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
+                        $paymentAction = \HpsTransactionType::REVERSE;
+                    }
                 }
             }// end of verifying that we have something that looks like  transaction ID to use
 
@@ -445,7 +446,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                     break;
                 case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
                     $response = $chargeService->reverse($parentPaymentID, $requestedAmount, $currency, $details,
-                                                        $authAmount);
+                                                        $newAuthAmount);
                     break;
                 case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
                     $response = $chargeService->refund($requestedAmount, $currency, $parentPaymentID, $validCardHolder,
