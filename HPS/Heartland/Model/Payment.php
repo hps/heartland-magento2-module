@@ -116,98 +116,6 @@ class Payment
         = ['developerId'   => '000000',
            'versionNumber' => '0000',];
 
-    /** Process funds back to the consumer. this is the opposit of what \HPS\Heartland\Model\Payment::_payment does
-     *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param null|float                           $amount
-     * @param null|float                           $newAmount
-     */
-    private
-    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null)
-    {
-        /**
-         * @var  \HpsCreditCard|\HpsTokenData|int                                                   $cardData
-         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address           $order
-         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
-         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
-         * @var \HpsCreditService                                                                   $chargeService
-         * @var string                                                                              $errorMsg
-         * @var \HpsCardHolder|null                                                                 $validCardHolder
-         * @var \HpsReportTransactionDetails|null                                                   $authResponse
-         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                           $response
-         * @var null|\HpsTransactionDetails                                                         $details
-         * @var int                                                                                 $action
-         * @var string                                                                              $currency
-         * @var null|float                                                                          $authAmount
-         *
-         */
-        $chargeService   = $this->getHpsCreditService();
-        $errorMsg        = false;
-        $validCardHolder = null;
-        $authResponse    = null;
-        $response        = null;
-        $details         = null;
-        $currency        = HPS_DATA::getCurrencyCode();
-        $authAmount      = null;
-        $cardData        = $payment->getParentTransactionId();
-
-        try {
-            switch ($action) {
-                case (\HpsTransactionType::VOID):
-                    $response = $chargeService->void($cardData);
-                    break;
-                case (\HpsTransactionType::REVERSE):
-                    $response = $chargeService->reverse($cardData, $amount, $currency, $details, $authAmount);
-                    break;
-                case (\HpsTransactionType::REFUND):
-                    $order           = $payment->getOrder();
-                    $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
-                    $response        = $chargeService->refund($amount,
-                                                              $currency,
-                                                              $cardData,
-                                                              $validCardHolder,
-                                                              $details);
-                    break;
-                default:
-                    $errorMsg
-                        = 'An error occured. ' . __FILE__ . ':' . __LINE__ . ' There is no method for action: ' . $action . '. not implemented';
-
-            }
-
-            $transactionId = $payment->getParentTransactionId();
-            $chargeService = $this->getHpsCreditService();
-            // \HpsCreditService::refund
-            $chargeService->refund($amount, 'usd', $transactionId);
-            $payment->setTransactionId($transactionId . '-' . Transaction::TYPE_REFUND);
-            $payment->setParentTransactionId($transactionId);
-            $payment->setIsTransactionClosed(1);
-            $payment->setShouldCloseParentTransaction(1);
-        }
-        catch (\HpsInvalidRequestException $e) {
-            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
-            ' . $e->getMessage();
-        }
-        catch (\HpsAuthenticationException $e) {
-            $errorMsg
-                = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
-                contact Heartland: ' . $e->getMessage();
-        }
-        catch (\HpsGatewayException $e) {
-            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
-                contact Heartland:  ' . $e->getMessage();
-        }
-        catch (\HpsException $e) {
-            $errorMsg
-                = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
-        }
-        if ($errorMsg) {
-            throw new LocalizedException(new Phrase(__($errorMsg)));
-        }
-
-        return $response;
-    }
 
     private
     function porticoTransaction()
@@ -487,80 +395,82 @@ class Payment
                     throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
-
-            // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
-            $info = $this->getInfoInstance();
-            // magic method \Magento\Framework\DataObject::__call
-            $CcL4 = $info->getCcNumber();
-            //$this->log($payment,'$payment ');
-
-            $this->log($response, 'setStatus ');
-            // magic method \Magento\Framework\DataObject::__call
-            @$payment->setStatus($response->responseText);
-            $payment->setTransactionId($response->transactionId);
-            $payment->setIsTransactionClosed(false);
-            $payment->setCcLast4($CcL4);
-            $payment->setAdditionalInformation($response->authorizationCode);
-
-            // magic method \Magento\Framework\DataObject::__call
-
-            if ($payment->isCaptureFinal($requestedAmount)) {
-                $payment->setShouldCloseParentTransaction(true);
-            }
-            if (isset($suToken->tokenValue)) {
-                $payment->setTransactionAdditionalInfo('token', $suToken->tokenValue);
-            }/*/**/
-
-            /*
-            $payment
-                ->setTransactionId($response->transactionId)
-                ->setIsTransactionClosed(0);*/
-            try {
-                if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
-                    // \HPS\Heartland\Model\StoredCard::setStoredCards
-                    HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
-                                                     strtolower($info->getCcType()),
-                                                     $CcL4,
-                                                     $this->getAdditionalData()['cc_exp_month'],
-                                                     $this->getAdditionalData()['cc_exp_year']);
-                }/**/
-            }
-            catch (\Exception $e) {
-                // \Psr\Log\LoggerInterface::error
-                $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
-                    not returned. The most likely cause would be that Multi-use tokens need to be enabled by
-                    Heartland'));
-            }
-            // \Psr\Log\LoggerInterface::error
-            $this->log($response,
-                       'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
         }
+
         catch (\HpsInvalidRequestException $e) {
-            $errorMsg = __('Failure: The message structure sent to Heartland was invalid. Please check log files for
-            more detail before contacting Heartland: ' . $e->getMessage());
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
+            ' . $e->getMessage();
         }
         catch (\HpsAuthenticationException $e) {
-            $errorMsg = __('Failure: Credentials Rejected by Gateway please contact Heartland: ' . $e->getMessage());
+            $errorMsg
+                = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
+                contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg = __('Failure: An Error occured at Heartlands gateway. If this problem continues please
-            contact Heartland: ' . $e->getMessage());
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
+                contact Heartland:  ' . $e->getMessage();
         }
         catch (\HpsCreditException $e) {
-            $errorMsg = __('Failure: The payment method was rejected. The response that follows comes from the
-            CardHolders Issueing bank. Please direct your consumer to their bank for more info: ' . $e->getMessage());
+            $errorMsg = 'Cannot process Payment: ' . $e->getMessage();
         }
-        catch (\Exception $e) {
+        catch (\HpsException $e) {
             $errorMsg
-                = __('Failure: General code error. Additional troubleshooting may be required: ' . $e->getMessage());
+                = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
         }
         if ($errorMsg) {
-            // \Psr\Log\LoggerInterface::error
-            $this->_logger->error($response,
-                                  'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
-            throw new LocalizedException(new Phrase(__('Payment failure. Please contact site owner to
-            complete this transaction')));
+            throw new LocalizedException(new Phrase(__($errorMsg)));
         }
+
+
+
+        // \Magento\Payment\Model\Method\AbstractMethod::getInfoInstance
+        $info = $this->getInfoInstance();
+        // magic method \Magento\Framework\DataObject::__call
+        $CcL4 = $info->getCcNumber();
+        //$this->log($payment,'$payment ');
+
+        $this->log($response, 'setStatus ');
+        // magic method \Magento\Framework\DataObject::__call
+        @$payment->setStatus($response->responseText);
+        $payment->setTransactionId($response->transactionId);
+        $payment->setIsTransactionClosed(false);
+        $payment->setCcLast4($CcL4);
+        $payment->setAdditionalInformation($response->authorizationCode);
+
+        // magic method \Magento\Framework\DataObject::__call
+
+        if ($payment->isCaptureFinal($requestedAmount)) {
+            $payment->setShouldCloseParentTransaction(true);
+        }
+        if (isset($suToken->tokenValue)) {
+            $payment->setTransactionAdditionalInfo('token', $suToken->tokenValue);
+        }/*/**/
+
+        /*
+        $payment
+            ->setTransactionId($response->transactionId)
+            ->setIsTransactionClosed(0);*/
+        try {
+            if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
+                // \HPS\Heartland\Model\StoredCard::setStoredCards
+                HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
+                                                 strtolower($info->getCcType()),
+                                                 $CcL4,
+                                                 $this->getAdditionalData()['cc_exp_month'],
+                                                 $this->getAdditionalData()['cc_exp_year']);
+            }/**/
+        }
+        catch (\Exception $e) {
+            // \Psr\Log\LoggerInterface::error
+            $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
+                    not returned. The most likely cause would be that Multi-use tokens need to be enabled by
+                    Heartland'));
+        }
+        // \Psr\Log\LoggerInterface::error
+        $this->log($response,
+                   'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
+
+
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
 
         // \HPS\Heartland\Model\Payment
