@@ -116,60 +116,109 @@ class Payment
         = ['developerId'   => '000000',
            'versionNumber' => '0000',];
 
-    /**
-     * Payment constructor.
+    /** Process funds back to the consumer. this is the opposit of what \HPS\Heartland\Model\Payment::_payment does
      *
-     * @param \Magento\Framework\Model\Context                     $context
-     * @param \Magento\Framework\Registry                          $registry
-     * @param \Magento\Framework\Api\ExtensionAttributesFactory    $extensionFactory
-     * @param \Magento\Framework\Api\AttributeValueFactory         $customAttributeFactory
-     * @param \Magento\Payment\Helper\Data                         $paymentData
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface   $scopeConfig
-     * @param \Magento\Payment\Model\Method\Logger                 $logger
-     * @param \Magento\Framework\Module\ModuleListInterface        $moduleList
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param \Magento\Directory\Model\CountryFactory              $countryFactory
-     * @param \HpsServicesConfig                                   $config
-     * @param array                                                $data
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param null|float                           $amount
+     * @param null|float                           $newAmount
      */
-    public
-    function __construct(\Magento\Framework\Model\Context $context,
-                         \Magento\Framework\Registry $registry,
-                         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
-                         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-                         \Magento\Payment\Helper\Data $paymentData,
-                         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-                         \Magento\Payment\Model\Method\Logger $logger,
-                         \Magento\Framework\Module\ModuleListInterface $moduleList,
-                         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-                         \Magento\Directory\Model\CountryFactory $countryFactory,
-                         \HpsServicesConfig $config,
-                         array $data = [])
+    private
+    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null)
     {
-        parent::__construct($context,
-                            $registry,
-                            $extensionFactory,
-                            $customAttributeFactory,
-                            $paymentData,
-                            $scopeConfig,
-                            $logger,
-                            $moduleList,
-                            $localeDate,
-                            null,
-                            null,
-                            $data);
-        // \HPS\Heartland\Model\countryFactory
-        // \HPS\Heartland\Model\Payment::$_countryFactory
-        $this->_countryFactory = $countryFactory;
-        // \HPS\Heartland\Model\Payment::$_heartlandApi
-        // \HpsServicesConfig
-        $this->_heartlandApi = $config;
-        // \HpsServicesConfig::$secretApiKey
-        $this->_heartlandApi->secretApiKey = $this->getConfigData('private_key');
-        // \HpsServicesConfig::$developerId
-        $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
-        // \HpsServicesConfig::$versionNumber
-        $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
+        /**
+         * @var  \HpsCreditCard|\HpsTokenData|int                                                   $cardData
+         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address           $order
+         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
+         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
+         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
+         * @var \HpsCreditService                                                                   $chargeService
+         * @var string                                                                              $errorMsg
+         * @var \HpsCardHolder|null                                                                 $validCardHolder
+         * @var \HpsReportTransactionDetails|null                                                   $authResponse
+         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                           $response
+         * @var null|\HpsTransactionDetails                                                         $details
+         * @var int                                                                                 $action
+         * @var string                                                                              $currency
+         * @var null|float                                                                          $authAmount
+         *
+         */
+        $chargeService   = $this->getHpsCreditService();
+        $errorMsg        = false;
+        $validCardHolder = null;
+        $authResponse    = null;
+        $response        = null;
+        $details         = null;
+        $currency        = HPS_DATA::getCurrencyCode();
+        $authAmount      = null;
+        $cardData        = $payment->getParentTransactionId();
+
+        try {
+            switch ($action) {
+                case (\HpsTransactionType::VOID):
+                    $response = $chargeService->void($cardData);
+                    break;
+                case (\HpsTransactionType::REVERSE):
+                    $response = $chargeService->reverse($cardData, $amount, $currency, $details, $authAmount);
+                    break;
+                case (\HpsTransactionType::REFUND):
+                    $order           = $payment->getOrder();
+                    $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
+                    $response        = $chargeService->refund($amount,
+                                                              $currency,
+                                                              $cardData,
+                                                              $validCardHolder,
+                                                              $details);
+                    break;
+                default:
+                    $errorMsg
+                        = 'An error occured. ' . __FILE__ . ':' . __LINE__ . ' There is no method for action: ' . $action . '. not implemented';
+
+            }
+
+            $transactionId = $payment->getParentTransactionId();
+            $chargeService = $this->getHpsCreditService();
+            // \HpsCreditService::refund
+            $chargeService->refund($amount, 'usd', $transactionId);
+            $payment->setTransactionId($transactionId . '-' . Transaction::TYPE_REFUND);
+            $payment->setParentTransactionId($transactionId);
+            $payment->setIsTransactionClosed(1);
+            $payment->setShouldCloseParentTransaction(1);
+        }
+        catch (\HpsInvalidRequestException $e) {
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
+            ' . $e->getMessage();
+        }
+        catch (\HpsAuthenticationException $e) {
+            $errorMsg
+                = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
+                contact Heartland: ' . $e->getMessage();
+        }
+        catch (\HpsGatewayException $e) {
+            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
+                contact Heartland:  ' . $e->getMessage();
+        }
+        catch (\HpsException $e) {
+            $errorMsg
+                = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
+        }
+        if ($errorMsg) {
+            throw new LocalizedException(new Phrase(__($errorMsg)));
+        }
+
+        return $response;
+    }
+
+    private
+    function porticoTransaction()
+    {
+
+    }
+
+    private
+    function userNotification()
+    {
+
     }
 
     /**
@@ -889,108 +938,59 @@ class Payment
         return parent::void($payment); // TODO: Change the autogenerated stub
     }
 
-    /** Process funds back to the consumer. this is the opposit of what \HPS\Heartland\Model\Payment::_payment does
+    /**
+     * Payment constructor.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param null|float                           $amount
-     * @param null|float                           $newAmount
+     * @param \Magento\Framework\Model\Context                     $context
+     * @param \Magento\Framework\Registry                          $registry
+     * @param \Magento\Framework\Api\ExtensionAttributesFactory    $extensionFactory
+     * @param \Magento\Framework\Api\AttributeValueFactory         $customAttributeFactory
+     * @param \Magento\Payment\Helper\Data                         $paymentData
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface   $scopeConfig
+     * @param \Magento\Payment\Model\Method\Logger                 $logger
+     * @param \Magento\Framework\Module\ModuleListInterface        $moduleList
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Directory\Model\CountryFactory              $countryFactory
+     * @param \HpsServicesConfig                                   $config
+     * @param array                                                $data
      */
-    private
-    function _return(\Magento\Payment\Model\InfoInterface $payment, $amount = null, $newAmount = null)
+    public
+    function __construct(\Magento\Framework\Model\Context $context,
+                         \Magento\Framework\Registry $registry,
+                         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+                         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+                         \Magento\Payment\Helper\Data $paymentData,
+                         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+                         \Magento\Payment\Model\Method\Logger $logger,
+                         \Magento\Framework\Module\ModuleListInterface $moduleList,
+                         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+                         \Magento\Directory\Model\CountryFactory $countryFactory,
+                         \HpsServicesConfig $config,
+                         array $data = [])
     {
-        /**
-         * @var  \HpsCreditCard|\HpsTokenData|int                                                   $cardData
-         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address           $order
-         * @var \Magento\Sales\Model\Order\Payment\Interceptor|\Magento\Payment\Model\InfoInterface $payment
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getTransactionId()
-         * @method \Magento\Sales\Model\Order\Payment\Interceptor getOrder()
-         * @method \Magento\Sales\Api\Data\OrderInterface getBillingAddress()
-         * @var \HpsCreditService                                                                   $chargeService
-         * @var string                                                                              $errorMsg
-         * @var \HpsCardHolder|null                                                                 $validCardHolder
-         * @var \HpsReportTransactionDetails|null                                                   $authResponse
-         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                           $response
-         * @var null|\HpsTransactionDetails                                                         $details
-         * @var int                                                                                 $action
-         * @var string                                                                              $currency
-         * @var null|float                                                                          $authAmount
-         *
-         */
-        $chargeService   = $this->getHpsCreditService();
-        $errorMsg        = false;
-        $validCardHolder = null;
-        $authResponse    = null;
-        $response        = null;
-        $details         = null;
-        $currency        = HPS_DATA::getCurrencyCode();
-        $authAmount      = null;
-        $cardData        = $payment->getParentTransactionId();
-
-        try {
-            switch ($action) {
-                case (\HpsTransactionType::VOID):
-                    $response = $chargeService->void($cardData);
-                    break;
-                case (\HpsTransactionType::REVERSE):
-                    $response = $chargeService->reverse($cardData, $amount, $currency, $details, $authAmount);
-                    break;
-                case (\HpsTransactionType::REFUND):
-                    $order           = $payment->getOrder();
-                    $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
-                    $response        = $chargeService->refund($amount,
-                                                              $currency,
-                                                              $cardData,
-                                                              $validCardHolder,
-                                                              $details);
-                    break;
-                default:
-                    $errorMsg
-                        = 'An error occured. ' . __FILE__ . ':' . __LINE__ . ' There is no method for action: ' . $action . '. not implemented';
-
-            }
-
-            $transactionId = $payment->getParentTransactionId();
-            $chargeService = $this->getHpsCreditService();
-            // \HpsCreditService::refund
-            $chargeService->refund($amount, 'usd', $transactionId);
-            $payment->setTransactionId($transactionId . '-' . Transaction::TYPE_REFUND);
-            $payment->setParentTransactionId($transactionId);
-            $payment->setIsTransactionClosed(1);
-            $payment->setShouldCloseParentTransaction(1);
-        }
-        catch (\HpsInvalidRequestException $e) {
-            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
-            ' . $e->getMessage();
-        }
-        catch (\HpsAuthenticationException $e) {
-            $errorMsg
-                = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
-                contact Heartland: ' . $e->getMessage();
-        }
-        catch (\HpsGatewayException $e) {
-            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
-                contact Heartland:  ' . $e->getMessage();
-        }
-        catch (\HpsException $e) {
-            $errorMsg
-                = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
-        }
-        if ($errorMsg) {
-            throw new LocalizedException(new Phrase(__($errorMsg)));
-        }
-
-        return $response;
-    }
-
-    private
-    function porticoTransaction()
-    {
-
-    }
-
-    private
-    function userNotification()
-    {
-
+        parent::__construct($context,
+                            $registry,
+                            $extensionFactory,
+                            $customAttributeFactory,
+                            $paymentData,
+                            $scopeConfig,
+                            $logger,
+                            $moduleList,
+                            $localeDate,
+                            null,
+                            null,
+                            $data);
+        // \HPS\Heartland\Model\countryFactory
+        // \HPS\Heartland\Model\Payment::$_countryFactory
+        $this->_countryFactory = $countryFactory;
+        // \HPS\Heartland\Model\Payment::$_heartlandApi
+        // \HpsServicesConfig
+        $this->_heartlandApi = $config;
+        // \HpsServicesConfig::$secretApiKey
+        $this->_heartlandApi->secretApiKey = $this->getConfigData('private_key');
+        // \HpsServicesConfig::$developerId
+        $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
+        // \HpsServicesConfig::$versionNumber
+        $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
     }
 }
