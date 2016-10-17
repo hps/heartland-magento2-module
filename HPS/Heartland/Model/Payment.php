@@ -302,7 +302,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
             $response        = null;
             $details         = null;
             $currency        = HPS_DATA::getCurrencyCode();
-            $newAuthAmount      = null;
+            $newAuthAmount   = null;
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
@@ -339,7 +339,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                     // set to do a capture
                     $paymentAction = \HpsTransactionType::CAPTURE;
                 }
-                if ($paymentAction === \HpsTransactionType::VOID) {
+                elseif ($paymentAction === \HpsTransactionType::VOID) {
 
                     if ($reportTxnDetail->transactionStatus != 'A'
                         || $requestedAmount > $reportTxnDetail->settlementAmount
@@ -350,12 +350,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                         transaction is no longer Active. ', $parentPaymentID, $reportTxnDetail->authorizedAmount));
                     } // validated acceptable authorization
 
+                    // refunds are only appropriate if the transaction is no longer active
+                    // fortunately if we want to return less than was authorized we can simply reduce the amount
                     if ($requestedAmount < $reportTxnDetail->settlementAmount) {
-                        $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
                         $paymentAction = \HpsTransactionType::REVERSE;
                     }
                 }
             }// end of verifying that we have something that looks like  transaction ID to use
+            // these are the only 2 transaction types where Magento2 does not need a transaction ID to reference
+            elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
+                //We know we dont have a valid transaction id so its time to throw an error
+
+            }// all of these types of transactions require a transaction id from  previous transaction
+
+
 
             /*
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
@@ -443,14 +451,18 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                  * Reverses the full amount and removes any related capture from the batch*/
                 case (\HpsTransactionType::VOID): // Portico CreditVoid \HpsTransactionType::VOID
                     $response = $chargeService->void($parentPaymentID);
+                    $payment->setAmount($newAuthAmount);
+                    $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
                     break;
                 case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
                     $response = $chargeService->reverse($parentPaymentID, $requestedAmount, $currency, $details,
                                                         $newAuthAmount);
+                    $payment->setAmount($newAuthAmount);
                     break;
                 case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
                     $response = $chargeService->refund($requestedAmount, $currency, $parentPaymentID, $validCardHolder,
                                                        $details);
+                    $payment->setAmount($newAuthAmount);
                     break;
                 default:
                     throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
@@ -472,7 +484,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
             $payment->setAdditionalInformation($response->authorizationCode);
 
             // magic method \Magento\Framework\DataObject::__call
-            $payment->setAmount($requestedAmount);
+
             if ($payment->isCaptureFinal($requestedAmount)) {
                 $payment->setShouldCloseParentTransaction(true);
             }
