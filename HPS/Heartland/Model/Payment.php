@@ -114,18 +114,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
      * @var array
      */
     protected $_heartlandConfigFields
-        = ['active'             => false,
-           'cctypes'            => false,
-           'debug'              => false,
-           'fraudprotection'    => false,
-           'fraud_email'        => false,
-           'fraud_notification' => false,
-           'order_status'       => false,
-           'payment_action'     => false,
-           'private_key'        => false,
-           'public_key'         => false,
-           'title'              => false,
-           'use_vault'          => false];
+        = ['developerId'             => '000000',
+           'versionNumber'            => '0000',];
 
     /**
      * Payment constructor.
@@ -166,11 +156,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
         // \HpsServicesConfig::$secretApiKey
         $this->_heartlandApi->secretApiKey = $this->getConfigData('private_key');
         // \HpsServicesConfig::$developerId
-        $this->_heartlandApi->developerId = '000000';
+        $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
         // \HpsServicesConfig::$versionNumber
-        $this->_heartlandApi->versionNumber = '0000';
+        $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
     }
-
 
     /**
      * @return \HpsCreditService
@@ -362,7 +351,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
                     = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
                 // \HPS\Heartland\Model\Payment::chargeToken
             }
-
+ 
             /*
              * execute the portic messages related to the specified action
              */
