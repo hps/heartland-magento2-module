@@ -52,7 +52,7 @@ There are now 2 options for installing our heartland-magento2-module.
 * [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
 Just SSH to your server as a user part of the web servers group and call this line 
 ```
-wget https://raw.githubusercontent.com/hps/heartland-magento2-module/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
+wget https://raw.githubusercontent.com/hps/heartland-magento2-module/master/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
 ```
 * Manual
 
