@@ -13,6 +13,7 @@
 
 namespace HPS\Heartland\Model;
 
+use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 use \HPS\Heartland\Helper\Data as HPS_DATA;
 use \Magento\Framework\Exception\LocalizedException;
