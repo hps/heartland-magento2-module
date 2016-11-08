@@ -15,28 +15,16 @@ namespace HPS\Heartland\Helper;
 
 class HPS_Responses
 {
-    private $messageManager;
-    /**
-     * UI constructor.
-     */
-    public function __construct(\Magento\Framework\Message\ManagerInterface $messageManager)
+
+    static
+    function getMessageManager()
     {
-        $this->messageManager = $messageManager; //addSuccess('Add your success message');
-        $this->messageManager->addErrorMessage();
-        $this->messageManager->addExceptionMessage();
-        $this->messageManager->addNoticeMessage();
-        $this->messageManager->addSuccessMessage();
-        $this->messageManager->addNoticeMessage();
+        /**
+         * @var \Magento\Framework\Message\ManagerInterface $messageManager
+         */
+        $messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');
+        return $messageManager;
     }
 
-    public function getMessageManager()
-    {
-        return $this->messageManager;
-    }
-
-    public function setMessageManager($messageManager)
-    {
-        $this->messageManager = $messageManager;
-    }
 
 }
