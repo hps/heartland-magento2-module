@@ -691,7 +691,7 @@ class Payment
 
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
         $chargedMsg = "The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
-            ['cc_exp_month'] . " \ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
+            ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
         $response->authorizationCode;
         $this->messageManager->addComplexSuccessMessage(\Magento\Framework\Message\MessageInterface::TYPE_SUCCESS,
                                                         $chargedMsg);
