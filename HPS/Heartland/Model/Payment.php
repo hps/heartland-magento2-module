@@ -177,7 +177,7 @@ class Payment
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
 
-        $this->messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');;
+        //$this->messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');;
     }
 
     /**
@@ -688,11 +688,11 @@ class Payment
 
 
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
-        $chargedMsg = "The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
+        /*$chargedMsg = "The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
             ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
         $response->authorizationCode;
         $this->messageManager->addComplexSuccessMessage(\Magento\Framework\Message\MessageInterface::TYPE_SUCCESS,
-                                                        $chargedMsg);
+                                                        $chargedMsg);*/
         // \HPS\Heartland\Model\Payment
         return $this; // goes back to
     }
