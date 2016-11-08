@@ -11,17 +11,20 @@
  */
 
 namespace HPS\Heartland\Helper;
+use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 
 
 class HPS_Responses
 {
-    private $messageManager;
-    /**
-     * UI constructor.
-     */
-    public function __construct(\Magento\Framework\Message\ManagerInterface $messageManager)
+
+    static
+    function getMessageManager()
     {
-        $this->messageManager = $messageManager; //addSuccess('Add your success message');
+        /**
+         * @var \Magento\Framework\Message\ManagerInterface $messageManager
+         */
+        $messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');
+        return $messageManager;
     }
 
 }

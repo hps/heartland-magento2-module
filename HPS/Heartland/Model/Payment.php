@@ -117,6 +117,11 @@ class Payment
            'versionNumber' => '0000',];
 
     /**
+     * @var \Magento\Framework\Message\ManagerInterface $messageManager
+     */
+    private $messageManager = null;
+
+    /**
      * Payment constructor.
      *
      * @param \Magento\Framework\Model\Context                     $context
@@ -170,6 +175,11 @@ class Payment
         $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
+
+        /**
+         * @var \Magento\Framework\Message\ManagerInterface $messageManager
+         */
+        $this->messageManager = \HPS\Heartland\Helper\HPS_Responses::getMessageManager();
     }
 
     /**
@@ -411,7 +421,8 @@ class Payment
          * @var string                                                                    $errorMsg
          * @var \HpsCardHolder|null                                                       $validCardHolder
          * @var \HpsReportTransactionDetails|null                                         $reportTxnDetail
-         * @var \HpsReversal|\HpsReversal|\HpsRefund|null                                 $response
+         * @var \HpsReversal|\HpsReversal|\HpsRefund|\HpsAuthorization|\HpsReportTransactionDetails|null
+         * $response
          * @var null|\HpsTransactionDetails                                               $details
          * @var int                                                                       $paymentAction
          * @var string                                                                    $currency
@@ -577,6 +588,7 @@ class Payment
                                                        $suToken,
                                                        $validCardHolder,
                                                        $canSaveToken);
+
                     break;
                 /**
                  * Reverses the full amount and removes any related capture from the batch*/
@@ -678,7 +690,12 @@ class Payment
 
 
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
-
+        $chargedMsg = "The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
+            ['cc_exp_month'] . " \ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
+        $response->
+        ";
+        $this->messageManager->addComplexSuccessMessage(\Magento\Framework\Message\MessageInterface::TYPE_SUCCESS,
+                                                        $chargedMsg);
         // \HPS\Heartland\Model\Payment
         return $this; // goes back to
     }
