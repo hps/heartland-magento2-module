@@ -229,20 +229,7 @@ class Payment
         return $this->_payment($payment, $amount, \HpsTransactionType::REFUND);
     }
 
-    /**
-     * @param string $currencyCode
-     *
-     * @return bool
-     */
-    public
-    function canUseForCurrency($currencyCode)
-    {
-        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-            return false;
-        }
 
-        return true;
-    }
 
     /**
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
