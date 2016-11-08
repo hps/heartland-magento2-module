@@ -177,9 +177,6 @@ class Payment
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
 
-        /**
-         * @var \Magento\Framework\Message\ManagerInterface $messageManager
-         */
         $this->messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');;
     }
 
