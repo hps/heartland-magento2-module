@@ -10,6 +10,7 @@
  * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 namespace HPS\Heartland\Helper;
+use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 
 
 
