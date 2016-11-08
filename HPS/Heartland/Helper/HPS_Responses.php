@@ -17,7 +17,7 @@ use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 class HPS_Responses
 {
 
-    static
+    public static
     function getMessageManager()
     {
         /**
