@@ -179,7 +179,7 @@ class Payment
         /**
          * @var \Magento\Framework\Message\ManagerInterface $messageManager
          */
-        $this->messageManager = \HPS\Heartland\Helper\HPS_Responses::getMessageManager();
+        $this->messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');;
     }
 
     /**
