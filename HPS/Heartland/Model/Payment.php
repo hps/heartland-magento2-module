@@ -212,7 +212,7 @@ class Payment
     function void(\Magento\Payment\Model\InfoInterface $payment)
     {
         return $this->_payment($payment, 0.00, \HpsTransactionType::VOID);
-    }
+    } 
 
     /**
      * \HPS\Heartland\Model\Payment::refund tells Heartland SDK to connect to Portico and issue a refund
