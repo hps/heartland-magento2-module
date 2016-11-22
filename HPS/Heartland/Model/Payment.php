@@ -197,7 +197,7 @@ class Payment
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::AUTHORIZE);
     }
- 
+
     /**
      * Potentially authorize and capture \HpsCreditService::charge or just capture  \HpsCreditService::reverse to
      * potentially reduce any hold on the card over the amount of the capture and then \CreditService::capture
