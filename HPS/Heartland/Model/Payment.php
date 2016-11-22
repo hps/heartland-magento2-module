@@ -718,14 +718,7 @@ class Payment
                 break;
             default:
         }
-        $this->messageManager->addComplexSuccessMessage(
-            'addProductAddSuccessMessage',
-            [
-                'product_name' => $chargedMsg,
-                'referer' => HPS_OM::getObjectManager()->get('Magento\Checkout\Helper\Cart')->getCartUrl()
-            ]
-
-            );
+        $this->messageManager->addSuccess($chargedMsg);
         // \HPS\Heartland\Model\Payment
         return $this; // goes back to
     }
