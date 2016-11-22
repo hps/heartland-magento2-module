@@ -707,7 +707,8 @@ class Payment
                 break;
             case 'HpsAuthorization':
                 $chargedMsg = __("The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
-                    ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
+                    ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged
+                    successfully. Your approval code is " .
                               $response->authorizationCode);
                 break;
             case 'HpsReportTransactionDetails':
