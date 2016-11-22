@@ -638,6 +638,7 @@ class Payment
                 = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
         }
         if ($errorMsg) {
+            $this->messageManager->addError($errorMsg);
             throw new LocalizedException(new Phrase(__($errorMsg)));
         }
 
