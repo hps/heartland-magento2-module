@@ -197,7 +197,7 @@ class Payment
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::AUTHORIZE);
     }
-
+ 
     /**
      * Potentially authorize and capture \HpsCreditService::charge or just capture  \HpsCreditService::reverse to
      * potentially reduce any hold on the card over the amount of the capture and then \CreditService::capture
@@ -441,7 +441,8 @@ class Payment
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
-            $parentPaymentID = $payment->getParentTransactionId();
+            list($parentPaymentID) = explode('-', $payment->getParentTransactionId());
+            $parentPaymentID = (int)$parentPaymentID;
             $suToken         = null;
             $validCardHolder = null;
             $reportTxnDetail = null;
@@ -508,7 +509,8 @@ class Payment
                 $order = $payment->getOrder();
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
-                if ($paymentAction !== \HpsTransactionType::REFUND) {
+                if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction ===
+                                                                      \HpsTransactionType::CHARGE) {
                     // \HPS\Heartland\Model\Payment::$_token_value
                     $suToken
                         = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
@@ -550,7 +552,8 @@ class Payment
                      *
                      */
                     try {
-                        if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) > \HpsInputValidation::checkAmount($requestedAmount)) {
+                        if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) >
+                        \HpsInputValidation::checkAmount($requestedAmount)) {
                             $chargeService->reverse($parentPaymentID,
                                                     \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
                                                     HPS_DATA::getCurrencyCode(),
@@ -624,8 +627,7 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg = 'Incorrect parameters on line: ' . $e->getLine() . '. Please
-                contact Heartland:  ' . $e->getMessage();
+            $errorMsg = '. Please contact Heartland:  ' . $e->getMessage();
         }
         catch (\HpsCreditException $e) {
             $errorMsg = 'Cannot process Payment: ' . $e->getMessage();
@@ -688,11 +690,35 @@ class Payment
 
 
         $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
-        $chargedMsg = "The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
-            ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
-        $response->authorizationCode;
+        /*
         $this->messageManager->addComplexSuccessMessage(\Magento\Framework\Message\MessageInterface::TYPE_SUCCESS,
-                                                        $chargedMsg);
+                                                        $chargedMsg);*/
+
+        switch(get_class($response)){
+            case 'HpsReversal':
+
+                break;
+            case 'HpsRefund':
+
+                break;
+            case 'HpsVoid':
+
+                break;
+            case 'HpsAuthorization':
+                $chargedMsg = __("The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
+                    ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged successfully " .
+                              $response->authorizationCode);
+                break;
+            case 'HpsReportTransactionDetails':
+                $chargedMsg = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
+                                 successfully " .
+                                 $response->settlementAmount);
+
+                break;
+            default:
+        }
+        $this->messageManager->addComplexSuccessMessage(\Magento\Framework\Message\MessageInterface::TYPE_SUCCESS,
+                                                        [$chargedMsg]);
         // \HPS\Heartland\Model\Payment
         return $this; // goes back to
     }
