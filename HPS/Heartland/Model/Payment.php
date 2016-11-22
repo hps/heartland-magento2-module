@@ -723,7 +723,7 @@ class Payment
                 'product_name' => $chargedMsg,
                 'referer' => HPS_OM::getObjectManager()->get('Magento\Checkout\Helper\Cart')->getCartUrl()
             ]
-            
+
             );
         // \HPS\Heartland\Model\Payment
         return $this; // goes back to
