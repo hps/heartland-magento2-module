@@ -685,6 +685,8 @@ class Payment
             $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
                     not returned. The most likely cause would be that Multi-use tokens need to be enabled by
                     Heartland'));
+            $this->messageManager->addError(__('Your payment was successful. However, we could not save your payment
+            information for later use.'));
         }
         // \Psr\Log\LoggerInterface::error
         $this->log($response,
