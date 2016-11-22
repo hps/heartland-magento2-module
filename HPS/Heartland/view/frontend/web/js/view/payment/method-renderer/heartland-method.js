@@ -68,7 +68,7 @@ define(
                         $.ajax({
                             url: "../heartland/creditcard/get"
                             , success: function (data) {
-                                if (data.length) {
+                                if (data != '[]') {
 
                                     // process json string to table rows
                                     //$("#SavedCardsTable").append(JSON.parse(data));
