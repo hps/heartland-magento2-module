@@ -68,7 +68,7 @@ define(
                         $.ajax({
                             url: "../heartland/creditcard/get"
                             , success: function (data) {
-                                if (data) {
+                                if (data.length) {
 
                                     // process json string to table rows
                                     //$("#SavedCardsTable").append(JSON.parse(data));
@@ -116,7 +116,7 @@ define(
                 $('#securesubmit_token').removeAttr('value');;
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
-                if ($("#SavedCardsTable tr").length < 2){
+                if ($("#SavedCardsTable tr").length > 1){
                     $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success( function(publicKey) {
                             self.hpsShowCcForm(publicKey);
