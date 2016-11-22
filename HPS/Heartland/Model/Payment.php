@@ -121,6 +121,7 @@ class Payment
      * @var \Magento\Framework\Message\ManagerInterface $messageManager
      */
     private $messageManager = null;
+    private $_objectManager = null;
 
     /**
      * Payment constructor.
@@ -176,8 +177,8 @@ class Payment
         $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
-
-        $this->messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');;
+        $this->_objectManager = HPS_OM::getObjectManager();
+        $this->messageManager = $this->_objectManager->get('\Magento\Framework\Message\ManagerInterface');;
     }
 
     /**
