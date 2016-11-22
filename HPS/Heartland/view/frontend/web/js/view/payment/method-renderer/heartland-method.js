@@ -116,7 +116,7 @@ define(
                 $('#securesubmit_token').removeAttr('value');;
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
-                if ($("#SavedCardsTable tr").length > 1){
+                if ($("#SavedCardsTable tr").length < 2){
                     $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success( function(publicKey) {
                             self.hpsShowCcForm(publicKey);
