@@ -6,6 +6,6 @@
  * Date: 11/22/16
  * Time: 9:33 PM
  */
-class Add {
+class Add  extends {
     
 }
