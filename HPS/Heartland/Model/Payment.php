@@ -724,7 +724,7 @@ class Payment
         }
         $this->messageManager->addSuccess($chargedMsg);
         // \HPS\Heartland\Model\Payment
-        return $this; // goes back to
+        return $this; // goes back to 
     }
 
     /**
