@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2016.
-  ~ Heartland payment method model
+  ~  Heartland payment method model
   ~
-  ~ @category    HPS
-  ~ @package     HPS_Heartland
-  ~ @author      Charlie Simmons <charles.simmons@e-hps.com>
-  ~ @copyright   Heartland (http://heartland.us)
-  ~ @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Charlie Simmons <charles.simmons@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
   -->
 
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">

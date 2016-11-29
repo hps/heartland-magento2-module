@@ -1,13 +1,12 @@
 <?php
 /**
- * Copyright (c) 2016.
- * Heartland payment method model
+ *  Heartland payment method model
  *
- * @category    HPS
- * @package     HPS_Heartland
- * @author      Charlie Simmons <charles.simmons@e-hps.com>
- * @copyright   Heartland (http://heartland.us)
- * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 
@@ -505,16 +504,20 @@ class Payment
              */
             if ($paymentAction === \HpsTransactionType::AUTHORIZE
                 || $paymentAction === \HpsTransactionType::CAPTURE
+                || $paymentAction === \HpsTransactionType::CHARGE
                 || $paymentAction === \HpsTransactionType::REFUND
             ) {
                 $order = $payment->getOrder();
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
+                $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction ===
                                                                       \HpsTransactionType::CHARGE) {
+                    $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
                     // \HPS\Heartland\Model\Payment::$_token_value
                     $suToken
                         = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
+                    $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
             }
 
@@ -534,6 +537,8 @@ class Payment
                  * the typical use case for this transaction is if a product is ordered and not immediately shipped
                  */
                 case (\HpsTransactionType::AUTHORIZE): // Portico CreditAuth \HpsTransactionType::AUTHORIZE
+
+                    $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
                     $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount),
                                                           $currency,
                                                           $suToken,
@@ -555,6 +560,7 @@ class Payment
                     try {
                         if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) >
                         \HpsInputValidation::checkAmount($requestedAmount)) {
+                            $this->log($suToken, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $chargeService->reverse($parentPaymentID,
                                                     \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
                                                     HPS_DATA::getCurrencyCode(),
@@ -571,6 +577,7 @@ class Payment
                     /*
                      * Capture the sale
                      */
+                    $this->log($suToken, 'HPS\Heartland\Model\Payment capture Method Called: ');
                     $response = $chargeService->capture($parentPaymentID, $requestedAmount);
 
                     /*
@@ -585,6 +592,7 @@ class Payment
                  * Digital media sales which are immediately delivered are an ideal use case for this transaction
                  */
                 case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
+                    $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
                     $response = $chargeService->charge(\HpsInputValidation::checkAmount($requestedAmount),
                                                        HPS_DATA::getCurrencyCode(),
                                                        $suToken,
@@ -628,7 +636,7 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg = '. Please contact Heartland:  ' . $e->getMessage();
+            $errorMsg = 'Server Error:  ' . $e->getMessage();
         }
         catch (\HpsCreditException $e) {
             $errorMsg = 'Cannot process Payment: ' . $e->getMessage();
@@ -686,7 +694,7 @@ class Payment
                     not returned. The most likely cause would be that Multi-use tokens need to be enabled by
                     Heartland'));
             $this->messageManager->addError(__('Your payment was successful. However, we could not save your payment
-            information for later use.'));
+            information for later use.' . print_r($e->getMessage(),true)));
         }
         // \Psr\Log\LoggerInterface::error
         $this->log($response,
@@ -709,7 +717,7 @@ class Payment
 
                 break;
             case 'HpsAuthorization':
-                $chargedMsg = __("The " . $info->getCcType() . " ending in " . $CcL4 .  $this->getAdditionalData()
+                $chargedMsg = __("The " . $info->getCcType() . " ending in " . $CcL4 . " which expires on: " .  $this->getAdditionalData()
                     ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged
                     successfully. Your approval code is " .
                               $response->authorizationCode);
@@ -724,6 +732,16 @@ class Payment
         }
         $this->messageManager->addSuccess($chargedMsg);
         // \HPS\Heartland\Model\Payment
+        return [
+            'payment' => [
+                self::CODE => [
+                    'transactionResults' => [
+                       1 => __('Success'),
+                        0 => __('Fraud')
+                    ]
+                ]
+            ]
+        ];; // goes back to
         return $this; // goes back to
     }
 
