@@ -25,6 +25,7 @@ use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
  * @method \Magento\Payment\Model\Method\AbstractMethod getConfigData($field, $storeId = null)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ *
  * @package HPS\Heartland\Model
  */
 class Payment
@@ -397,41 +398,41 @@ class Payment
         // Sanitize
         $requestedAmount = \HpsInputValidation::checkAmount($requestedAmount);
         /**
-         * @var  \HpsCreditCard|\HpsTokenData|int                                         $parentPaymentID
-         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address $order
-         * @var \HpsCreditService                                                         $chargeService
-         * @var string                                                                    $errorMsg
-         * @var \HpsCardHolder|null                                                       $validCardHolder
-         * @var \HpsReportTransactionDetails|null                                         $reportTxnDetail
+         * @var  \HpsCreditCard|\HpsTokenData|int                                                        $parentPaymentID
+         * @var \Magento\Sales\Api\Data\OrderInterface|\Magento\Sales\Model\Order\Address                $order
+         * @var \HpsCreditService                                                                        $chargeService
+         * @var array                                                                                    $errorMsg
+         * @var \HpsCardHolder|null                                                                      $validCardHolder
+         * @var \HpsReportTransactionDetails|null                                                        $reportTxnDetail
          * @var \HpsReversal|\HpsReversal|\HpsRefund|\HpsAuthorization|\HpsReportTransactionDetails|null $response
-         * @var null|\HpsTransactionDetails                                               $details
-         * @var int                                                                       $paymentAction
-         * @var string                                                                    $currency
-         * @var null|float                                                                $newAuthAmount
+         * @var null|\HpsTransactionDetails                                                              $details
+         * @var int                                                                                      $paymentAction
+         * @var string                                                                                   $currency
+         * @var null|float                                                                               $newAuthAmount
          *
          */
+        $errorMsg = [];
+        $successMsg = [];
+        $noticeMsg = [];
+        $validCardHolder = null;
+        $reportTxnDetail = null;
+        $response = null;
+        $details = null;
+        $newAuthAmount = null;
+        $suToken = null;
+        $validCardHolder = null;
+        $reportTxnDetail = null;
+        $response = null;
         try {
 
 
             $chargeService = $this->getHpsCreditService();
-            $errorMsg = false;
-            $successMsg = false;
-            $noticeMsg = false;
-            $validCardHolder = null;
-            $reportTxnDetail = null;
-            $response = null;
-            $details = null;
             $currency = HPS_DATA::getCurrencyCode();
-            $newAuthAmount = null;
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
             list($parentPaymentID) = explode('-', $payment->getParentTransactionId());
             $parentPaymentID = (int)$parentPaymentID;
-            $suToken = null;
-            $validCardHolder = null;
-            $reportTxnDetail = null;
-            $response = null;
             $canSaveToken = $this->saveMuToken()
                 ? true
                 : false;
@@ -550,7 +551,7 @@ class Payment
                             $this->log($suToken, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $chargeService->reverse($parentPaymentID,
                                 \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
-                                HPS_DATA::getCurrencyCode(),
+                                $currency,
                                 null,
                                 $requestedAmount);
                         }
@@ -610,140 +611,170 @@ class Payment
                     throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
-        } catch (\HpsInvalidRequestException $e) {
+        }
+        catch (\HpsInvalidRequestException $e) {
             $errorMsg[] = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
             ' . $e->getMessage();
-        } catch (\HpsAuthenticationException $e) {
+        }
+        catch (\HpsAuthenticationException $e) {
             $errorMsg[]
                 = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by Gateway please
                 contact Heartland: ' . $e->getMessage();
-        } catch (\HpsGatewayException $e) {
+        }
+        catch (\HpsGatewayException $e) {
             $errorMsg[] = 'Server Error:  ' . $e->getMessage();
-        } catch (\HpsCreditException $e) {
+        }
+        catch (\HpsCreditException $e) {
             $errorMsg[] = 'Cannot process Payment: ' . $e->getMessage();
-        } catch (\HpsException $e) {
+        }
+        catch (\HpsException $e) {
             $errorMsg[]
                 = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
         }
-        if (empty($errorMsg)) {
-            /**
-             * @var \Magento\Payment\Model\InfoInterface|\Magento\Payment\Model\Method\AbstractMethod|\Magento\Framework\DataObject $info
-             * @method string $info::getCcNumber() Retrieves the value in the Credit card field in this instance
-             * @method string getCcType() Retrieves the text type for the credit card in this instance
-             */
-            $info = $this->getInfoInstance();
-            $CcL4 = $info->getCcNumber();;
+        try {
+            if (empty($errorMsg)) {
+                /**
+                 * @var \Magento\Payment\Model\InfoInterface|\Magento\Payment\Model\Method\AbstractMethod|\Magento\Framework\DataObject $info
+                 * @method string $info::getCcNumber() Retrieves the value in the Credit card field in this instance
+                 * @method string getCcType() Retrieves the text type for the credit card in this instance
+                 */
+                $info = $this->getInfoInstance();
+                $CcL4 = $info->getCcNumber();;
 
-            $this->log($response, 'setStatus ');
-            // set items always found in the response header
-            /** @var \HpsTransaction $response Properties found in the header*/
-            $payment->setStatus($response->responseText);
-            $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[ $paymentAction ]);
-            $payment->setCcTransId($response->transactionId);
+                $this->log($response, 'setStatus ');
+                // set items always found in the response header
+                /** @var \HpsTransaction $response Properties found in the header */
+                $payment->setStatus($response->responseText);
+                $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[ $paymentAction ]);
+                $payment->setCcTransId($response->transactionId);
+                $payment->setAdditionalInformation(serialize($response));
+                if ($payment->isCaptureFinal($requestedAmount)) {
+                    $payment->setShouldCloseParentTransaction(true);
+                }
+                if (isset($suToken->tokenValue)) {
+                    $payment->setTransactionAdditionalInfo('token', $suToken->tokenValue);
+                }
 
 
-            if ($payment->isCaptureFinal($requestedAmount)) {
-                $payment->setShouldCloseParentTransaction(true);
-            }
-            if (isset($suToken->tokenValue)) {
-                $payment->setTransactionAdditionalInfo('token', $suToken->tokenValue);
-            }
-
-            /*
-            $payment
-                ->setTransactionId($response->transactionId)
-                ->setIsTransactionClosed(0);*/
-            try {
-                if (((bool)$canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
-                    // \HPS\Heartland\Model\StoredCard::setStoredCards
-                    HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
-                        strtolower($info->getCcType()),
-                        $CcL4,
-                        $this->getAdditionalData()['cc_exp_month'],
-                        $this->getAdditionalData()['cc_exp_year']);
-                    $successMsg[] = __("Payment Token saved securely.");
-                }/**/
-            } catch (\Exception $e) {
-                // \Psr\Log\LoggerInterface::error
-                $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
+                try {
+                    if (((bool)$canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
+                        /**This call will automatically make sure the expire date is updated on a save*/
+                        $chargeService->updateTokenExpiration($response->tokenData->tokenValue, $this->getAdditionalData()['cc_exp_month'], $this->getAdditionalData()['cc_exp_year']);
+                        // \HPS\Heartland\Model\StoredCard::setStoredCards
+                        HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
+                            strtolower($info->getCcType()),
+                            $CcL4,
+                            $this->getAdditionalData()['cc_exp_month'],
+                            $this->getAdditionalData()['cc_exp_year']);
+                        $successMsg[] = __("Payment token saved for future purchases");
+                    }/**/
+                } catch (\Exception $e) {
+                    // \Psr\Log\LoggerInterface::error
+                    $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
                     not returned. The most likely cause would be that Multi-use tokens need to be enabled by
                     Heartland'));
-                $noticeMsg[] = __('We could not save your payment information for later use.' . $e->getMessage());
-            }
-            // \Psr\Log\LoggerInterface::error
-            $this->log($response,
-                'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
+                    $noticeMsg[] = __('We could not save your payment information for later use.' . $e->getMessage());
+                }
+                // \Psr\Log\LoggerInterface::error
+                // an error any where here will it seems not get picked up by Magento2 error handlers.
+
+                $this->log($response,
+                    'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
 
 
-            $this->log((array)$response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
+                $this->log((array)$response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
 
-            switch (get_class($response)) {
+                switch (get_class($response)) {
 
-                case 'HpsReversal':
-                    /** @var \HpsReversal $response Properties found in the HpsReversal*/
+                    case 'HpsReversal':
+                        /** @var \HpsReversal $response Properties found in the HpsReversal */
 
-                    break;
+                        break;
 
-                case 'HpsRefund':
-                    /** @var \HpsRefund $response Properties found in the HpsRefund*/
+                    case 'HpsRefund':
+                        /** @var \HpsRefund $response Properties found in the HpsRefund */
 
-                    break;
+                        break;
 
-                case 'HpsVoid':
-                    /** @var \HpsVoid $response Properties found in the HpsVoid*/
-                    $payment->setIsTransactionClosed(true);
-                    break;
+                    case 'HpsVoid':
+                        /** @var \HpsVoid $response Properties found in the HpsVoid */
+                        $payment->setIsTransactionClosed(true);
+                        break;
 
-                case 'HpsAuthorization':
-                    /** @var \HpsAuthorization $response Properties found in the HpsAuthorization*/
+                    case 'HpsAuthorization':
+                        /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
 
-                    $payment->setCcApproval($response->authorizationCode);
-                    $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
-                    $payment->setCcCidStatus($response->cvvResultCode . ': ' . $response->cvvResultText);
-                    $payment->setAmountAuthorized($response->authorizedAmount);
-                    $payment->setAmountOrdered($requestedAmount);
-                    $payment->setCcLast4($this->getAdditionalData()['cc_number']);
-                    $payment->setCcExpMonth($this->getAdditionalData()['cc_exp_month']);
-                    $payment->setCcExpYear($this->getAdditionalData()['cc_exp_year']);
-                    $payment->setCcType($this->getAdditionalData()['cc_type']);
-                    if ($paymentAction === \HpsTransactionType::CHARGE){
-                        /** @var \HpsReportTransactionDetails $detail Properties found in the as a result of capture or get*/
-                        $detail = $chargeService->get($response->transactionId);
-                        $payment->setAmountPaid($detail->settlementAmount);
-                        //$payment->setIsTransactionClosed(true);
-                    }
-                    //Build a message to show the user what is happening
-                    $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " which expires on: " . $this->getAdditionalData()
-                        ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged
+                        $payment->setCcApproval($response->authorizationCode);
+                        $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
+                        $payment->setCcCidStatus($response->cvvResultCode . ': ' . $response->cvvResultText);
+                        $payment->setCcLast4($this->getAdditionalData()['cc_number']);
+                        $payment->setCcExpMonth($this->getAdditionalData()['cc_exp_month']);
+                        $payment->setCcExpYear($this->getAdditionalData()['cc_exp_year']);
+                        $payment->setCcType($this->getAdditionalData()['cc_type']);
+                        $payment->setCcOwner($validCardHolder->lastName . ', ' . $validCardHolder->firstName);
+                        if ($paymentAction === \HpsTransactionType::CHARGE) {
+                            /** @var \HpsReportTransactionDetails $detail Properties found in the as a result of capture or get */
+                            $detail = $chargeService->get($response->transactionId);
+                            $payment->setAmountPaid($detail->settlementAmount);
+                            //$payment->setIsTransactionClosed(true);
+                        }
+                        //Build a message to show the user what is happening
+                        $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " which expires on: " . $this->getAdditionalData()
+                            ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged [$" . $requestedAmount . "]
                     successfully. Your approval code is " .
-                        $response->authorizationCode);
-                    break;
+                            $response->authorizationCode);
+                        break;
 
-                case 'HpsReportTransactionDetails':
-                    /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails*/
-                    $payment->setAmountPaid($response->settlementAmount);
-                    $payment->setIsTransactionClosed(true);
-                    $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
+                    case 'HpsReportTransactionDetails':
+                        /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
+                        $payment->setAmountPaid($response->settlementAmount);
+                        $payment->setIsTransactionClosed(true);
+                        $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
                                  successfully " .
-                        $response->settlementAmount);
+                            $response->settlementAmount);
 
-                    break;
+                        break;
 
-                default:
+                    default:
+                }
+
+                foreach ($successMsg as $msg) {
+                    if (trim($msg)) {
+                        $this->messageManager->addSuccessMessage($msg);
+                    }
+                }
+
+            } // end if
+
+            // send any error messages from processing to the browser
+            if (count($errorMsg)) {
+                foreach ($errorMsg as $msg) {
+                    if (trim($msg)) {
+                        $this->messageManager->addErrorMessage($msg);
+                    }
+                }
             }
-
-            /*foreach ($successMsg as $msg) {
-                $this->messageManager->addSuccessMessage($msg);
-            }*/
+            else{
+                if (count($noticeMsg)) {
+                    foreach ($noticeMsg as $msg) {
+                        if (trim($msg)) {
+                            $this->messageManager->addWarningMessage($msg);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
+                $chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
+            }
+            //$this->messageManager->addErrorMessage('oops');
+            throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
+        }
+        finally{
+            return $this; // goes back to
         }
 
-        /*foreach ($errorMsg as $msg) {
-            $this->messageManager->addErrorMessage($msg);
-        }*/
 
-        //$this->messageManager->addMessage($chargedMsg);
-        //$this->messageManager->addWarningMessage($chargedMsg);
-        return $this; // goes back to
     }
 
     /**

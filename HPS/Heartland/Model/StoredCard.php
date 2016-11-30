@@ -97,11 +97,24 @@ class StoredCard {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME]
+                        ['o' => self::TABLE_NAME],
+                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
                     )
-                    ->where('o.customer_id = ?', (int)Customer::getCustID());
-                $data = (array)$conn->fetchAll($select);
-                self::validate($data);
+                    ->where('o.customer_id = ?', (int)Customer::getCustID())
+                ->group('o.token_value')
+                ;
+                $tdata = (array)$conn->fetchAll($select);
+                self::validate($tdata);
+                foreach ($tdata as $item) {
+                    $conn = Db::db_connect();
+                        $select2 = $conn->select()
+                            ->from(['o' => self::TABLE_NAME])
+                            ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
+                        $sdata = (array)$conn->fetchAll($select2);
+                        self::validate($sdata);
+                    $data[] = $sdata[0];
+                }
+                self::validate($data);/**/
             }
         }
         else {
