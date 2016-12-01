@@ -712,23 +712,24 @@ class Payment
                         $payment->setCcExpYear($this->getAdditionalData()['cc_exp_year']);
                         $payment->setCcType($this->getAdditionalData()['cc_type']);
                         $payment->setCcOwner($validCardHolder->lastName . ', ' . $validCardHolder->firstName);
+                        $actionVerb = 'Authorised for';
                         if ($paymentAction === \HpsTransactionType::CHARGE) {
+                            $actionVerb = 'Charged';
                             /** @var \HpsReportTransactionDetails $detail Properties found in the as a result of capture or get */
                             $detail = $chargeService->get($response->transactionId);
                             $payment->setAmountPaid($detail->settlementAmount);
-                            //$payment->setIsTransactionClosed(true);
                         }
                         //Build a message to show the user what is happening
-                        $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " which expires on: " . $this->getAdditionalData()
-                            ['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was charged [$" . $requestedAmount . "]
-                    successfully. Your approval code is " .
-                            $response->authorizationCode);
+                        $successMsg[] = __("The {$info->getCcType()} ending in {$CcL4} which expires on: {$this->getAdditionalData()
+                            ['cc_exp_month']} \\ {$this->getAdditionalData()['cc_exp_year']} was {$actionVerb} [${$requestedAmount}]
+                    successfully. Your approval code is {$response->authorizationCode}"
+                        );
+
                         break;
 
                     case 'HpsReportTransactionDetails':
                         /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
                         $payment->setAmountPaid($response->settlementAmount);
-                        $payment->setIsTransactionClosed(true);
                         $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
                                  successfully " .
                             $response->settlementAmount);
@@ -736,6 +737,7 @@ class Payment
                         break;
 
                     default:
+                        break;
                 }
 
                 foreach ($successMsg as $msg) {
