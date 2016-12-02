@@ -326,7 +326,7 @@ class Payment
      *
      * @return \HpsCardHolder
      */
-    private 
+    private
     function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
         $cardHolder = new \HpsCardHolder();
         // \Magento\Sales\Model\Order\Address::getName
