@@ -777,8 +777,8 @@ class Payment
             throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
         }
         finally{
-            return $this; // goes back to
         }
+        return $this; // goes back to
 
 
     }
