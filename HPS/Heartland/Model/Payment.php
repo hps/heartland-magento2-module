@@ -545,15 +545,19 @@ class Payment
                      *
                      */
                     try {
-                        if (\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount) >
+                        if (\HpsInputValidation::checkAmount($reportTxnDetail->settlementAmount) >
                             \HpsInputValidation::checkAmount($requestedAmount)
                         ) {
                             $this->log($suToken, 'HPS\Heartland\Model\Payment reverse Method Called: ');
+                            $this->log($parentPaymentID, 'HPS\Heartland\Model\Payment reverse Method Called: ');
+                            $this->log(\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
+                                       'HPS\Heartland\Model\Payment reverse Method Called authorizedAmount: ');
+                            $this->log(\HpsInputValidation::checkAmount($requestedAmount), 'HPS\Heartland\Model\Payment reverse Method Called: requestedAmount');
                             $chargeService->reverse($parentPaymentID,
                                 \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
                                 $currency,
                                 null,
-                                $requestedAmount);
+                                \HpsInputValidation::checkAmount($requestedAmount));
                         }
                     } catch (\Exception $e) {
                         $this->log($e->getCode(),
