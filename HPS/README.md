@@ -46,7 +46,7 @@ Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.co
 * While Magento2 documentation on [versioning](http://devdocs.magento.com/guides/v2.1/architecture/versioning.html) indicates the difference between 2.0.x and 2.1.x should be backward compatible changes 2.1.x no longer allows php 5.5.22 or greater.
 [2.0.x](http://devdocs.magento.com/guides/v2.0/install-gde/system-requirements.html) vs [2.1.x](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html)
 
-##### Because there are not yet any 2.0.x deployments in play, we will elect to go to the latest system requirements
+##### Latest system requirements
 
 There are now 2 options for installing our heartland-magento2-module.
 
