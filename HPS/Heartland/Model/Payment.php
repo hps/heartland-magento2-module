@@ -102,9 +102,9 @@ class Payment
      */
     protected $_debugReplacePrivateDataKeys
         = ['number',
-           'exp_month',
-           'exp_year',
-           'cvc'];
+            'exp_month',
+            'exp_year',
+            'cvc'];
     /**
      * @var bool
      */
@@ -150,20 +150,19 @@ class Payment
                          \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
                          \Magento\Directory\Model\CountryFactory $countryFactory,
                          \HpsServicesConfig $config,
-                         array $data = [])
-    {
+                         array $data = []) {
         parent::__construct($context,
-                            $registry,
-                            $extensionFactory,
-                            $customAttributeFactory,
-                            $paymentData,
-                            $scopeConfig,
-                            $logger,
-                            $moduleList,
-                            $localeDate,
-                            null,
-                            null,
-                            $data);
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $paymentData,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $localeDate,
+            null,
+            null,
+            $data);
         // \HPS\Heartland\Model\countryFactory
         // \HPS\Heartland\Model\Payment::$_countryFactory
         $this->_countryFactory = $countryFactory;
@@ -176,9 +175,8 @@ class Payment
         $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
         // \HpsServicesConfig::$versionNumber
         $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
-        $this->_objectManager               = HPS_OM::getObjectManager();
-        $this->messageManager
-                                            = $this->_objectManager->get('\Magento\Framework\Message\ManagerInterface');;
+        $this->_objectManager = HPS_OM::getObjectManager();
+        $this->messageManager = $this->_objectManager->get('\Magento\Framework\Message\ManagerInterface');;
     }
 
     /**
@@ -194,8 +192,7 @@ class Payment
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public
-    function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
+    function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         return $this->_payment($payment, $amount, \HpsTransactionType::AUTHORIZE);
     }
 
@@ -212,14 +209,12 @@ class Payment
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public
-    function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
+    function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
     }
 
     public
-    function void(\Magento\Payment\Model\InfoInterface $payment)
-    {
+    function void(\Magento\Payment\Model\InfoInterface $payment) {
         return $this->_payment($payment, 0.00, \HpsTransactionType::VOID);
     }
 
@@ -233,8 +228,7 @@ class Payment
      * @return \HPS\Heartland\Model\Payment         $this
      */
     public
-    function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
+    function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         return $this->_payment($payment, $amount, \HpsTransactionType::REFUND);
     }
 
@@ -245,8 +239,7 @@ class Payment
      * @return bool
      */
     public
-    function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {
+    function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null) {
         if (!$this->getConfigData('private_key')) {
             return false;
         }
@@ -263,13 +256,12 @@ class Payment
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public
-    function validate()
-    {
+    function validate() {
         $this->log('validate', '\HPS\Heartland\Model\Payment::validate');
-        $info           = $this->getInfoInstance();
-        $errorMsg       = false;
+        $info = $this->getInfoInstance();
+        $errorMsg = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
-        $ccNumber       = $info->getCcNumber();
+        $ccNumber = $info->getCcNumber();
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
@@ -315,8 +307,7 @@ class Payment
      * @return bool
      */
     public
-    function validateCcNum($ccNumber)
-    { // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
+    function validateCcNum($ccNumber) { // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
         return preg_match('/^[\d]{4}$/', $ccNumber) === 1;
     }
 
@@ -324,8 +315,7 @@ class Payment
      * @return \HpsCreditService
      */
     private
-    function getHpsCreditService()
-    {
+    function getHpsCreditService() {
         // \HPS\Heartland\Model\Payment::$_heartlandApi
         // \HpsCreditService::__construct
         return new \HpsCreditService($this->_heartlandApi);
@@ -337,8 +327,7 @@ class Payment
      * @return \HpsCardHolder
      */
     private
-    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
-    {
+    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
         $cardHolder = new \HpsCardHolder();
         // \Magento\Sales\Model\Order\Address::getName
         //$splitName = explode(' ', $billing->getName());
@@ -363,8 +352,7 @@ class Payment
      * @return \HpsAddress
      */
     private
-    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
-    {
+    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing) {
         $address = new \HpsAddress();
         // \Magento\Sales\Model\Order\Address::getStreetLine
         /** @var \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
@@ -405,8 +393,7 @@ class Payment
     function _payment(\Magento\Payment\Model\InfoInterface $payment,
                       $requestedAmount = 0.00,
                       $paymentAction
-                      = \HpsTransactionType::CHARGE)
-    {
+                      = \HpsTransactionType::CHARGE) {
 
         // Sanitize
         $requestedAmount = \HpsInputValidation::checkAmount($requestedAmount);
@@ -424,29 +411,29 @@ class Payment
          * @var null|float                                                                               $newAuthAmount
          *
          */
-        $errorMsg        = [];
-        $successMsg      = [];
-        $noticeMsg       = [];
+        $errorMsg = [];
+        $successMsg = [];
+        $noticeMsg = [];
         $validCardHolder = null;
         $reportTxnDetail = null;
-        $response        = null;
-        $details         = null;
-        $newAuthAmount   = null;
-        $suToken         = null;
+        $response = null;
+        $details = null;
+        $newAuthAmount = null;
+        $suToken = null;
         $validCardHolder = null;
         $reportTxnDetail = null;
-        $response        = null;
+        $response = null;
         try {
 
 
             $chargeService = $this->getHpsCreditService();
-            $currency      = HPS_DATA::getCurrencyCode();
+            $currency = HPS_DATA::getCurrencyCode();
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
             list($parentPaymentID) = explode('-', $payment->getParentTransactionId());
-            $parentPaymentID = (int) $parentPaymentID;
-            $canSaveToken    = $this->saveMuToken()
+            $parentPaymentID = (int)$parentPaymentID;
+            $canSaveToken = $this->saveMuToken()
                 ? true
                 : false;
 
@@ -468,8 +455,8 @@ class Payment
                         // new auth is requred
                         throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be captured. The amount is either larger than Authorized (%s) or
                     the authorisation for this transaction is no longer valid. A new authorisation is required',
-                                                                                     $parentPaymentID,
-                                                                                     $reportTxnDetail->authorizedAmount));
+                            $parentPaymentID,
+                            $reportTxnDetail->authorizedAmount));
                     } // validated acceptable authorization
                     // set to do a capture
                     $paymentAction = \HpsTransactionType::CAPTURE;
@@ -510,7 +497,9 @@ class Payment
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
-                if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
+                if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction ===
+                    \HpsTransactionType::CHARGE
+                ) {
                     $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
                     // \HPS\Heartland\Model\Payment::$_token_value
                     $suToken
@@ -538,10 +527,10 @@ class Payment
 
                     $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
                     $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount),
-                                                          $currency,
-                                                          $suToken,
-                                                          $validCardHolder,
-                                                          $canSaveToken);
+                        $currency,
+                        $suToken,
+                        $validCardHolder,
+                        $canSaveToken);
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -556,23 +545,23 @@ class Payment
                      *
                      */
                     try {
-                        if (\HpsInputValidation::checkAmount($reportTxnDetail->settlementAmount) > \HpsInputValidation::checkAmount($requestedAmount)) {
+                        if (\HpsInputValidation::checkAmount($reportTxnDetail->settlementAmount) >
+                            \HpsInputValidation::checkAmount($requestedAmount)
+                        ) {
                             $this->log($suToken, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $this->log($parentPaymentID, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $this->log(\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
                                        'HPS\Heartland\Model\Payment reverse Method Called authorizedAmount: ');
-                            $this->log(\HpsInputValidation::checkAmount($requestedAmount),
-                                       'HPS\Heartland\Model\Payment reverse Method Called: requestedAmount');
+                            $this->log(\HpsInputValidation::checkAmount($requestedAmount), 'HPS\Heartland\Model\Payment reverse Method Called: requestedAmount');
                             $chargeService->reverse($parentPaymentID,
-                                                    \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
-                                                    $currency,
-                                                    null,
-                                                    \HpsInputValidation::checkAmount($requestedAmount));
+                                \HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
+                                $currency,
+                                null,
+                                \HpsInputValidation::checkAmount($requestedAmount));
                         }
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         $this->log($e->getCode(),
-                                   'Reversal error. Logged only the capture proceeded normally
+                            'Reversal error. Logged only the capture proceeded normally
                         unless an error was generated by that call: ' . $e->getMessage());
 
                     }
@@ -596,10 +585,10 @@ class Payment
                 case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
                     $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
                     $response = $chargeService->charge(\HpsInputValidation::checkAmount($requestedAmount),
-                                                       HPS_DATA::getCurrencyCode(),
-                                                       $suToken,
-                                                       $validCardHolder,
-                                                       $canSaveToken);
+                        HPS_DATA::getCurrencyCode(),
+                        $suToken,
+                        $validCardHolder,
+                        $canSaveToken);
 
                     break;
                 /**
@@ -609,18 +598,18 @@ class Payment
                     break;
                 case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
                     $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
-                    $response      = $chargeService->reverse($parentPaymentID,
-                                                             $requestedAmount,
-                                                             $currency,
-                                                             $details,
-                                                             $newAuthAmount);
+                    $response = $chargeService->reverse($parentPaymentID,
+                        $requestedAmount,
+                        $currency,
+                        $details,
+                        $newAuthAmount);
                     break;
                 case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
                     $response = $chargeService->refund($requestedAmount,
-                                                       $currency,
-                                                       $parentPaymentID,
-                                                       $validCardHolder,
-                                                       $details);
+                        $currency,
+                        $parentPaymentID,
+                        $validCardHolder,
+                        $details);
                     break;
                 default:
                     throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
@@ -672,21 +661,18 @@ class Payment
 
 
                 try {
-                    if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
+                    if (((bool)$canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
                         /**This call will automatically make sure the expire date is updated on a save*/
-                        $chargeService->updateTokenExpiration($response->tokenData->tokenValue,
-                                                              $this->getAdditionalData()['cc_exp_month'],
-                                                              $this->getAdditionalData()['cc_exp_year']);
+                        $chargeService->updateTokenExpiration($response->tokenData->tokenValue, $this->getAdditionalData()['cc_exp_month'], $this->getAdditionalData()['cc_exp_year']);
                         // \HPS\Heartland\Model\StoredCard::setStoredCards
                         HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
-                                                         strtolower($info->getCcType()),
-                                                         $CcL4,
-                                                         $this->getAdditionalData()['cc_exp_month'],
-                                                         $this->getAdditionalData()['cc_exp_year']);
+                            strtolower($info->getCcType()),
+                            $CcL4,
+                            $this->getAdditionalData()['cc_exp_month'],
+                            $this->getAdditionalData()['cc_exp_year']);
                         $successMsg[] = __("Payment token saved for future purchases");
                     }/**/
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     // \Psr\Log\LoggerInterface::error
                     $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
                     not returned. The most likely cause would be that Multi-use tokens need to be enabled by
@@ -697,10 +683,10 @@ class Payment
                 // an error any where here will it seems not get picked up by Magento2 error handlers.
 
                 $this->log($response,
-                           'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
+                    'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
 
 
-                $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
+                $this->log((array)$response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
 
                 switch (get_class($response)) {
 
@@ -738,9 +724,11 @@ class Payment
                             $payment->setAmountPaid($detail->settlementAmount);
                         }
                         //Build a message to show the user what is happening
-                        $successMsg[]
-                            = __("The " . $info->getCcType() . " ending in {$CcL4} which expires on: " . $this->getAdditionalData()['cc_exp_month'] . " \\ " . $this->getAdditionalData()['cc_exp_year'] . " was {$actionVerb}
-                                           [${$requestedAmount}] successfully. Your approval code is " . $response->authorizationCode);
+                        $successMsg[] = __("The {$info->getCcType()} ending in {$CcL4} which expires on: {$this->getAdditionalData()
+                            ['cc_exp_month']} \\ {$this->getAdditionalData()['cc_exp_year']} was {$actionVerb}
+                            [\${$requestedAmount}]
+                    successfully. Your approval code is {$response->authorizationCode}"
+                        );
 
                         break;
 
@@ -748,7 +736,8 @@ class Payment
                         /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
                         $payment->setAmountPaid($response->settlementAmount);
                         $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
-                                 successfully " . $response->settlementAmount);
+                                 successfully " .
+                            $response->settlementAmount);
 
                         break;
 
@@ -764,34 +753,32 @@ class Payment
 
             } // end if
 
-                // send any error messages from processing to the browser
-                if (count($errorMsg)) {
-                    foreach ($errorMsg as $msg) {
+            // send any error messages from processing to the browser
+            if (count($errorMsg)) {
+                foreach ($errorMsg as $msg) {
+                    if (trim($msg)) {
+                        $this->messageManager->addErrorMessage($msg);
+                    }
+                }
+            }
+            else{
+                if (count($noticeMsg)) {
+                    foreach ($noticeMsg as $msg) {
                         if (trim($msg)) {
-                            $this->messageManager->addErrorMessage($msg);
-                        }
-                    }
-                }
-                else {
-                    if (count($noticeMsg)) {
-                        foreach ($noticeMsg as $msg) {
-                            if (trim($msg)) {
-                                $this->messageManager->addWarningMessage($msg);
-                            }
+                            $this->messageManager->addWarningMessage($msg);
                         }
                     }
                 }
             }
-        catch
-            (\Exception $e) {
-                if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
-                    $chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
-                }
-                //$this->messageManager->addErrorMessage('oops');
-                throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
+        } catch (\Exception $e) {
+            if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
+                $chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
             }
+            //$this->messageManager->addErrorMessage('oops');
+            throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
+        }
         finally{
-            }
+        }
         return $this; // goes back to
 
 
@@ -806,16 +793,15 @@ class Payment
      *
      */
     private
-    function saveMuToken()
-    {
-        $data                    = $this->getAdditionalData();
+    function saveMuToken() {
+        $data = $this->getAdditionalData();
         $this->_save_token_value = 0;
         if (array_key_exists('_save_token_value', $data)) {
-            $this->_save_token_value = (int) $data['_save_token_value'];
+            $this->_save_token_value = (int)$data['_save_token_value'];
         }
-        $this->log((int) $this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
+        $this->log((int)$this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
 
-        return (int) $this->_save_token_value;
+        return (int)$this->_save_token_value;
     }
 
     /** returns additional_data element of paymentMethod
@@ -823,12 +809,11 @@ class Payment
      * @return array
      */
     private
-    function getAdditionalData()
-    {
+    function getAdditionalData() {
 
         static $data = [];
         if (count($data) < 1) {
-            $data = (array) $this->getPaymentMethod();
+            $data = (array)$this->getPaymentMethod();
         }
 
         return $this->elementFromArray($data, 'additional_data');
@@ -839,15 +824,14 @@ class Payment
      * @return array
      * */
     private
-    function getPaymentMethod()
-    {
+    function getPaymentMethod() {
         /**
          * @var array $data
          * Holds submited JSOn data in a PHP associative array
          */
         static $data = [];
         if (count($data) < 1) {
-            $data = (array) HPS_Data::jsonData();
+            $data = (array)HPS_Data::jsonData();
         }
         $this->log($data, 'HPS\Heartland\Model\Payment getPaymentMethod Method Called:  ');
 
@@ -862,11 +846,10 @@ class Payment
      * @return array
      */
     private
-    function elementFromArray($data, $element)
-    {
+    function elementFromArray($data, $element) {
         $r = [];
         if (key_exists($element, $data)) {
-            $r = (array) $data[ $element ];
+            $r = (array)$data[ $element ];
         }
 
         return $r;
@@ -880,8 +863,7 @@ class Payment
      * @return string
      */
     private
-    function __sanitize($data)
-    {
+    function __sanitize($data) {
         return trim(filter_var(@print_r($data, true), FILTER_SANITIZE_STRING));
     }
 
@@ -897,16 +879,15 @@ class Payment
      * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
      */
     private
-    function getToken(\HpsTokenData $suToken)
-    {
+    function getToken(\HpsTokenData $suToken) {
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
         $this->getTokenValue();
-        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
+        if (preg_match('/^[\w]{11,253}$/', (string)$this->_token_value) !== 1) {
             $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
         }
         //First identify if we have a singleuse token in memory already
         if (!$this->validateSuToken() && !$this->validateMuToken()) {
-            $this->_token_value = (string) '';
+            $this->_token_value = (string)'';
         }
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
 
@@ -919,18 +900,17 @@ class Payment
      * gets/assigns $this->_token_value from post data
      */
     private
-    function getTokenValue()
-    {
+    function getTokenValue() {
         static $data = [];
         if (count($data) < 1) {
-            $data = (array) $this->getAdditionalData();
+            $data = (array)$this->getAdditionalData();
         }
         $r = '';
         if (key_exists('token_value', $data)) {
-            $r = (string) $data['token_value'];
+            $r = (string)$data['token_value'];
         }
         // ensure that the string is clean and has not leading or trailing whitespace
-        $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
+        $this->_token_value = (string)trim(filter_var($r, FILTER_SANITIZE_STRING));
     }
 
     /**
@@ -939,10 +919,9 @@ class Payment
      * @return bool
      */
     private
-    function validateSuToken()
-    {
-        return (bool) (preg_match('/^su[\w]{5,253}$/',
-                                  (string) $this->_token_value) === 1); //supt_5EvfbSaBCj9r9HLlP3CauZ5t
+    function validateSuToken() {
+        return (bool)(preg_match('/^su[\w]{5,253}$/',
+                (string)$this->_token_value) === 1); //supt_5EvfbSaBCj9r9HLlP3CauZ5t
     }
 
     /**
@@ -954,9 +933,8 @@ class Payment
      * @return bool
      */
     private
-    function validateMuToken()
-    {
-        return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);
+    function validateMuToken() {
+        return (bool)(preg_match('/^[\w]{5,253}$/', (string)$this->_token_value) === 1);
     }
 
     /**
@@ -969,27 +947,23 @@ class Payment
      * @return null
      */
     private
-    function log($param, $txt = '')
-    {
+    function log($param, $txt = '') {
         try {
             getenv('MAGE_MODE') == 'developer'
                 ? $this->_logger->log(100, $txt . print_r($param, true))
                 : '';
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->_logger->log(100, $txt . print_r($param, true));
         }
     }
 
     private
-    function porticoTransaction()
-    {
+    function porticoTransaction() {
 
     }
 
     private
-    function userNotification()
-    {
+    function userNotification() {
 
     }
 
