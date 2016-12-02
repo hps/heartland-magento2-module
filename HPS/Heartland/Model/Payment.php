@@ -724,9 +724,11 @@ class Payment
                             $payment->setAmountPaid($detail->settlementAmount);
                         }
                         //Build a message to show the user what is happening
-                        $successMsg[] = __("The {$info->getCcType()} ending in {$CcL4} which expires on: {$this->getAdditionalData()
-                            ['cc_exp_month']} \\ {$this->getAdditionalData()['cc_exp_year']} was {$actionVerb} [${$requestedAmount}]
-                    successfully. Your approval code is {$response->authorizationCode}"
+                        $successMsg[] = __("The ".$info->getCcType()." ending in {$CcL4} which expires on: ".
+                {$this->getAdditionalData()
+                            ['cc_exp_month']." \\ ".$this->getAdditionalData()['cc_exp_year']." was {$actionVerb}
+                        [${$requestedAmount}]
+                    successfully. Your approval code is ".$response->authorizationCode
                         );
 
                         break;
