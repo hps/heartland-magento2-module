@@ -53,16 +53,23 @@ There are now 2 options for installing our heartland-magento2-module.
 * [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
 Just SSH to your server as a user part of the web servers group and call this line 
 ```
-wget https://raw.githubusercontent.com/hps/heartland-magento2-module/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
+wget https://raw.githubusercontent.com/hps/heartland-magento2-module/master/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
 ```
 * Manual
 
 ##### Manual Installation:
-Clone this repo
-`git clone https://github.com/hps/heartland-magento2-module.git`
-From your base Magento2 directory -> app -> code (you may have to create this directory) [Magento2 Documentation](http://devdocs.magento.com/guides/v2.1/architecture/archi_perspectives/components/modules/mod_intro.html). 
-Install Dependencies with Composer
-`composer require hps/heartland-php`
+Clone this repo:
+```
+git clone https://github.com/hps/heartland-magento2-module.git
+```
+
+From your base Magento2 directory -> app -> code (you may have to create this directory) [Magento2 Documentation](http://devdocs.magento.com/guides/v2.1/architecture/archi_perspectives/components/modules/mod_intro.html).
+
+Install Dependencies with Composer:
+```
+composer require hps/heartland-php
+```
+
 Copy the `HPS` directory from this repository to your `app/code` directory. From the base Magento2 directory (instructions assume Ubuntu 14+)
 ```
     cd ${Magento2Instalation}
@@ -76,15 +83,18 @@ Copy the `HPS` directory from this repository to your `app/code` directory. From
 ```
 The following commands should work from your Magento 2 installation directory .
 ```
+    cd ${Magento2Instalation}
     php bin/magento cache:clean
+    composer require hps/heartland-php
     php bin/magento module:enable HPS_Heartland
     php bin/magento setup:upgrade  --keep-generated
     php bin/magento setup:di:compile
     php bin/magento setup:static-content:deploy
 ```
 Navigate to your admin logon. If you need the path you can retrieve it (web install usually sets this other than admin)
-
-    php bin/magento info:adminuri
+```
+php bin/magento info:adminuri
+```
 
 This will echo out the path
 
