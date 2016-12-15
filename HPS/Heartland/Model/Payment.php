@@ -437,10 +437,10 @@ class Payment
          * @var null|float                                                                               $newAuthAmount
          *
          */
-        $storeName       = substr(filter_var(trim(HPS_OM::getObjectManager()->get
+        $storeName       = substr(trim(filter_var(HPS_OM::getObjectManager()->get
                                                   ('\Magento\Store\Model\StoreManagerInterface')->getStore()->getName
                                                   ()),
-                                             FILTER_SANITIZE_SPECIAL_CHARS),0,8);
+                                             FILTER_SANITIZE_SPECIAL_CHARS),0,18);
         $errorMsg        = [];
         $successMsg      = [];
         $noticeMsg       = [];
