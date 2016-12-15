@@ -44,7 +44,7 @@ class Payment
     }
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
-        if (empty($this->_transactionRecord)){
+        if (isNull($this->_transactionRecord)){
             $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
             $abs = $this->getMethodInstance();
             $hps->secretApiKey = $abs->getConfigData('private_key');
