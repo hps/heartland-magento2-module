@@ -724,8 +724,11 @@ class Payment
 
                     case 'HpsReversal':
                         /** @var \HpsReversal $response Properties found in the HpsReversal */
-                        $successMsg[] = __("The amount authorised for Transaction ID: {$payment->getCcTransId()} for
-                        [\${$reportTxnDetail->settlementAmount}] was reduced to [\${$requestedAmount}] successfully");
+                        $successMsg[] = __("The amount authorised for Transaction ID: %1 for
+                        [\$%1] was reduced to [\$%1] successfully",$payment->getCcTransId()
+                                           ,$reportTxnDetail->settlementAmount
+                    ,$requestedAmount
+                    );
                         break;
 
                     case 'HpsRefund':
@@ -787,9 +790,6 @@ class Payment
                 }
 
             } // end if
-            else {
-                $payment->deny(true);
-            }
             // send any error messages from processing to the browser
             if (count($errorMsg)) {
                 foreach ($errorMsg as $msg) {
@@ -797,12 +797,13 @@ class Payment
                         $this->messageManager->addErrorMessage($msg);
                     }
                 }
+                $payment->deny(true);
             }
             else {
                 if (count($noticeMsg)) {
                     foreach ($noticeMsg as $msg) {
                         if (trim($msg)) {
-                            $this->messageManager->addWarningMessage($msg);
+                            $this->messageManager->addNoticeMessage($msg);
                         }
                     }
                 }
