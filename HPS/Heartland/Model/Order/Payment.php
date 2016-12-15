@@ -29,7 +29,7 @@ class Payment
      */
     public
     function canVoid()
-    {
+    { return true
         return $this->getHPS()->transactionStatus === 'A';; //true;
     }
 
