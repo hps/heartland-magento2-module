@@ -797,7 +797,7 @@ class Payment
                         $this->messageManager->addErrorMessage($msg);
                     }
                 }
-                $payment->deny(true);
+                //$payment->deny(true);
             }
             else {
                 if (count($noticeMsg)) {
