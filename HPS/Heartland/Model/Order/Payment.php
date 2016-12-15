@@ -27,7 +27,7 @@ class Payment
     public
     function canVoid()
     {
-        return true;
+        return false; //true;
     }
 
     /** Heartlands gatewway does not ever support Multiple partial capture but does allow for 1 only. Attempts to do
