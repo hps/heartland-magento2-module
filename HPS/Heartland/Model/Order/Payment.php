@@ -12,7 +12,7 @@ namespace HPS\Heartland\Model\Order;
  */
 class Payment
     extends \Magento\Sales\Model\Order\Payment {
-    private $_transactionRecord = null;
+    //private $_transactionRecord = null;
     /** Can Capture
      * @return bool
      */
