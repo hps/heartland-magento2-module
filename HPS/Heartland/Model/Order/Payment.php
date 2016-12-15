@@ -43,9 +43,11 @@ class Payment
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
         $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
-        $hps->secretApiKey = $this->getConfigData('private_key');
-        $hps->developerId = $this->getConfigData('developerId');
-        $hps->versionNumber = $this->getConfigData('versionNumber');
+        $abs = HPS\Heartland\Helper\ObjectManager::getObjectManager()->get
+        ('\Magento\Payment\Model\Method\AbstractMethod');
+        $hps->secretApiKey = $abs->getConfigData('private_key');
+        $hps->developerId = $abs->getConfigData('developerId');
+        $hps->versionNumber = $abs->getConfigData('versionNumber');
         return new \HpsCreditService($hps);
     }
 }
