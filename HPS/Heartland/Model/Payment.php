@@ -483,7 +483,8 @@ class Payment
                         || $reportTxnDetail->transactionType !== \HpsTransactionType::AUTHORIZE
                     ) {
                         // new auth is requred
-                        throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be captured. The amount is either larger than Authorized (%s) or
+                        throw new \Magento\Framework\Exception\LocalizedException(__('The transaction "%1" cannot be
+                        captured. The amount is either larger than Authorized (%2) or
                     the authorisation for this transaction is no longer valid. A new authorisation is required',
                                                                                      $parentPaymentID,
                                                                                      $reportTxnDetail->authorizedAmount));
