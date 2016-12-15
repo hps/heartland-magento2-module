@@ -30,7 +30,7 @@ class Payment
     public
     function canVoid()
     {
-        return $this->getHPS()->get($this->getCcTransId())->transactionStatus === 'A';; //true;
+        return $this->getHPS()->transactionStatus === 'A';; //true;
     }
 
     /** Heartlands gatewway does not ever support Multiple partial capture but does allow for 1 only. Attempts to do
@@ -40,7 +40,7 @@ class Payment
     public
     function canCapturePartial()
     {
-        return false;
+        return $this->getHPS()->settlementAmount>0;
     }
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
