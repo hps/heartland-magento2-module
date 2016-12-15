@@ -39,7 +39,5 @@ class Payment
     {
         return true;
     }
-    public function cancel(){
-        return false;
-    }
+    
 }
