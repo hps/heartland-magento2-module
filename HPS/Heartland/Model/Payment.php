@@ -815,7 +815,8 @@ class Payment
                 @$chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
             }
             //$this->messageManager->addErrorMessage('oops');
-            throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
+            //throw new LocalizedException(new Phrase("An unexpected error occurred and your transaction was not
+            //processed. If your card was charged those funds have been reversed {$e->getLine()} {$e->getMessage()}"));
         }
         finally {
         }
