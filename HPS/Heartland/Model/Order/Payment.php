@@ -21,7 +21,7 @@ class Payment
         ;
        $l =$this->getLastTransId();
         $d = $this->getHPS()->get($this->getCcTransId());
-        return $d->settlementAmount ?false:true;
+        return $d->settlementAmount>0 ?false:true;
     }
 
     /**
