@@ -39,7 +39,7 @@ class Payment
      */
     public
     function canCapturePartial()
-    {
+    {return true;
         return $this->getHPS()->settlementAmount>0?false:true;
     }
     private function getHPS(){
