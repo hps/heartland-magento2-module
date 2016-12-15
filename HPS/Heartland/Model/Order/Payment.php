@@ -21,7 +21,7 @@ class Payment
         ;
        $l =$this->getLastTransId();
         $d = $this->getHPS()->get($this->getCcTransId());
-        return $d->transactionStatus === 'A'?true:false;
+        return $d->settlementAmount ?true:false;
     }
 
     /**
