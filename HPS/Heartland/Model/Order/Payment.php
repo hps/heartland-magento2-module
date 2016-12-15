@@ -19,7 +19,7 @@ class Payment
     function canCapture()
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         ;
-        return $this->getHPS()->get($this->getCcTransId())->transactionStatus === 'A';
+        return $this->getHPS()->get($this->getCcTransId())->transactionStatus === 'A'?true:false;
     }
 
     /**
