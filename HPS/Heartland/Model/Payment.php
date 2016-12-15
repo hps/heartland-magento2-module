@@ -656,7 +656,7 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg[] = 'Server Error:  ' . $e->getMessage();
+            $errorMsg[] = 'Gateway Error:  ' . $e->getMessage();
         }
         catch (\HpsCreditException $e) {
             $errorMsg[] = 'Cannot process Payment: ' . $e->getMessage();
