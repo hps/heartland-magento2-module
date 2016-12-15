@@ -18,7 +18,5 @@
 namespace HPS\Heartland\Block\Form;
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
-
-    protected $_template = 'Magento_Payment::form/cc.phtml';
-
+    protected $_template = 'HPS_Heartland::form/cc.phtml';
 }

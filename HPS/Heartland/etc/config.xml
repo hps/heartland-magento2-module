@@ -12,9 +12,13 @@
     <default>
         <payment>
             <hps_heartland>
-                <active>0</active>
+                <active>1</active>
                 <model>HPS\Heartland\Model\Payment</model>
                 <payment_action>authorize_capture</payment_action>
+                <currency>USD</currency>
+                <can_capture>1</can_capture>
+                <can_void>1</can_void>
+                <is_gateway></is_gateway>
                 <title>Heartland</title>
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />

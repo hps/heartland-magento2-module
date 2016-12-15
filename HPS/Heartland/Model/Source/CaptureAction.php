@@ -28,7 +28,7 @@ class CaptureAction implements \Magento\Framework\Option\ArrayInterface
         return [
             [
                 'value' => PaymentMethod::CAPTURE_ON_INVOICE,
-                'label' => __('Invoice'),
+                'label' => __('Invoice*'),
             ],
             [
                 'value' => PaymentMethod::CAPTURE_ON_SHIPMENT,
