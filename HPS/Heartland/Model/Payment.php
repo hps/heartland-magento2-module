@@ -795,6 +795,7 @@ class Payment
                 foreach ($errorMsg as $msg) {
                     if (trim($msg)) {
                         $this->messageManager->addErrorMessage($msg);
+                        throw new LocalizedException(new Phrase($msg));
                     }
                 }
                 //$payment->deny(true);
