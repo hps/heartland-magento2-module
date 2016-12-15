@@ -20,7 +20,7 @@ class Payment
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         ;
        $l =$this->getLastTransId();
-        $d = $this->getHPS()->get($this->getLastTransId());
+        $d = $this->getHPS()->get((int)$this->getLastTransId());
         return $d->transactionStatus === 'A'?true:false;
     }
 
