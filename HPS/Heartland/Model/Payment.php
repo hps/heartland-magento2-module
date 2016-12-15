@@ -63,7 +63,7 @@ class Payment
     /**
      * @var bool
      */
-    protected $_canOrder = true;
+    protected $_canOrder  = true;
     protected $_canCancel = true;
 
     /**
@@ -223,12 +223,12 @@ class Payment
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
     }
+
     public
     function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::$CAPTURE);
     }
-
 
     public
     function void(\Magento\Payment\Model\InfoInterface $payment)
@@ -555,8 +555,6 @@ class Payment
                                                           $suToken,
                                                           $validCardHolder,
                                                           $canSaveToken);
-                    //$payment->setParentTransactionId($response->transactionId . '-' . $this->transactionTypeMap[
-                    //                                                                   $paymentAction ]);
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -754,7 +752,7 @@ class Payment
                             $actionVerb = 'Charged';
                             /** @var \HpsReportTransactionDetails $detail Properties found in the as a result of capture or get */
                             $detail = $chargeService->get($response->transactionId);
-                            //$payment->setAmountPaid($detail->settlementAmount);
+                            $payment->setAmountPaid($detail->settlementAmount);
                         }
                         //Build a message to show the user what is happening
                         $successMsg[] = __("The {$info->getCcType()} ending in {$CcL4} which expires on: {$this->getAdditionalData()
@@ -766,9 +764,10 @@ class Payment
 
                     case 'HpsReportTransactionDetails':
                         /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
-                        //$payment->setAmountPaid($response->settlementAmount);
-                        $successMsg[] = __("The " . $info->getCcType() . " ending in " . $CcL4 . " was Invoiced
-                                 successfully " . $response->settlementAmount);
+                        $payment->setAmountPaid($response->settlementAmount);
+                        $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
+                        $successMsg[] = __("The {$response->cardType} ending in {$response->maskedCardNumber}
+                        was Invoiced successfully \${$response->settlementAmount}" );
 
                         break;
 
@@ -783,7 +782,9 @@ class Payment
                 }
 
             } // end if
-
+            else {
+                $payment->deny(true);
+            }
             // send any error messages from processing to the browser
             if (count($errorMsg)) {
                 foreach ($errorMsg as $msg) {
