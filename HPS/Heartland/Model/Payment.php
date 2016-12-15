@@ -794,7 +794,7 @@ class Payment
             if (count($errorMsg)) {
                 foreach ($errorMsg as $msg) {
                     if (trim($msg)) {
-                        $this->messageManager->addErrorMessage($msg);
+                        //$this->messageManager->addErrorMessage($msg);
                         throw new LocalizedException(new Phrase($msg));
                     }
                 }
