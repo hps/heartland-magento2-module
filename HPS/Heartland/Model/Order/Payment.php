@@ -29,7 +29,8 @@ class Payment
      */
     public
     function canVoid()
-    { return true;
+    {
+        return true;
         return $this->getHPS()->transactionStatus === 'A';; //true;
     }
 
@@ -39,7 +40,8 @@ class Payment
      */
     public
     function canCapturePartial()
-    {return true;
+    {
+        return true;
         return $this->getHPS()->settlementAmount>0?false:true;
     }
     private function getHPS(){
