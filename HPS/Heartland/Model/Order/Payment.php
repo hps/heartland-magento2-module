@@ -18,7 +18,8 @@ class Payment
     public
     function canCapture()
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
-        return true;
+        ;
+        return $this->getHPS()->get($this->getCcTransId())->transactionStatus === 'A';
     }
 
     /**
@@ -39,5 +40,12 @@ class Payment
     {
         return true;
     }
-    
+    private function getHPS(){
+        /** @var \HpsServicesConfig $hps */
+        $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
+        $hps->secretApiKey = $this->getConfigData('private_key');
+        $hps->developerId = $this->getConfigData('developerId');
+        $hps->versionNumber = $this->getConfigData('versionNumber');
+        return new \HpsCreditService($hps);
+    }
 }
