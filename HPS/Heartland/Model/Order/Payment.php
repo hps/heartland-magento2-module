@@ -43,7 +43,7 @@ class Payment
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
         $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
-        $abs = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->create('\Magento\Payment\Model\Method\AbstractMethod');
+        $abs = $this->getMethodInstance();
         $hps->secretApiKey = $abs->getConfigData('private_key');
         $hps->developerId = $abs->getConfigData('developerId');
         $hps->versionNumber = $abs->getConfigData('versionNumber');
