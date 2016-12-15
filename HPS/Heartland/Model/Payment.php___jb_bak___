@@ -798,7 +798,7 @@ class Payment
                         throw new LocalizedException(new Phrase($msg));
                     }
                 }
-                //$payment->deny(true);
+                $payment->deny(true);
             }
             else {
                 if (count($noticeMsg)) {
