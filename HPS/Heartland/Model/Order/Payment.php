@@ -15,6 +15,7 @@ class Payment
     /** Can Capture
      * @return bool
      */
+
     public
     function canCapture()
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
@@ -40,7 +41,7 @@ class Payment
     public
     function canCapturePartial()
     {
-        return true;
+        return false;
     }
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
