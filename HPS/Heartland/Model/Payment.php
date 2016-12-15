@@ -228,7 +228,7 @@ class Payment
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::$CAPTURE);
     }
- 
+
 
     public
     function void(\Magento\Payment\Model\InfoInterface $payment)
