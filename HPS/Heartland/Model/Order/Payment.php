@@ -39,4 +39,7 @@ class Payment
     {
         return true;
     }
+    public function canCancel(){
+        return false;
+    }
 }
