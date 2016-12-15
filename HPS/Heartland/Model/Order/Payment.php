@@ -12,6 +12,7 @@ namespace HPS\Heartland\Model\Order;
  */
 class Payment
     extends \Magento\Sales\Model\Order\Payment {
+    private $_transactionRecord = null;
     /** Can Capture
      * @return bool
      */
@@ -21,6 +22,7 @@ class Payment
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         ;
        $l =$this->getLastTransId();
+        $this->_transactionRecord = $this->getHPS()->get($this->getCcTransId());
         $d = $this->getHPS()->get($this->getCcTransId());
         return $d->settlementAmount>0 ;
     }
@@ -45,11 +47,15 @@ class Payment
     }
     private function getHPS(){
         /** @var \HpsServicesConfig $hps */
-        $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
-        $abs = $this->getMethodInstance();
-        $hps->secretApiKey = $abs->getConfigData('private_key');
-        $hps->developerId = $abs->getConfigData('developerId');
-        $hps->versionNumber = $abs->getConfigData('versionNumber');
-        return new \HpsCreditService($hps);
+        if (empty($this->_transactionRecord)){
+            $hps = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
+            $abs = $this->getMethodInstance();
+            $hps->secretApiKey = $abs->getConfigData('private_key');
+            $hps->developerId = $abs->getConfigData('developerId');
+            $hps->versionNumber = $abs->getConfigData('versionNumber');
+
+            $this->_transactionRecord = $this->getHPS()->get($this->getCcTransId());
+
+        }
     }
 }
