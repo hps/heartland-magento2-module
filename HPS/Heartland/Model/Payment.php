@@ -418,7 +418,7 @@ class Payment
     function _payment(\Magento\Payment\Model\InfoInterface $payment,
                       $requestedAmount = 0.00,
                       $paymentAction
-                      = \HpsTransactionType::CHARGE)
+                      = \HpsTransactionType::CHARGE) 
     {
 
         // Sanitize
@@ -437,10 +437,13 @@ class Payment
          * @var null|float                                                                               $newAuthAmount
          *
          */
-        $storeName       = substr(trim(filter_var(HPS_OM::getObjectManager()->get
-                                                  ('\Magento\Store\Model\StoreManagerInterface')->getStore()->getName
-                                                  ()),
-                                             FILTER_SANITIZE_SPECIAL_CHARS),0,18);
+        $storeName       = substr(trim(filter_var(HPS_OM::getObjectManager()
+                                                        ->get('\Magento\Store\Model\StoreManagerInterface')
+                                                        ->getStore()
+                                                        ->getName()),
+                                       FILTER_SANITIZE_SPECIAL_CHARS),
+                                  0,
+                                  18);
         $errorMsg        = [];
         $successMsg      = [];
         $noticeMsg       = [];
@@ -559,7 +562,9 @@ class Payment
                                                           $currency,
                                                           $suToken,
                                                           $validCardHolder,
-                                                          $canSaveToken,null,$storeName);
+                                                          $canSaveToken,
+                                                          null,
+                                                          $storeName);
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -725,32 +730,34 @@ class Payment
                     case 'HpsReversal':
                         /** @var \HpsReversal $response Properties found in the HpsReversal */
                         $successMsg[] = __("The amount authorised for Transaction ID: %1 for
-                        [\$%1] was reduced to [\$%1] successfully",$payment->getCcTransId()
-                                           ,$reportTxnDetail->settlementAmount
-                    ,$requestedAmount
-                    );
+                        [\$%1] was reduced to [\$%1] successfully",
+                                           $payment->getCcTransId(),
+                                           $reportTxnDetail->settlementAmount,
+                                           $requestedAmount);
                         break;
 
                     case 'HpsRefund':
                         /** @var \HpsRefund $response Properties found in the HpsRefund */
-                        $successMsg[] = __("The Transaction ID: {$payment->getCcTransId()} was refunded for [\${$requestedAmount}]
-                        successfully");
+                        $successMsg[] = __("The Transaction ID: %1 was refunded for \$%1
+                        successfully",
+                                           $payment->getCcTransId(),
+                                           $requestedAmount);
+                        $payment->setBaseAmountRefunded($requestedAmount);
 
                         break;
 
                     case 'HpsVoid':
                         /** @var \HpsVoid $response Properties found in the HpsVoid */
-                        $successMsg[] = __("The Transaction ID: {$payment->getCcTransId()} was voided successfully");
+                        $successMsg[] = __("The Transaction ID: %1 was voided successfully", $payment->getCcTransId());
                         break;
 
                     case 'HpsAuthorization':
                         /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
                         $payment->setCcTransId($response->transactionId);
-
                         $payment->setCcApproval($response->authorizationCode);
                         $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
                         $payment->setCcCidStatus($response->cvvResultCode . ': ' . $response->cvvResultText);
-                        //$payment->setCcLast4($this->getAdditionalData()['cc_number']);
+                        $payment->setCcLast4($this->getAdditionalData()['cc_number']);
                         $payment->setCcExpMonth($this->getAdditionalData()['cc_exp_month']);
                         $payment->setCcExpYear($this->getAdditionalData()['cc_exp_year']);
                         $payment->setCcType($this->getAdditionalData()['cc_type']);
@@ -763,10 +770,15 @@ class Payment
                             $payment->setAmountPaid($detail->settlementAmount);
                         }
                         //Build a message to show the user what is happening
-                        $successMsg[] = __("The {$info->getCcType()} ending in {$CcL4} which expires on: {$this->getAdditionalData()
-                            ['cc_exp_month']} \\ {$this->getAdditionalData()['cc_exp_year']} was {$actionVerb}
-                            \${$requestedAmount}
-                    successfully. Your approval code is {$response->authorizationCode}");
+                        $successMsg[]
+                            = __("The %1 ending in %1 which expires on: %1 \\ %1 was %1 \$%1 successfully. Your approval code is %1",
+                                 $response->cardType,
+                                 $CcL4,
+                                 $this->getAdditionalData() ['cc_exp_month'],
+                                 $this->getAdditionalData()['cc_exp_year'],
+                                 $actionVerb,
+                                 $requestedAmount,
+                                 $response->authorizationCode);
 
                         break;
 
@@ -774,8 +786,10 @@ class Payment
                         /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
                         $payment->setAmountPaid($response->settlementAmount);
                         $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
-                        $successMsg[] = __("The {$response->cardType} ending in {$response->maskedCardNumber}
-                        was Invoiced successfully \${$response->settlementAmount}" );
+                        $successMsg[] = __("The %1 ending in %1 was Invoiced successfully \$%1",
+                                           $response->cardType,
+                                           $response->maskedCardNumber,
+                                           $response->settlementAmount);
 
                         break;
 
