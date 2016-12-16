@@ -418,7 +418,7 @@ class Payment
     function _payment(\Magento\Payment\Model\InfoInterface $payment,
                       $requestedAmount = 0.00,
                       $paymentAction
-                      = \HpsTransactionType::CHARGE) 
+                      = \HpsTransactionType::CHARGE)
     {
 
         // Sanitize
