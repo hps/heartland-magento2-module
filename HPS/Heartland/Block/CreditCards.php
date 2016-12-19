@@ -29,6 +29,6 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
                 return $childBlock->render($token);
             }
         }
-        return $this->render('{}');
+        return '';
     }
 }
