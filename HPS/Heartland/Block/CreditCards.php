@@ -23,6 +23,6 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
     public function renderTokenHtml(PaymentTokenInterface $token)
     {
 
-        return '*';
+        return 'sdfsdf';
     }
 }
