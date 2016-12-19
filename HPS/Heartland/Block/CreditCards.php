@@ -26,7 +26,7 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
         foreach ($this->getChildNames() as $childName) {
             $childBlock = $this->getChildBlock($childName);
             if ($childBlock instanceof TokenRendererInterface && $childBlock->canRender($token)) {
-                return $childBlock->render($childName);
+                return $childBlock->render($token);
             }
         }
         return $this->render('{}');
