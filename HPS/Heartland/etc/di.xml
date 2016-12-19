@@ -26,6 +26,5 @@
         </arguments>
     </type>
 
-    <preference for="Magento\Sales\Model\Order\Payment" type="\HPS\Heartland\Model\Order\Payment" />
 
 </config>
