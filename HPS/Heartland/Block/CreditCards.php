@@ -20,7 +20,7 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
      * @param PaymentTokenInterface $token
      * @return string
      */
-    public function renderTokenHtml(PaymentTokenInterface $token)
+    public function renderTokenHtml()
     {
 
         return '';
