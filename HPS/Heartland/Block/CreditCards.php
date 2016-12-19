@@ -23,12 +23,6 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
     public function renderTokenHtml(PaymentTokenInterface $token)
     {
 
-        foreach ($this->getChildNames() as $childName) {
-            $childBlock = $this->getChildBlock($childName);
-            if ($childBlock instanceof \Magento\Vault\Block\TokenRendererInterface && $childBlock->canRender($token)) {
-                return $childBlock->render($token);
-            }
-        }
         return '';
     }
 }
