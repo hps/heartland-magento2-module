@@ -14,7 +14,7 @@
         <route id="heartland" frontName="heartland">
             <module name="HPS_Heartland" />
         </route>
-        <route frontName="vault" id="vault">
+        <route frontName="listaction" id="listaction">
             <module name="HPS_Heartland"/>
         </route>
     </router>
