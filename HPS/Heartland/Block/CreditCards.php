@@ -22,8 +22,6 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
      */
     public function renderTokenHtml(PaymentTokenInterface $token)
     {
-          $this->setTemplate('HPS_Heartland::heartlandtokens.phtml');
-
-        return $this->toHtml();;
+        return '';
     }
 }
