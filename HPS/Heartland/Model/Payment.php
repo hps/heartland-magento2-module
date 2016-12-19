@@ -27,7 +27,7 @@ use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  *
  * @package HPS\Heartland\Model
- */
+ */ 
 class Payment
     extends \Magento\Payment\Model\Method\Cc {
     /**
