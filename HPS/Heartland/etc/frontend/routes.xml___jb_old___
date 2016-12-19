@@ -14,8 +14,5 @@
         <route id="heartland" frontName="heartland">
             <module name="HPS_Heartland" />
         </route>
-        <route frontName="vault" id="vault">
-            <module name="HPS_Heartland"/>
-        </route>
     </router>
 </config>
