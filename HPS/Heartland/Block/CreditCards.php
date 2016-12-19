@@ -19,16 +19,16 @@ class CreditCards extends \Magento\Vault\Block\CreditCards
     /**
      * @param PaymentTokenInterface $token
      * @return string
-
+     */
     public function renderTokenHtml(PaymentTokenInterface $token)
     {
 
         foreach ($this->getChildNames() as $childName) {
             $childBlock = $this->getChildBlock($childName);
-            if ($childBlock instanceof TokenRendererInterface && $childBlock->canRender($token)) {
+            if ($childBlock instanceof \Magento\Vault\Block\TokenRendererInterface && $childBlock->canRender($token)) {
                 return $childBlock->render($token);
             }
         }
         return '';
-    } */
+    }
 }
