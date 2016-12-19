@@ -1,5 +1,15 @@
 <?php
 /**
+ *  Heartland payment method model
+ *
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ */
+
+/**
  * Created by PhpStorm.
  * User: charles.simmons
  * Date: 2/22/2016
@@ -87,9 +97,13 @@ class Data extends AbstractHelper
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_DIRECTORY_LIST)->getRoot();
     }
     public static function getBaseUrl()    {
-        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();;
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();
     }
 
-
-
+    public static function getCurrencyCode() {
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getCurrentCurrency()->getCode();
+    }
 }
+
+
+

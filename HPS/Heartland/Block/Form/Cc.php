@@ -1,4 +1,13 @@
 <?php
+/**
+ *  Heartland payment method model
+ *
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ */
 
 /**
  * Created by PhpStorm.
@@ -9,7 +18,5 @@
 namespace HPS\Heartland\Block\Form;
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
-
-    protected $_template = 'Magento_Payment::form/cc.phtml';
-
+    protected $_template = 'HPS_Heartland::form/cc.phtml';
 }

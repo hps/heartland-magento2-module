@@ -1,5 +1,15 @@
 
 
+/*
+ *  Heartland payment method model
+ *
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ */
+
 var getImageURL = (function () {
     //build a relative path based on the module location on the configured server
     var myScript = document.querySelector('script#HPS_SECURESUBMIT_IFRAME_CODE').src.split('/').slice(0,-4).join('/') + '/images/';

@@ -1,11 +1,11 @@
-/**
- * HPS_Heartland Magento JS component
+/*
+ *  Heartland payment method model
  *
- * @category    HPS
- * @package     HPS_Heartland
- * @author      Charles Simmons <charles.simmons@e-hps.com>
- * @copyright   HPS (http://heartland.us)
- * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 /*browser:true*/
 /*global define*/

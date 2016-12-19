@@ -9,15 +9,14 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
-namespace HPS\Heartland\Model\Source;
-
-class CcType extends \Magento\Payment\Model\Source\Cctype
-{
-    /**
-     * @return array
-     */
-    public function getAllowedTypes()
-    {
-        return array('VI', 'MC', 'AE', 'DI', 'JCB', 'OT');
-    }
+/**
+ * Created by PhpStorm.
+ * User: ttnnkkrr
+ * Date: 11/22/16
+ * Time: 9:33 PM
+ */
+namespace HPS\Heartland\Controller\Cart;
+use Magento\Checkout\Controller\Cart\Add;
+class Add  extends Magento\Checkout\Controller\Cart\Add{
+    
 }

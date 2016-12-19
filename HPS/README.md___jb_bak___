@@ -46,63 +46,28 @@ Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.co
 * While Magento2 documentation on [versioning](http://devdocs.magento.com/guides/v2.1/architecture/versioning.html) indicates the difference between 2.0.x and 2.1.x should be backward compatible changes 2.1.x no longer allows php 5.5.22 or greater.
 [2.0.x](http://devdocs.magento.com/guides/v2.0/install-gde/system-requirements.html) vs [2.1.x](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html)
 
-##### Because there are not yet any 2.0.x deployments in play, we will elect to go to the latest system requirements
+##### Latest system requirements
 
 There are now 2 options for installing our heartland-magento2-module.
 
 * [PHP script] (HPS_Installer.php) The script will check system requirements for you and locate your magento instalation and create a customized ssh script to execute. If there is a problem it will tell you what the issue might be.
 Just SSH to your server as a user part of the web servers group and call this line 
 ```
-wget https://raw.githubusercontent.com/hps/heartland-magento2-module/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
+wget https://raw.githubusercontent.com/hps/heartland-magento2-module/master/HPS_Installer.php && php -f HPS_Installer.php | tee -a HPS_Heartland.log && sh HPS_Install.sh | tee -a HPS_Heartland.log
 ```
 * Manual
 
 ##### Manual Installation:
-Clone this repo
-`git clone https://github.com/hps/heartland-magento2-module.git`
-From your base Magento2 directory -> app -> code (you may have to create this directory) [Magento2 Documentation](http://devdocs.magento.com/guides/v2.1/architecture/archi_perspectives/components/modules/mod_intro.html). 
-Install Dependencies with Composer
-`composer require hps/heartland-php`
-Copy the `HPS` directory from this repository to your `app/code` directory. From the base Magento2 directory (instructions assume Ubuntu 14+)
+Clone this repo:
 ```
-    cd ${Magento2Instalation}
-    rm -rf var/cache/*
-    rm -rf var/page_cache/*
-    rm -rf var/generation/*
-    rm -rf var/di
-    rm -rf pub/static/adminhtml
-    rm -rf pub/static/frontend
-    rm -rf var/report/*
+git clone https://github.com/hps/heartland-magento2-module.git
 ```
-The following commands should work from your Magento 2 installation directory .
+
+From your base Magento2 directory -> app -> code (you may have to create this directory) [Magento2 Documentation](http://devdocs.magento.com/guides/v2.1/architecture/archi_perspectives/components/modules/mod_intro.html).
+
+Install Dependencies with Composer:
 ```
-    php bin/magento cache:clean
-    php bin/magento module:enable HPS_Heartland
-    php bin/magento setup:upgrade  --keep-generated
-    php bin/magento setup:di:compile
-    php bin/magento setup:static-content:deploy
+composer require hps/heartland-php
 ```
-Navigate to your admin logon. If you need the path you can retrieve it (web install usually sets this other than admin)
 
-    php bin/magento info:adminuri
-
-This will echo out the path
-
-## Configure your store:
-
-Open Store Configuration
-
-![image](configNav.png)
-
-Expand Sales and navigate to Payment Methods.
-
-![image](pMethod.png)
-
-Fill out the form as per the instructions on the screen. Please be aware that you can change the title to anything you would like to appear on your checkout page for the consumer to see.
-
-![image](cHeartland.png)
-
-### Support or Contact
-
-Having trouble? Check out our [documentation](https://developer.heartlandpaymentsystems.com/SecureSubmit/Documentation) or [contact support](https://developer.heartlandpaymentsystems.com/SecureSubmit/Support) and we’ll help you sort it out.
-
+Copy the `HPS` directory from this
