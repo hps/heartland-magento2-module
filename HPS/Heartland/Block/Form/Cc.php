@@ -30,6 +30,18 @@ class Cc extends \Magento\Payment\Block\Form\Cc
 {
     protected $_template = 'HPS_Heartland::form/cc.phtml';
 
+    public function getCcTokens(){
+        //\Magento\Sales\Api\OrderRepositoryInterface
+        //$this->_request
+        //\HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\Magento\Sales\Api\OrderRepositoryInterface')
+        //$s = $this->getData('method')->getData('info_instance')->getQuote();
+        //return $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');;
+        //return ‌‌$this->getData('method'); //_data['method']->_data['info_instance']->_quote->_currentPayment->_quote
+        //->customerRepository
+        //->customerRegistry;
+        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id'));
+    }
+
     /**
      * Render block HTML
      *
