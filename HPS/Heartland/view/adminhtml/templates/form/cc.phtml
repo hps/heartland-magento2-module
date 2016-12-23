@@ -2,11 +2,11 @@
 /**
  *  Heartland payment method model
  *
- *  @category    HPS
- *  @package     HPS_Heartland
- *  @author      Charlie Simmons <charles.simmons@e-hps.com>
- *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Charlie Simmons <charles.simmons@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 // @codingStandardsIgnoreFile
@@ -14,25 +14,245 @@
  * @var \HPS\Heartland\Block\Form\Cc $block
  */
 
-$hpsTokens = $block->getCcTokens();
-$code = $block->escapeHtml($block->getMethodCode());
-$ccType = $block->getInfoData('cc_type');
+$hpsTokens  = $block->getCcTokens();
+$pubApiKey  = \HPS\Heartland\Helper\Data::getPublicKey();
+$code       = $block->escapeHtml($block->getMethodCode());
+$ccType     = $block->getInfoData('cc_type');
 $ccExpMonth = $block->getInfoData('cc_exp_month');
-$ccExpYear = $block->getInfoData('cc_exp_year');
-var_dump($hpsTokens);
+$ccExpYear  = $block->getInfoData('cc_exp_year'); //
+//var_dump($hpsTokens);
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>"
+
+
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */
+echo $code; ?>"
           style="display:none">
+
+    <script>
+        var <?php /* @noEscape */ echo $code; ?>;
+        require([
+                    'ko',
+                    'jquery',
+                    'uiComponent'
+                ],
+
+                /*
+                 *  Heartland payment method model
+                 *
+                 *  @category    HPS
+                 *  @package     HPS_Heartland
+                 *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+                 *  @copyright   Heartland (http://heartland.us)
+                 *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+                 */
+
+                /*browser:true*/
+                /*global define*/
+                function (
+
+
+                        ko,
+                        $,
+                        Component 
+
+                ) {
+                    'use strict';
+                    /**
+                     * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                     * if there is any form of error we disable the payment form
+                     *
+                     */
+                    $(document).ready(function(){
+                    <?php /* @noEscape */ echo $code; ?> = {
+                        hpsSavedCards: function(){
+                            
+                            $("#SavedCardsTable").fadeIn();
+
+
+                            if ($("#SavedCardsTable tr").length < 2) {
+                                <?php /* @noEscape */ echo $code; ?>.hpsBusy();
+                                if(customer.isLoggedIn()){
+                                    $.ajax({
+                                        url: "../heartland/creditcard/get"
+                                        , success: function (data) {
+                                            if (data != '[]') {
+
+                                                // process json string to table rows
+                                                //$("#SavedCardsTable").append(JSON.parse(data));
+                                                <?php /* @noEscape */ echo $code; ?>.drawTable(JSON.parse(data))
+                                                // $("#SavedCardsTable").append($("<tr></tr>"));
+                                                <?php /* @noEscape */ echo $code; ?>.hpsNotBusy();
+
+                                            } else {
+                                                $("#SavedCardsTable").append($("<tr />"));
+                                                <?php /* @noEscape */ echo $code; ?>.hpsNewCard();
+                                            }
+                                            $("#hps_heartland_NewCard").insertAfter($("#SavedCardsTable tr").last());
+                                        }
+                                    });
+                                }else{
+                                    $("#SavedCardsTable").append($("<tr />"));
+                                    <?php /* @noEscape */ echo $code; ?>.hpsNewCard();
+                                }
+                            }
+                            //return true;
+                        },
+                        drawTable: function(data) {
+                            
+                            for (var i = 0; i < data.length; i++) {
+                                <?php /* @noEscape */ echo $code; ?>.drawRow(data[i]);
+                            }
+                        },
+
+                        drawRow: function(rowData) {
+
+                            var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
+                            var row = $("<tr " + rOnClick + " />")
+                            $("#SavedCardsTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+                            // {"token_value":"1","cc_last4":"1111","cc_type":"visa","cc_exp_month":"02","cc_exp_year":"2021"}
+                            row.append($("<td width=\"width:100px\" ><input style=\"width:100px;cursor:pointer;\" type=\"radio\" name=\"HPSTokens[]\" id=\"hssCardSelected" + rowData.token_value + "\"></td>"));
+                            row.append($("<th align=\"left\" id=\"image_holder_" + rowData.token_value + "\"  >" + rowData.cc_type.toUpperCase() + " ending in " + rowData.cc_last4 + "<br />Expiring on " + rowData.cc_exp_month + "/" + rowData.cc_exp_year + "<span class=\"card-type-" + rowData.cc_type + "\" /></th>"));
+                        },
+
+
+
+
+
+                        hpsNewCard: function(){
+                            $('#securesubmit_token').removeAttr('value');;
+                            $("#SelectNewCardHPS").prop('checked', true);
+                            <?php /* @noEscape */ echo $code; ?>.hpsBusy();
+                            <?php /* @noEscape */ echo $code; ?>.hpsShowCcForm('<?php /* @noEscape */ echo $pubApiKey?>');
+                            return true;
+                        },
+                        hpsBusy: function(){
+                            $("#checkout-loader-iframeEdition").fadeIn();
+                        },
+                        hpsNotBusy: function(){
+                            $("#checkout-loader-iframeEdition").fadeOut();_HPS_EnablePlaceOrder()
+                        },
+                        hpsShowCcForm: function(publicKey){
+                            if ( publicKey ){
+                                
+                                $("#iframes").fadeIn();
+                                alert(publicKey);
+                                //HPS_SecureSubmit(document, Heartland, publicKey);
+                                alert(publicKey);
+                                <?php /* @noEscape */ echo $code; ?>.hpsGetCanSave();
+                            }
+
+                        }
+                    ,
+                        hideNewCardForm: function(){
+                            $("#iframes").fadeOut();
+                        },
+                        hpsGetCanSave: function(){
+                            var data;
+                            $("#saveCardCheck").parent().fadeOut();
+                                $.get("../heartland/creditcard/cansave/").success(function (data) {
+                                    if (data === '1') {
+                                        $("#saveCardCheck").parent().fadeIn();
+                                    } else {
+                                        $("#saveCardCheck").parent().fadeOut();
+                                    }
+
+                                });
+                            return data
+                        },
+                        getCode: function () {
+                            try{$("#iframes").fadeOut();}catch(e){}
+                            return '<?php /* @noEscape */ echo $code; ?>';
+
+                        },
+                        isActive: function () {
+                            return true;
+                        },
+
+                        /**
+                         * Create child message renderer component
+                         *
+                         * @returns {Component} Chainable.
+                         */
+
+                        getToken: function (data, event) {
+                            
+                            <?php /* @noEscape */ echo $code; ?>.hpsBusy();
+                            if ($("#securesubmit_token").val() == ''){
+                                $("#bValidateButton").click();
+                            }else{
+                                <?php /* @noEscape */ echo $code; ?>.placeOrder();
+                            }
+                            <?php /* @noEscape */ echo $code; ?>.hpsNotBusy();
+                        },
+                        /**
+                         * Place order.
+                         */
+                        placeOrder: function (data, event) {
+
+                            var self = this,
+                                    placeOrder;
+                            <?php /* @noEscape */ echo $code; ?>.hpsBusy();
+                            if (event) {
+                                event.preventDefault();
+                            }
+                            if ($("#securesubmit_token").val() !== ''){
+                                if (this.validate() && additionalValidators.validate()) {
+                                    this.isPlaceOrderActionAllowed(false);
+
+                                    var pData = this.getData();
+                                    this.getData();
+                                    pData.additional_data.cc_type = $('#hps_heartland_cc_type').val();
+                                    pData.additional_data.cc_exp_year =  $('#hps_heartland_expiration_yr').val();
+                                    pData.additional_data.cc_exp_month = $('#hps_heartland_expiration').val();
+                                    pData.additional_data.cc_number = $('#hps_heartland_cc_number').val();
+                                    pData.additional_data.token_value = $('#securesubmit_token').val();
+
+                                    pData.additional_data._save_token_value = (document.querySelector('#saveCardCheck').checked?1:0);
+                                    placeOrder = placeOrderAction(pData, this.redirectAfterPlaceOrder, this.messageContainer);
+
+                                    $.when(placeOrder).fail(function () {
+                                        <?php /* @noEscape */ echo $code; ?>.isPlaceOrderActionAllowed(true);
+                                    }).done(window.location.replace('../checkout/onepage/success/'));
+                                    return true;
+                                }
+
+                            }else{
+                                $("#iframesCardError").text("Token lookup failed. Please try again.")
+                                <?php /* @noEscape */ echo $code; ?>.hpsNotBusy();
+                            }
+                            return false;
+                        }
+                    };});
+
+                }
+        );
+
+
+
+
+    </script>
+    <table id="SavedCardsTable">
+        <tbody>
+        <tr id="hps_heartland_NewCard" onclick="return <?php /* @noEscape */
+        echo $code; ?>.hpsNewCard()"><td><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="SelectNewCardHPS"></td>
+            <th  title="Click to enter a new Payment Method"  style="position: relative;text-align: left;border-left-style:groove;cursor:pointer;"> New Card ... </th></td>
+        </tr>
+        </tbody>
+    </table>
     <div class="field-type admin__field _required">
-        <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_cc_type">
+        <label class="admin__field-label" for="<?php /* @noEscape */
+        echo $code; ?>_cc_type">
             <span><?php echo $block->escapeHtml(__('Credit Card Type')); ?></span>
         </label>
+
         <div class="admin__field-control">
-            <select id="<?php /* @noEscape */ echo $code; ?>_cc_type" name="payment[cc_type]"
+            <select id="<?php /* @noEscape */
+            echo $code; ?>_cc_type" name="payment[cc_type]"
                     class="required-entry validate-cc-type-select admin__control-select">
                 <option value=""></option>
                 <?php foreach ($block->getCcAvailableTypes() as $typeCode => $typeName): ?>
-                    <option value="<?php echo $block->escapeHtml($typeCode); ?>" <?php if ($typeCode == $ccType): ?>selected="selected"<?php endif ?>>
+                    <option value="<?php echo $block->escapeHtml($typeCode); ?>"
+                            <?php if ($typeCode == $ccType): ?>selected="selected"<?php endif ?>>
                         <?php echo $block->escapeHtml($typeName); ?>
                     </option>
                 <?php endforeach ?>
@@ -40,21 +260,27 @@ var_dump($hpsTokens);
         </div>
     </div>
     <div class="field-number admin__field _required">
-        <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_cc_number">
+        <label class="admin__field-label" for="<?php /* @noEscape */
+        echo $code; ?>_cc_number">
             <span><?php echo $block->escapeHtml(__('Credit Card Number')); ?></span>
         </label>
         <div class="admin__field-control">
-            <input type="text" id="<?php /* @noEscape */ echo $code; ?>_cc_number" name="payment[cc_number]"
-                   title="<?php echo $block->escapeHtml(__('Credit Card Number')); ?>" class="admin__control-text validate-cc-number"
-                   value="<?php /* @noEscape */ echo $block->getInfoData('cc_number'); ?>"/>
+            <input type="text" id="<?php /* @noEscape */
+            echo $code; ?>_cc_number" name="payment[cc_number]"
+                   title="<?php echo $block->escapeHtml(__('Credit Card Number')); ?>"
+                   class="admin__control-text validate-cc-number"
+                   value="<?php /* @noEscape */
+                   echo $block->getInfoData('cc_number'); ?>"/>
         </div>
     </div>
     <div class="field-date admin__field _required">
-        <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_expiration">
+        <label class="admin__field-label" for="<?php /* @noEscape */
+        echo $code; ?>_expiration">
             <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
         </label>
         <div class="admin__field-control">
-            <select id="<?php /* @noEscape */ echo $code ?>_expiration" name="payment[cc_exp_month]"
+            <select id="<?php /* @noEscape */
+            echo $code ?>_expiration" name="payment[cc_exp_month]"
                     class="admin__control-select admin__control-select-month validate-cc-exp required-entry">
                 <?php foreach ($block->getCcMonths() as $k => $v): ?>
                     <option value="<?php echo $block->escapeHtml($k); ?>"
@@ -63,10 +289,14 @@ var_dump($hpsTokens);
                     </option>
                 <?php endforeach; ?>
             </select>
-            <select id="<?php /* @noEscape */ echo $code ?>_expiration_yr" name="payment[cc_exp_year]"
+            <select id="<?php /* @noEscape */
+            echo $code ?>_expiration_yr" name="payment[cc_exp_year]"
                     class="admin__control-select admin__control-select-year required-entry">
                 <?php foreach ($block->getCcYears() as $k => $v): ?>
-                    <option value="<?php /* @noEscape */ echo $k ? $block->escapeHtml($k) : '' ?>"
+                    <option value="<?php /* @noEscape */
+                    echo $k
+                            ? $block->escapeHtml($k)
+                            : '' ?>"
                             <?php if ($k == $ccExpYear): ?>selected="selected"<?php endif ?>>
                         <?php echo $block->escapeHtml($v); ?>
                     </option>
@@ -77,57 +307,75 @@ var_dump($hpsTokens);
 
     <?php if ($block->hasVerification()): ?>
         <div class="field-number required admin__field _required">
-            <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_cc_cid">
+            <label class="admin__field-label" for="<?php /* @noEscape */
+            echo $code; ?>_cc_cid">
                 <span><?php echo $block->escapeHtml(__('Card Verification Number')); ?></span>
             </label>
             <div class="admin__field-control">
                 <input type="text" title="<?php echo $block->escapeHtml(__('Card Verification Number')); ?>"
                        class="required-entry validate-cc-cvn admin__control-cvn admin__control-text"
-                       id="<?php /* @noEscape */ echo $code; ?>_cc_cid"
-                       name="payment[cc_cid]" value="<?php /* @noEscape */ echo $block->getInfoData('cc_cid') ?>"/>
+                       id="<?php /* @noEscape */
+                       echo $code; ?>_cc_cid"
+                       name="payment[cc_cid]" value="<?php /* @noEscape */
+                echo $block->getInfoData('cc_cid') ?>"/>
             </div>
         </div>
     <?php endif; ?>
 
     <?php if ($block->hasSsCardType()): ?>
-        <div id="<?php /* @noEscape */ echo $code; ?>_cc_type_ss_div">
+        <div id="<?php /* @noEscape */
+        echo $code; ?>_cc_type_ss_div">
             <div class="field-type required admin__field _required">
-                <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_cc_issue">
+                <label class="admin__field-label" for="<?php /* @noEscape */
+                echo $code; ?>_cc_issue">
                     <span><?php echo $block->escapeHtml(__('Switch/Solo/Maestro Only')); ?></span>
                 </label>
             </div>
             <div class="admin__field field-issue">
                 <label class="admin__field-label"
-                       for="<?php /* @noEscape */ echo $code; ?>_cc_issue">
+                       for="<?php /* @noEscape */
+                       echo $code; ?>_cc_issue">
                     <span><?php echo $block->escapeHtml(__('Issue Number')); ?></span>
                 </label>
 
                 <div class="admin__field-control">
                     <input type="text" title="<?php echo $block->escapeHtml(__('Issue Number')); ?>"
                            class="validate-cc-ukss cvv admin__control-cvv admin__control-text"
-                           id="<?php /* @noEscape */ echo $code; ?>_cc_issue" name="payment[cc_ss_issue]" value=""/>
+                           id="<?php /* @noEscape */
+                           echo $code; ?>_cc_issue" name="payment[cc_ss_issue]" value=""/>
                 </div>
             </div>
             <div class="field field-date">
-                <label class="admin__field-label" for="<?php /* @noEscape */ echo $code; ?>_start_month">
+                <label class="admin__field-label" for="<?php /* @noEscape */
+                echo $code; ?>_start_month">
                     <span><?php echo $block->escapeHtml(__('Start Date')); ?></span>
                 </label>
                 <div class="admin__field-control">
-                    <select id="<?php /* @noEscape */ echo $code; ?>_start_month" name="payment[cc_ss_start_month]"
+                    <select id="<?php /* @noEscape */
+                    echo $code; ?>_start_month" name="payment[cc_ss_start_month]"
                             class="validate-cc-ukss admin__control-select admin__control-select-month">
                         <?php foreach ($block->getCcMonths() as $k => $v): ?>
-                            <option value="<?php /* @noEscape */ echo $k ? $block->escapeHtml($k) : '' ?>"
-                                <?php if ($k == $block->getInfoData('cc_ss_start_month')): ?> selected="selected"<?php endif ?>>
+                            <option value="<?php /* @noEscape */
+                            echo $k
+                                    ? $block->escapeHtml($k)
+                                    : '' ?>"
+                                    <?php if ($k == $block->getInfoData('cc_ss_start_month')): ?> selected="selected"<?php endif ?>>
                                 <?php echo $block->escapeHtml($v); ?>
                             </option>
                         <?php endforeach ?>
                     </select>
-                    <select id="<?php /* @noEscape */ echo $code; ?>_start_year" name="payment[cc_ss_start_year]"
+                    <select id="<?php /* @noEscape */
+                    echo $code; ?>_start_year" name="payment[cc_ss_start_year]"
                             class="validate-cc-ukss admin__control-select admin__control-select-year">
                         <?php foreach ($block->getSsStartYears() as $k => $v): ?>
-                            <option value="<?php /* @noEscape */ echo $block->escapeHtml($k) ? $k : '' ?>"
-                                <?php if ($k == $block->getInfoData('cc_ss_start_year')): ?> selected="selected"<?php endif ?>>
-                                <?php echo $block->escapeHtml($v); ?>
+                            <option value="<?php /* @noEscape */
+                            echo $block->escapeHtml($k)
+                                    ? $k
+                                    : '' ?>"
+                                    <?php if ($k == $block->getInfoData('cc_ss_start_year')): ?> selected="selected"<?php endif ?>>
+                                <?php
+                                echo $block->escapeHtml($v);
+                                ?>
                             </option>
                         <?php endforeach ?>
                     </select>
@@ -137,23 +385,37 @@ var_dump($hpsTokens);
             <div class="adv-container">&nbsp;</div>
 
             <script>
-require(['jquery', 'prototype'], function(jQuery){
+                require(['jquery', '<?php /* @noEscape */
+                        echo $code; ?> '], function (jQuery,<?php /* @noEscape */ echo $code; ?> )
+                {
+                    alert<?php /* @noEscape */ echo $code; ?> = function (<?php /* @noEscape */ echo $code; ?> )
+                    {
 
-    //<![CDATA[
-    SSChecked<?php /* @noEscape */ echo $code; ?> = function() {
-        var elm = $('<?php /* @noEscape */ echo $code; ?>_cc_type');
-        if (['SS','SM','SO'].indexOf(elm.value) != -1) {
-            jQuery('#' + '<?php /* @noEscape */ echo $code; ?>_cc_type_ss_div').show().removeClass('ignore-validate');
-        } else {
-            jQuery('#' + '<?php /* @noEscape */ echo $code; ?>_cc_type_ss_div').hide().addClass('ignore-validate');
-        }
-    };
-    Event.observe($('<?php /* @noEscape */ echo $code; ?>_cc_type'), 'change', SSChecked<?php /* @noEscape */ echo $code; ?>);
-    SSChecked<?php /* @noEscape */ echo $code; ?>();
-    //]]>
+                        alert(<?php /* @noEscape */ echo $code; ?>.getCode()
+                        )
+                        ;
+                    }
+                    alert<?php /* @noEscape */ echo $code; ?>();
+                    //<![CDATA[
+                    SSChecked<?php /* @noEscape */ echo $code; ?> = function ()
+                    {
+                        var elm = $('<?php /* @noEscape */ echo $code; ?>_cc_type');
+                        if (['SS', 'SM', 'SO'].indexOf(elm.value) != -1) {
+                            jQuery('#' + '<?php /* @noEscape */ echo $code; ?>_cc_type_ss_div').show().removeClass('ignore-validate');
+                        } else {
+                            jQuery('#' + '<?php /* @noEscape */ echo $code; ?>_cc_type_ss_div').hide().addClass('ignore-validate');
+                        }
+                    };
+                    Event.observe($('<?php /* @noEscape */ echo $code; ?>_cc_type'), 'change', SSChecked<?php /* @noEscape */ echo $code; ?>);
+                    SSChecked<?php /* @noEscape */ echo $code; ?>();
+                    //]]>
 
-});
+
+                });
+
             </script>
+
         </div>
     <?php endif; ?>
+
 </fieldset>
