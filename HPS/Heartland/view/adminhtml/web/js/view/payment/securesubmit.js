@@ -97,7 +97,7 @@ function HPS_SecureSubmit(document, Heartland, publicKey) {
             });
         }
 
-
+ 
         // Handles tokenization response
         function responseHandler(response) {
             if(document.querySelector('#heartland-frame-cardNumber') != null){
