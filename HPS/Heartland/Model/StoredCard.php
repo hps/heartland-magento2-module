@@ -72,7 +72,6 @@ class StoredCard {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $conn->delete(self::TABLE_NAME, array(
-                    'customer_id = ?'   => (int)Customer::getCustID(),
                     'heartland_storedcard_id = ?' => (int)$id,
                 ));
             }
