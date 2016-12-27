@@ -1,12 +1,12 @@
 <?php
 /**
- * Heartland payment method model
+ *  Heartland payment method model
  *
- * @category    HPS
- * @package     HPS_Heartland
- * @author      Charlie Simmons <charles.simmons@e-hps.com>
- * @copyright   Heartland (http://heartland.us)
- * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Controller\Creditcard;
@@ -45,21 +45,22 @@ class Get extends Action
      */
     public function execute(){
         // \HPS\Heartland\Model\StoredCard::getCanStoreCards
+        $jsonData = array();
         if ( HPS_STORED_CARDS::getCanStoreCards()){
             // \HPS\Heartland\Model\StoredCard::getStoredCards
             $data = HPS_STORED_CARDS::getStoredCards(); /**/
-            $jsonData = array();
+            $data = HPS_STORED_CARDS::getStoredCards(); /**/
             foreach ($data as $row) {
                 $jsonData[] = array (
-                    'token_value'  => $row["storedcard_id"] ,
+                    'token_value'  => $row["heartland_storedcard_id"] ,
                     'cc_last4'     => $row["cc_last4"]      ,
                     'cc_type'      => $row["cc_type"]       ,
                     'cc_exp_month' => $row["cc_exp_month"]  ,
                     'cc_exp_year'  => $row["cc_exp_year"]   ,
                 );
             }
-            echo(json_encode($jsonData));
         }
+        echo(json_encode($jsonData));
     }
 
     /**

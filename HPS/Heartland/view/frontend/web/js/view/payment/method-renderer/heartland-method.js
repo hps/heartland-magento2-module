@@ -1,11 +1,11 @@
-/**
- * Heartland payment method model
+/*
+ *  Heartland payment method model
  *
- * @category    HPS
- * @package     HPS_Heartland
- * @author      Charlie Simmons <charles.simmons@e-hps.com>
- * @copyright   Heartland (http://heartland.us)
- * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 /*browser:true*/
@@ -68,7 +68,7 @@ define(
                         $.ajax({
                             url: "../heartland/creditcard/get"
                             , success: function (data) {
-                                if (data) {
+                                if (data != '[]') {
 
                                     // process json string to table rows
                                     //$("#SavedCardsTable").append(JSON.parse(data));

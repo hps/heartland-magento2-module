@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-/**
-* HPS_Heartland layout configuration
-*
-* @category    HPS
-* @package     HPS Heartland
-* @author      Charlie Simmons <charles.simmons@e-hps.com>
-* @copyright   Heartland (http://heartland.us)
-* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-*/
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Charlie Simmons <charles.simmons@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <head>
         <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
