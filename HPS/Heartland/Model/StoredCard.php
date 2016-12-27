@@ -57,9 +57,6 @@ class StoredCard {
                 }
             }
         }
-        else {
-            throw new \Exception(__('No valid User Logged On!! Cannot get saved card.'));
-        }
 
         //}
         return $MuToken;
