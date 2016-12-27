@@ -66,10 +66,10 @@ echo $code; ?>"
                             document.querySelector('#hps_heartland_expiration').value = response.cc_exp_month.trim();
                             document.querySelector('#hps_heartland_expiration_yr').value = response.cc_exp_year.trim();
                         },
-                        deleteCard: function (id) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
+                        deleteCard: function (id,this) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
                             // "cc_exp_month":"2","cc_exp_year":"2025"}
 
-                            $("#iframes").fadeOut();console.log($(this).html())
+                            $("#iframes").fadeOut();console.log(this.html())
                         },
 
                         hpsNewCard: function () {
@@ -218,7 +218,7 @@ echo $code; ?>"
                 <tr onclick='return {$code}._HPS_setHssTransaction1(JSON.parse("{$tokenJson}"));'>
                     <td width="width:100px" ><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="hssCardSelected{$token['token_value']}"></td>
                     <th align="left" id="image_holder_{$token['token_value']}">{$ccTypeHPS} ending in {$token['cc_last4']}<br />Expiring on {$token['cc_exp_month']}/{$token['cc_exp_year']}<span class="card-type-{$token['cc_type']}" /></th>
-                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']})"
+                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this)"
                     style="color:red;font-size:
                     2em" type="button"
                      value="X"></td>
