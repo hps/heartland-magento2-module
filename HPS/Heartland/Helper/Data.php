@@ -98,6 +98,7 @@ class Data extends AbstractHelper
         if (empty($inputs) === true && $_SERVER['REQUEST_METHOD'] === 'POST'){
             $post = $_POST;
             $inputs['paymentMethod']['additional_data'] = $post['payment'];;
+            //$inputs['paymentMethod']['additional_data'] = _save_token_value;;
             $inputs['paymentMethod']['additional_data']['token_value'] = $post['securesubmit_token'];;
         }
 
