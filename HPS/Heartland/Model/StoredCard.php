@@ -30,10 +30,10 @@ use \HPS\Heartland\Helper\Db;
 class StoredCard {
     const TABLE_NAME = 'hps_heartland_storedcard';
 
-    /**
+    /** performs a db lookup for the current customer within the db given a specific token ID
      * @param int $id
      *
-     * @return bool
+     * @return bool|array
      * @throws \Exception
      */
     public static function getToken($id,$custID = null) {
