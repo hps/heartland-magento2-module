@@ -762,7 +762,7 @@ class Payment
                         $requestedAmount,
                         $response->authorizationCode);
 
-                    break;
+                    break; 
 
                 case 'HpsReportTransactionDetails':
                     /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
