@@ -275,7 +275,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
             );
 
             console.log('Token'); //edit_form
-            e.cancel();
 return false;
         });
     }
