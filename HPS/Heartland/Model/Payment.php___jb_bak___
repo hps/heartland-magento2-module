@@ -735,7 +735,6 @@ class Payment
 
                 case 'HpsAuthorization':
                     /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
-                    $payment->getParentTransactionId()
                     $payment->setCcTransId($response->transactionId);
                     $payment->setCcApproval($response->authorizationCode);
                     $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
@@ -771,7 +770,7 @@ class Payment
                     $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
                     $successMsg[] = __("The %1 ending in %2 was Invoiced successfully \$%3",
                         $response->cardType,
-                        $response->maskedCardNumber,
+                        substr($response->maskedCardNumber,-4),
                         $response->settlementAmount);
 
                     break;
