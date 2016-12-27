@@ -735,6 +735,7 @@ class Payment
 
                 case 'HpsAuthorization':
                     /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
+
                     $payment->setCcTransId($response->transactionId);
                     $payment->setCcApproval($response->authorizationCode);
                     $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
