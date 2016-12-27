@@ -110,7 +110,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);
-                    document.getElementById('edit_form').submit()
+                    //document.getElementById('edit_form').submit()
                 }
         }
 
