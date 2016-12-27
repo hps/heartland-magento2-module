@@ -56,19 +56,21 @@ echo $code; ?>"
                     <?php /* @noEscape */ echo $code; ?> = {
 
                         _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
+                            if(document.querySelector("#hssCardSelected" + response.token_value.trim())
+                            {
+                                $("#iframes").fadeOut();
+                                document.querySelector("#hssCardSelected" + response.token_value.trim()).checked = true;
+                                document.querySelector('#securesubmit_token').value = response.token_value.trim();
 
-                            $("#iframes").fadeOut();
-                            document.querySelector("#hssCardSelected" + response.token_value.trim()).checked = true;
-                            document.querySelector('#securesubmit_token').value = response.token_value.trim();
-
-                            document.querySelector('#hps_heartland_cc_number').value = response.cc_last4.trim();
-                            document.querySelector('#hps_heartland_cc_type').value = response.cc_type.trim();
-                            document.querySelector('#hps_heartland_expiration').value = response.cc_exp_month.trim();
-                            document.querySelector('#hps_heartland_expiration_yr').value = response.cc_exp_year.trim();
+                                document.querySelector('#hps_heartland_cc_number').value = response.cc_last4.trim();
+                                document.querySelector('#hps_heartland_cc_type').value = response.cc_type.trim();
+                                document.querySelector('#hps_heartland_expiration').value = response.cc_exp_month.trim();
+                                document.querySelector('#hps_heartland_expiration_yr').value = response.cc_exp_year.trim();
+                            }
                         },
                         deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
                             // "cc_exp_month":"2","cc_exp_year":"2025"}
-
+                            e.preventDefault();
                             $("#iframes").fadeOut();
                         console.log(e.remove())
                         },
