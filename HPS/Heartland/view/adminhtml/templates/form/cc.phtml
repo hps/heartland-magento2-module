@@ -144,13 +144,15 @@ echo $code; ?>"
 
                             // add additional service parameters
                             params = $.param({
-                                "api_key": '<?php /* @noEscape */ echo $pubApiKey?>',
+                                "api_key": "<?php /* @noEscape */ echo $pubApiKey?>",
                                 "object": "token",
                                 "token_type": "supt",
                                 "_method": "post",
                                 "card[number]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_number").val()),
-                                "card[cvc]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_cid").val(),
+                                "card[cvc]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_cid").val()),
+
                                         "card[exp_month]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration").val()),
+
                                     "card[exp_year]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration_yr").val())
                         });
 
