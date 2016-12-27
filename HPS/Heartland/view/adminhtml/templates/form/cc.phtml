@@ -137,53 +137,7 @@ echo $code; ?>"
                         Urls: {
                             CERT: "https://cert.api2.heartlandportico.com/Hps.Exchange.PosGateway.Hpf.v1/api/token",
                             PROD: "https://api2.heartlandportico.com/SecureSubmit.v1/api/token"
-                        },
-                        tokenize: function () {
-                            var gateway_url, params, env;
-
-
-                            // add additional service parameters
-                            params = $.param({
-                                "api_key": '<?php /* @noEscape */ echo $pubApiKey?>',
-                                "object": "token",
-                                "token_type": "supt",
-                                "_method": "post",
-                                "card[number]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_number").val()),
-                                "card[cvc]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_cid").val(),
-                                "card[exp_month]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration").val()),
-                                "card[exp_year]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration_yr").val())
-                            });
-
-                            env = options.data.public_key.split("_")[1];
-
-                            if (env === "cert") {
-                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.CERT;
-                            } else {
-                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.PROD;
-                            }
-
-                            // request token
-                            $.ajax({
-                                cache: false,
-                                url: gateway_url,
-                                data: params,
-                                dataType: "jsonp",
-                                success: function (response) {
-
-                                    // Request failed, handle error
-                                    if (typeof response.error === 'object') {
-                                        // call error handler if provided and valid
-                                        if (typeof options.error === 'function') {
-                                            options.error(response.error);
-                                        }
-                                        // handle exception
-                                        //HPS.error(response.error.message);
-                                    }
-                                    else if(typeof options.success === 'function') {
-                                        options.success(response);
-                                    }
-                                }
-                            });
+                        }
 
 
                     };
