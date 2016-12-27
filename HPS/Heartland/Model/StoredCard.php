@@ -48,7 +48,7 @@ class StoredCard {
                     ->from(
                         ['o' => self::TABLE_NAME]
                     )
-                    ->where('o.customer_id   = ?', (int)Customer::getCustID())
+                    ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
                 $data = (array)$conn->fetchAll($select);
                 self::validate($data);
