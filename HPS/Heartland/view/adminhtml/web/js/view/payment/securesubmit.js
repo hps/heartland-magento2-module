@@ -120,7 +120,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                 } else {
                     _HPS_setHssTransaction(response);
                     document.getElementById('edit_form'),detachEvent()
-                    document.getElementById('edit_form'),submit()
+                    //document.getElementById('edit_form'),submit()
                 }
 
             }
