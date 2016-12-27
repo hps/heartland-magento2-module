@@ -276,6 +276,7 @@ function HPS_SecureSubmit(document, Heartland, publicKey) {
             // Prevent the form from continuing to the `action` address
 
             e.preventDefault();
+            console.log(e.outerHTML); //edit_form
             // Tell the iframes to tokenize the data
             hps.Messages.post(
                 {
