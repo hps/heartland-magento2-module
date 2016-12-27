@@ -26,9 +26,7 @@ class Payment
                 return false;
 
             }
-            return $this->_transactionRecord->settlementAmount > 0
-                ? false
-                : true;
+            return $this->_transactionRecord->settlementAmount > 0;
         }
         catch (\Exception $e) {
             return false;
