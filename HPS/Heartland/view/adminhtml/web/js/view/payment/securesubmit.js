@@ -260,7 +260,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              }*/
         });
         // Attach a handler to interrupt the form submission
-        $("#edit_form").bind("submit",function(e){
+        $("#edit_form").submit(function(e){
             e.preventDefault(e);
             console.log('Token'); //edit_form
             console.log('Token'); //edit_form
