@@ -74,10 +74,7 @@ echo $code; ?>"
                             $.get({
                                 url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
                                 , success: function (data) {
-                                    if (data != '[]') {
                                         e.remove()
-
-                                    }
                                 }
                             });
 
