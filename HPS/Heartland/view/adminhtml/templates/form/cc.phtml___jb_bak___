@@ -1,0 +1,343 @@
+<?php
+/**
+ *  Heartland payment method model
+ *
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Charlie Simmons <charles.simmons@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ */
+
+// @codingStandardsIgnoreFile
+/**
+ * @var \HPS\Heartland\Block\Form\Cc $block
+ */
+
+$hpsTokens = $block->getCcTokens();
+$pubApiKey = \HPS\Heartland\Helper\Data::getPublicKey();
+$code = $block->escapeHtml($block->getMethodCode());
+$ccType = $block->getInfoData('cc_type');
+$ccExpMonth = $block->getInfoData('cc_exp_month');
+$ccExpYear = $block->getInfoData('cc_exp_year'); //
+//var_dump($hpsTokens);
+?>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */
+echo $code; ?>"
+          style="display:none">
+
+    <script>
+        var <?php /* @noEscape */ echo $code; ?>;
+        require([
+                'jquery'
+            ],
+
+            /*
+             *  Heartland payment method model
+             *
+             *  @category    HPS
+             *  @package     HPS_Heartland
+             *  @author      Charlie Simmons <charles.simmons@e-hps.com>
+             *  @copyright   Heartland (http://heartland.us)
+             *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+             */
+
+            /*browser:true*/
+            /*global define*/
+            function ($) {
+                'use strict';
+                /**
+                 * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                 * if there is any form of error we disable the payment form
+                 *
+                 */
+                $(document).ready(function ($) {
+                    $("#iframes").fadeOut();
+                    <?php /* @noEscape */ echo $code; ?> = {
+
+                        _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
+
+                            $("#iframes").fadeOut();
+                            document.querySelector("#hssCardSelected" + response.token_value.trim()).checked = true;
+                            document.querySelector('#securesubmit_token').value = response.token_value.trim();
+
+                            document.querySelector('#hps_heartland_cc_number').value = response.cc_last4.trim();
+                            document.querySelector('#hps_heartland_cc_type').value = response.cc_type.trim();
+                            document.querySelector('#hps_heartland_expiration').value = response.cc_exp_month.trim();
+                            document.querySelector('#hps_heartland_expiration_yr').value = response.cc_exp_year.trim();
+                        },
+                        deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
+                            // "cc_exp_month":"2","cc_exp_year":"2025"}
+
+                            $("#iframes").fadeOut();
+                        console.log(e.outerHTML)
+                        },
+
+                        hpsNewCard: function () {
+                            $('#securesubmit_token').removeAttr('value');
+                            ;
+                            $("#SelectNewCardHPS").prop('checked', true);
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsBusy();
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsShowCcForm('<?php /* @noEscape */ echo $pubApiKey?>');
+                            return true;
+                        },
+
+                        hpsBusy: function () {
+                            $("#checkout-loader-iframeEdition").fadeIn();
+                        },
+
+                        hpsNotBusy: function () {
+                            $("#checkout-loader-iframeEdition").fadeOut();
+                            _HPS_EnablePlaceOrder()
+                        },
+
+                        hpsShowCcForm: function (publicKey) {
+                            if (publicKey) {
+
+                                $("#iframes").fadeIn();
+                                HPS_SecureSubmit($,document, Heartland, publicKey);
+
+
+                            }
+
+                        }
+                        ,
+                        hideNewCardForm: function () {
+                            $("#iframes").fadeOut();
+                        },
+
+                        getCode: function () {
+                            try {
+                                $("#iframes").fadeOut();
+                            } catch (e) {
+                            }
+                            return '<?php /* @noEscape */ echo $code; ?>';
+
+                        },
+
+                        isActive: function () {
+                            return true;
+                        },
+
+                        /**
+                         * Create child message renderer component
+                         *
+                         * @returns {Component} Chainable.
+                         */
+
+                        getToken: function (data, event) {
+
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsBusy();
+
+                            if ($("#securesubmit_token").val() == '') {
+                                <?php /* @noEscape */ echo $code; ?>.tokenize()
+                            } else {
+                                <?php /* @noEscape */ echo $code; ?>.
+                                placeOrder();
+                            }
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsNotBusy();
+                        },
+
+                        Urls: {
+                            CERT: "https://cert.api2.heartlandportico.com/Hps.Exchange.PosGateway.Hpf.v1/api/token",
+                            PROD: "https://api2.heartlandportico.com/SecureSubmit.v1/api/token"
+                        },
+                        tokenize: function () {
+                            var gateway_url, params, env;
+
+
+                            // add additional service parameters
+                            params = $.param({
+                                "api_key": "<?php /* @noEscape */ echo $pubApiKey?>",
+                                "object": "token",
+                                "token_type": "supt",
+                                "_method": "post",
+                                "card[number]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_number").val()),
+                                "card[cvc]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_cc_cid").val()),
+
+                                        "card[exp_month]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration").val()),
+
+                                    "card[exp_year]": $.trim($("#<?php /* @noEscape */ echo $code; ?>_expiration_yr").val())
+                        });
+
+                            env = options.data.public_key.split("_")[1];
+
+                            if (env === "cert") {
+                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.CERT;
+                            } else {
+                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.PROD;
+                            }
+
+                            // request token
+                            $.ajax({
+                                cache: false,
+                                url: gateway_url,
+                                data: params,
+                                dataType: "jsonp",
+                                success: function (response) {
+
+                                    // Request failed, handle error
+                                    if (typeof response.error === 'object') {
+                                        // call error handler if provided and valid
+                                        if (typeof options.error === 'function') {
+                                            options.error(response.error);
+                                        }
+                                        // handle exception
+                                        //HPS.error(response.error.message);
+                                    }
+                                    else if(typeof options.success === 'function') {
+                                        options.success(response);
+                                    }
+                                }
+                            });
+                        }
+
+                        }
+                });
+
+
+            }
+        );
+
+
+    </script>
+    <table id="SavedCardsTable">
+        <caption>Stored Payments for this customer(if any)</caption>
+        <tbody>
+        <?php
+        foreach ($hpsTokens as $token) {
+            $token['token_value'] = $token['heartland_storedcard_id'];
+            unset($token['heartland_storedcard_id'], $token['dt'], $token['customer_id']);
+            $tokenJson = addslashes(json_encode($token));
+            //{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
+            $ccTypeHPS = strtoupper($token['cc_type']);
+            $jpsTokenTableRow = <<<TROW
+                <tr onclick='return {$code}._HPS_setHssTransaction1(JSON.parse("{$tokenJson}"));'>
+                    <td width="width:100px" ><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="hssCardSelected{$token['token_value']}"></td>
+                    <th align="left" id="image_holder_{$token['token_value']}">{$ccTypeHPS} ending in {$token['cc_last4']}<br />Expiring on {$token['cc_exp_month']}/{$token['cc_exp_year']}<span class="card-type-{$token['cc_type']}" /></th>
+                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this
+                    .parentNode().parentNode())"
+                    style="color:red;font-size:
+                    2em" type="button"
+                     value="X"></td>
+                </tr>
+
+TROW;
+            echo $jpsTokenTableRow;
+        }
+
+        ?>
+
+
+        <tr id="hps_heartland_NewCard" onclick="return <?php /* @noEscape */
+        echo $code; ?>.hpsNewCard()">
+            <td><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="SelectNewCardHPS"></td>
+            <th title="Click to enter a new Payment Method"
+                style="position: relative;text-align: left;border-left-style:groove;cursor:pointer;"> New Card ...
+            </th>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <span id="iframes" action="">
+
+        <div generated="true" id="iframesCardError"></div>
+        <!-- #iframesCardNumber is the target element for the cardNumber iframe -->
+        <dt>
+            <label for="iframesCardNumber" class="label">
+                <span><!-- ko i18n: 'Card Number:'--><!-- /ko --></span>
+            </label>
+        </dt>
+
+        <dd>
+            <div id="iframesCardNumber"></div>
+        </dd>
+
+        <!-- #iframesCardExpiration is the target element for the cardExpiration iframe -->
+        <dt>
+            <label for="iframesCardExpiration" class="label">
+                <span><!-- ko i18n: 'Card Expiration:'--><!-- /ko --></span>
+            </label>
+        </dt>
+        <dd>
+            <div id="iframesCardExpiration"></div>
+        </dd>
+
+        <!-- #iframesCardCvv is the target element for the cardCvv iframe -->
+        <dt>
+            <label for="iframesCardCvv" class="label">
+                <span id="iframesCardCvvLabel"><!-- ko i18n: 'Card CVV:'--><!-- /ko --></span>
+            </label>
+        </dt>
+        <dd>
+            <div id="iframesCardCvv"></div>
+        </dd>
+
+    </span>
+    <input id="securesubmit_token" name="securesubmit_token" type="hidden">
+
+
+    <div class="field-type admin__field _required">
+        <div class="control">
+            <input type="hidden" id="<?php /* @noEscape */echo $code; ?>_cc_type" name="payment[cc_type]">
+        </div>
+    </div>
+
+
+    <div class="field-number required admin__field _required">
+
+        <div class="admin__field-control">
+            <input type="hidden" id="<?php /* @noEscape */
+            echo $code; ?>_cc_number" name="payment[cc_number]"
+                   title="<?php echo $block->escapeHtml(__('Credit Card Number')); ?>"
+
+                   class="admin__control-text required-entry"/>
+        </div>
+    </div>
+
+    <div class="field-date admin__field _required">
+        <?php /* <label class="admin__field-label" for="
+        echo $code; ?>_expiration">
+            <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
+        </label>*/?>
+
+
+
+
+
+
+        <div class="admin__field-control">
+            <div class="fields group group-2">
+                <div class="field no-label month">
+                    <div class="control">
+                        <input type="hidden" id="<?php /* @noEscape */echo $code ?>_expiration"
+                               name="payment[cc_exp_month]" />
+                    </div>
+                </div>
+                <div class="field no-label year">
+                    <div class="control">
+                        <input type="hidden" id="<?php /* @noEscape */echo $code ?>_expiration_yr"
+                               name="payment[cc_exp_year]" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="field-number required admin__field _required">
+            <div class="admin__field-control">
+                <input type="hidden" title="<?php echo $block->escapeHtml(__('Card Verification Number')); ?>"
+                       id="<?php /* @noEscape */
+                       echo $code; ?>_cc_cid"
+                       name="payment[cc_cid]" value="<?php /* @noEscape */
+                echo $block->getInfoData('cc_cid') ?>"/>
+            </div>
+        </div>
+
+
+</fieldset>
