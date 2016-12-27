@@ -100,16 +100,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
 
         // Handles tokenization response
         function responseHandler(response) {
-            if(document.querySelector('#heartland-frame-cardNumber') != null){
-                toAll(document.querySelectorAll('#iframesCardNumber > div, #heartland-frame-cardNumber, #heartland-frame-cardExpiration, #heartland-frame-cardCvv'), function (element) {
-                    try{element.remove();}catch(e){}
-                });
-                document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
-                try{_HPS_addClass( document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');}catch(e){}
 
-                var errElement = document.querySelector('#iframesCardError');
-                try{errElement.innerText = '';}catch(e){}
-                try{_HPS_removeClass(errElement, 'mage-error');}catch(e){}
                 if (response.error) {
                     _HPS_addClass(errElement, 'mage-error');
                     errElement.innerText = response.error.message;
@@ -122,8 +113,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     document.getElementById('edit_form'),detachEvent()
                     //document.getElementById('edit_form'),submit()
                 }
-
-            }
         }
 
         // Load function to attach event handlers when WC refreshes payment fields
