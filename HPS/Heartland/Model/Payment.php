@@ -283,6 +283,7 @@ class Payment
         $errorMsg       = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
         $ccNumber       = $info->getCcNumber();
+
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
@@ -760,7 +761,8 @@ class Payment
                         $actionVerb,
                         $requestedAmount,
                         $response->authorizationCode);
-                    break; 
+
+                    break;
 
                 case 'HpsReportTransactionDetails':
                     /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
@@ -992,7 +994,8 @@ class Payment
      * by app/code/HPS/Heartland/Model/StoredCard.php
      *
      * @return bool
-     */    private
+     */
+    private
     function validateMuToken()
     {
         return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);

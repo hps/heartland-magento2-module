@@ -49,6 +49,7 @@ class Get extends Action
         if ( HPS_STORED_CARDS::getCanStoreCards()){
             // \HPS\Heartland\Model\StoredCard::getStoredCards
             $data = HPS_STORED_CARDS::getStoredCards(); /**/
+            $data = HPS_STORED_CARDS::getStoredCards(); /**/
             foreach ($data as $row) {
                 $jsonData[] = array (
                     'token_value'  => $row["heartland_storedcard_id"] ,
