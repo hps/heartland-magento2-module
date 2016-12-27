@@ -273,7 +273,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                 },
                 'cardNumber'
             );
-return;
+return false;
         });
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
