@@ -39,7 +39,7 @@ class StoredCard {
     public static function getToken($id) {
         $MuToken = false;
         //if( is_int($id) ){
-        if (Customer::isLoggedIn()) {
+        //if (Customer::isLoggedIn()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
@@ -54,10 +54,10 @@ class StoredCard {
                     $MuToken = $data[0]['token_value'];
                 }
             }
-        }
-        else {
-            throw new \Exception(__('No valid User Logged On!! Cannot get saved card.'));
-        }
+        //}
+        //else {
+        //    throw new \Exception(__('No valid User Logged On!! Cannot get saved card.'));
+       // }
 
         //}
         return $MuToken;
