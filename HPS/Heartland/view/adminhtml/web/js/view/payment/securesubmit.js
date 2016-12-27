@@ -97,7 +97,7 @@ function HPS_SecureSubmit(document, Heartland, publicKey) {
             });
         }
 
- 
+
         // Handles tokenization response
         function responseHandler(response) {
             if(document.querySelector('#heartland-frame-cardNumber') != null){
@@ -119,7 +119,8 @@ function HPS_SecureSubmit(document, Heartland, publicKey) {
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);
-                    document.querySelector("#bPlaceOrderNow").click();
+                    document.getElementById('edit_form'),detachEvent()
+                    document.getElementById('edit_form'),submit()
                 }
 
             }
