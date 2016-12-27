@@ -69,6 +69,7 @@ class StoredCard {
      * @throws \Exception
      */
     public static function deleteStoredCards($id) {
+        if (Customer::isLoggedIn()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $conn->delete(self::TABLE_NAME, array(
@@ -76,6 +77,10 @@ class StoredCard {
                     'heartland_storedcard_id = ?' => (int)$id,
                 ));
             }
+        }
+        else {
+            throw new \Exception(__('No valid User Logged On!! Cannot save card.'));
+        }
     }
 
     /** looks up existing stored cards for the currently logged on user
