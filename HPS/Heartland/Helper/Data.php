@@ -93,11 +93,12 @@ class Data extends AbstractHelper
     public static function jsonData()    {
 
         $inputs = json_decode((string) file_get_contents((string)'php://input'),(bool) true);;
-        if (empty($inputs) && !empty($_POST['payment']))
-        paymentMethod
+        if (empty($inputs) && ‌‌$_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['payment'])){
+            $inputs['paymentMethod'] = $_POST['payment'];
+        }
 
 
-        return (array) json_decode((string) file_get_contents((string)'php://input'),(bool) true);
+        return (array) $inputs;
     }
     public static function getRoot()    {
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_DIRECTORY_LIST)->getRoot();
