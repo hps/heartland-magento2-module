@@ -53,7 +53,7 @@ function _HPS_EnablePlaceOrder(){
         document.querySelector('#bPlaceOrderNow').disabled='';
     }catch(e){}
 }
-function HPS_SecureSubmit(document, Heartland, publicKey) {
+function HPS_SecureSubmit($,document, Heartland, publicKey) {
     //if (arguments.callee.count > 0 )
     //    return;
     if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
