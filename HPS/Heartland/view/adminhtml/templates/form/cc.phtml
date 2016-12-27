@@ -56,7 +56,7 @@ echo $code; ?>"
                     <?php /* @noEscape */ echo $code; ?> = {
 
                         _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
-                            if(document.querySelector("#hssCardSelected" + response.token_value.trim())
+                            if(document.querySelector("#hssCardSelected" + response.token_value.trim()))
                             {
                                 $("#iframes").fadeOut();
                                 document.querySelector("#hssCardSelected" + response.token_value.trim()).checked = true;
