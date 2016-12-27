@@ -272,7 +272,7 @@ function HPS_SecureSubmit(document, Heartland, publicKey) {
              }*/
         });
         // Attach a handler to interrupt the form submission
-        Heartland.Events.addHandler(document.getElementById('edit_form'), 'submit', function (e) {
+        Heartland.Events.addHandler(document.getElementById('edit_forms'), 'submit', function (e) {
             // Prevent the form from continuing to the `action` address
 
             e.preventDefault();
