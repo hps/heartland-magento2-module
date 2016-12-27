@@ -72,7 +72,7 @@ echo $code; ?>"
                             // "cc_exp_month":"2","cc_exp_year":"2025"}
                             $("#iframes").fadeOut();
                             $.ajax({
-                                url: "../heartland/creditcard/delete?t="+id
+                                url: "<?php echo $block->getUrl()?>/heartland/creditcard/delete?t="+id
                                 , success: function (data) {
                                     if (data != '[]') {
                                         e.remove()
