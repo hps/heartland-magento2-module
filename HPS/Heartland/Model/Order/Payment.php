@@ -26,7 +26,9 @@ class Payment
                 return false;
 
             }
-            return true;// (bool)$this->_transactionRecord->settlementAmount > 0;
+            return $this->_transactionRecord->settlementAmount > 0
+                ? false
+                : true;
         }
         catch (\Exception $e) {
             return false;
@@ -68,9 +70,9 @@ class Payment
                 return false;
 
             }
-            return true; ;;//$this->_transactionRecord->settlementAmount > 0
-                //? false
-                //: true;
+            return $this->_transactionRecord->settlementAmount > 0
+                ? false
+                : true;
         }
         catch (\Exception $e) {
             return false;
