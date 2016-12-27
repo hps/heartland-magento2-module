@@ -93,7 +93,7 @@ class Data extends AbstractHelper
     public static function jsonData()    {
 
         $inputs = json_decode((string) file_get_contents((string)'php://input'),(bool) true);;
-        if (empty($inputs) && !empty(payment))
+        if (empty($inputs) && !empty($_POST['payment']))
         paymentMethod
 
 
