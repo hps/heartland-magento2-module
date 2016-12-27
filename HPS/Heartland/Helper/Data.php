@@ -87,7 +87,9 @@ class Data extends AbstractHelper
     public static function getCanSave(){
         return (int) self::getConfig(self::S_CARDS);
     }
-    /**
+
+    /** Customer facing will generate JSON input while admin side will send post this function returns the relevent
+     * payment data either way
      * @return array
      */
     public static function jsonData()    {
