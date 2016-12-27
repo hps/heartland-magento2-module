@@ -65,7 +65,8 @@ class Payment
     function canCapturePartial()
     {
         try {
-
+            if (preg_match("/{Transaction::TYPE_AUTH}$/", $this->getLastTransId()) === 1)
+                return true;
             if ($this->getHPS() === null) {
                 return false;
 
