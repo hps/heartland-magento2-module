@@ -534,8 +534,10 @@ class Payment
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
                     $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
                     // \HPS\Heartland\Model\Payment::$_token_value
+
                     $suToken
-                        = $this->getToken(new \HpsTokenData); //$this->getSuToken();// this just gets the passed token value
+                        = $this->getToken(new \HpsTokenData,$order->getCustomerId()); //$this->getSuToken();// this just gets the passed
+                    // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
             }
@@ -758,8 +760,7 @@ class Payment
                         $actionVerb,
                         $requestedAmount,
                         $response->authorizationCode);
-
-                    break;
+                    break; 
 
                 case 'HpsReportTransactionDetails':
                     /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
@@ -767,7 +768,7 @@ class Payment
                     $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
                     $successMsg[] = __("The %1 ending in %2 was Invoiced successfully \$%3",
                         $response->cardType,
-                        $response->maskedCardNumber,
+                        substr($response->maskedCardNumber,-4),
                         $response->settlementAmount);
 
                     break;
@@ -936,12 +937,12 @@ class Payment
      * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
      */
     private
-    function getToken(\HpsTokenData $suToken)
+    function getToken(\HpsTokenData $suToken, $custID = null)
     {
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
         $this->getTokenValue();
         if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
-            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value);
+            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value,$custID);
         }
         //First identify if we have a singleuse token in memory already
         if (!$this->validateSuToken() && !$this->validateMuToken()) {
@@ -991,8 +992,7 @@ class Payment
      * by app/code/HPS/Heartland/Model/StoredCard.php
      *
      * @return bool
-     */
-    private
+     */    private
     function validateMuToken()
     {
         return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);

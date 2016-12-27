@@ -22,6 +22,11 @@ class Payment
     { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         try {
 
+            if (preg_match("/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
+                           .\Magento\Sales\Api\Data\TransactionInterface::TYPE_ORDER.")$/",
+                           $this->getLastTransId()
+                ) === 1)
+                return true;
             if ($this->getHPS() === null) {
                 return false;
 
@@ -65,7 +70,11 @@ class Payment
     function canCapturePartial()
     {
         try {
-
+            if (preg_match("/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
+                           .\Magento\Sales\Api\Data\TransactionInterface::TYPE_ORDER.")$/",
+                           $this->getLastTransId()
+                ) === 1)
+                return true;
             if ($this->getHPS() === null) {
                 return false;
 

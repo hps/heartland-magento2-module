@@ -20,16 +20,17 @@ use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 
 /**
  * Class Customer
+ * @method \Magento\User\Model\User|null getUser()
  *
  * @package HPS\Heartland\Helper
  */
-class Customer
+class Admin
 {
     /**
-     * @return \Magento\Customer\Model\Session
+     * @return \Magento\Backend\Model\Auth\Session
      */
     public static function getSession(){
-        return HPS_OM::getObjectManager()->get('Magento\Customer\Model\Session');
+        return HPS_OM::getObjectManager()->get('Magento\Backend\Model\Auth\Session');
     }
 
     /**
@@ -40,10 +41,16 @@ class Customer
     }
 
     /**
+     * @return bool|\Magento\User\Model\User
+     */
+    public static function getAdmin(){
+        return self::isLoggedIn() ? (int)self::getSession()->getUser() : false;
+    }
+    /**
      * @return bool|int
      */
-    public static function getCustID(){
-        return self::isLoggedIn() ? (int)self::getSession()->getCustomerId() : false;
+    public static function getAdminID(){
+        return self::isLoggedIn() ? (int)self::getAdmin()->getId() : false;
     }
 
 }

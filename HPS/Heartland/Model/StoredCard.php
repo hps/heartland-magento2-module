@@ -19,6 +19,7 @@
 namespace HPS\Heartland\Model;
 
 use \HPS\Heartland\Helper\Customer;
+use \HPS\Heartland\Helper\Admin;
 use \HPS\Heartland\Helper\Db;
 
 /**
@@ -29,23 +30,25 @@ use \HPS\Heartland\Helper\Db;
 class StoredCard {
     const TABLE_NAME = 'hps_heartland_storedcard';
 
-    /**
+    /** performs a db lookup for the current customer within the db given a specific token ID
      * @param int $id
      *
-     * @return bool
+     * @return bool|array
      * @throws \Exception
      */
-    public static function getToken($id) {
+    public static function getToken($id,$custID = null) {
         $MuToken = false;
-        //if( is_int($id) ){
-        if (Customer::isLoggedIn()) {
+        if(empty($custID) && Customer::isLoggedIn() ){
+            $custID = Customer::getCustID();
+        }
+        if (!empty($custID)) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
                         ['o' => self::TABLE_NAME]
                     )
-                    ->where('o.customer_id   = ?', (int)Customer::getCustID())
+                    ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
                 $data = (array)$conn->fetchAll($select);
                 self::validate($data);
@@ -53,9 +56,6 @@ class StoredCard {
                     $MuToken = $data[0]['token_value'];
                 }
             }
-        }
-        else {
-            throw new \Exception(__('No valid User Logged On!! Cannot get saved card.'));
         }
 
         //}
@@ -122,6 +122,45 @@ class StoredCard {
         }
 
         return (array)$data;
+    }/** looks up existing stored cards for the currently logged on user
+     *
+     * @return array
+     *
+     *
+     * @throws \Exception
+     */
+    public static function getStoredCardsAdmin($custID = null) {
+        $data = [];
+        if ($custID !== null && $custID > 0) {
+            $conn = Db::db_connect();
+            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+                $select = $conn->select()
+                    ->from(
+                        ['o' => self::TABLE_NAME],
+                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
+                    )
+                    ->where('o.customer_id = ?', (int)$custID)
+                ->group('o.token_value')
+                ;
+                $tdata = (array)$conn->fetchAll($select);
+                self::validate($tdata);
+                foreach ($tdata as $item) {
+                    $conn = Db::db_connect();
+                        $select2 = $conn->select()
+                            ->from(['o' => self::TABLE_NAME])
+                            ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
+                        $sdata = (array)$conn->fetchAll($select2);
+                        self::validate($sdata);
+                    $data[] = $sdata[0];
+                }
+                self::validate($data);/**/
+            }
+        }
+        else {
+            throw new \Exception(__('No valid User Logged On!! Cannot get saved cards.'));
+        }
+
+        return (array)$data;
     }
 
     /** returns true or false if stored cards are enabled
@@ -167,6 +206,11 @@ class StoredCard {
         $conn = Db::db_connect();
         if (Customer::isLoggedIn()) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+                // try to prevent duplicat records in the table
+                $conn->delete(self::TABLE_NAME, array(
+                    'customer_id = ?'   => (int)Customer::getCustID(),
+                    'token_value = ?' => $token,
+                ));
                 $conn->insert(self::TABLE_NAME, Array(
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
