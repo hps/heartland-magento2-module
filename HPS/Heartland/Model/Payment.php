@@ -774,7 +774,7 @@ class Payment
                         $response->settlementAmount);
 
                     break;
- 
+
                 default:
                     break;
             }
