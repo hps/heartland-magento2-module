@@ -91,6 +91,12 @@ class Data extends AbstractHelper
      * @return array
      */
     public static function jsonData()    {
+
+        $inputs = json_decode((string) file_get_contents((string)'php://input'),(bool) true);;
+        if (empty($inputs) && !empty(payment))
+        paymentMethod
+
+
         return (array) json_decode((string) file_get_contents((string)'php://input'),(bool) true);
     }
     public static function getRoot()    {
