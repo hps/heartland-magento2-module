@@ -110,7 +110,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);
-                    document.getElementById('edit_form').detachEvent()
                     document.getElementById('edit_form').submit()
                 }
         }
@@ -274,7 +273,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                 },
                 'cardNumber'
             );
-
+return;
         });
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
