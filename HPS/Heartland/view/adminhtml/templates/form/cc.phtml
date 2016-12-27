@@ -177,7 +177,7 @@ echo $code; ?>"
                                             options.error(response.error);
                                         }
                                         // handle exception
-                                        HPS.error(response.error.message);
+                                        //HPS.error(response.error.message);
                                     }
                                     else if(typeof options.success === 'function') {
                                         options.success(response);
@@ -185,7 +185,7 @@ echo $code; ?>"
                                 }
                             });
 
-                        },
+
                     };
                 });
 
