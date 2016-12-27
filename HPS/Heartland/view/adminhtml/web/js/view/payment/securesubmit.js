@@ -260,8 +260,8 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              }*/
         });
         // Attach a handler to interrupt the form submission
-        $("#edit_form").bind("submit",function(e,$){
-            e.preventDefault();
+        $("#edit_form").bind("submit",function(e){
+            //e.preventDefault();
             console.log('Token'); //edit_form
             console.log('Token'); //edit_form
             // Tell the iframes to tokenize the data
