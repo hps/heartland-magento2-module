@@ -125,13 +125,18 @@ echo $code; ?>"
                             hpsBusy();
 
                             if ($("#securesubmit_token").val() == '') {
-                                tokenize()
+                                <?php /* @noEscape */ echo $code; ?>.tokenize()
                             } else {
                                 <?php /* @noEscape */ echo $code; ?>.
                                 placeOrder();
                             }
                             <?php /* @noEscape */ echo $code; ?>.
                             hpsNotBusy();
+                        },
+
+                        Urls: {
+                            CERT: "https://cert.api2.heartlandportico.com/Hps.Exchange.PosGateway.Hpf.v1/api/token",
+                            PROD: "https://api2.heartlandportico.com/SecureSubmit.v1/api/token"
                         },
                         tokenize: function () {
                             var gateway_url, params, env;
@@ -152,9 +157,9 @@ echo $code; ?>"
                             env = options.data.public_key.split("_")[1];
 
                             if (env === "cert") {
-                                gateway_url = HPS.Urls.CERT;
+                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.CERT;
                             } else {
-                                gateway_url = HPS.Urls.PROD;
+                                gateway_url = <?php /* @noEscape */ echo $code; ?>.Urls.PROD;
                             }
 
                             // request token
