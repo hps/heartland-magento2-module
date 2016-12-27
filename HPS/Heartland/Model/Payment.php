@@ -283,6 +283,7 @@ class Payment
         $errorMsg       = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
         $ccNumber       = $info->getCcNumber();
+
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
