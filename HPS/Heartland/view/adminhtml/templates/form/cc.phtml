@@ -219,7 +219,8 @@ echo $code; ?>"
                 <tr onclick='return {$code}._HPS_setHssTransaction1(JSON.parse("{$tokenJson}"));'>
                     <td width="width:100px" ><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="hssCardSelected{$token['token_value']}"></td>
                     <th align="left" id="image_holder_{$token['token_value']}">{$ccTypeHPS} ending in {$token['cc_last4']}<br />Expiring on {$token['cc_exp_month']}/{$token['cc_exp_year']}<span class="card-type-{$token['cc_type']}" /></th>
-                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this)"
+                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this
+                    .parentNode().parentNode())"
                     style="color:red;font-size:
                     2em" type="button"
                      value="X"></td>
