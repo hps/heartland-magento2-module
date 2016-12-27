@@ -275,10 +275,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         $("#edit_form").bind("submit",null,function(e,$){
             e.preventDefault();
             console.log('Token'); //edit_form
-        Heartland.Events.addHandler($(this), 'submit', function (e) {
-            // Prevent the form from continuing to the `action` address
-
-            e.preventDefault();
             console.log('Token'); //edit_form
             // Tell the iframes to tokenize the data
             hps.Messages.post(
@@ -290,7 +286,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                 'cardNumber'
             );
 
-        });
         });
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
