@@ -68,9 +68,9 @@ class Payment
                 return false;
 
             }
-            return $this->_transactionRecord->settlementAmount > 0
-                ? false
-                : true;
+            return true; ;;//$this->_transactionRecord->settlementAmount > 0
+                //? false
+                //: true;
         }
         catch (\Exception $e) {
             return false;
