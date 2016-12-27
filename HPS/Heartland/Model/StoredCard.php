@@ -206,6 +206,11 @@ class StoredCard {
         $conn = Db::db_connect();
         if (Customer::isLoggedIn()) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+                // try to prevent duplicat records in the table
+                $conn->delete(self::TABLE_NAME, array(
+                    'customer_id = ?'   => (int)Customer::getCustID(),
+                    'token_value = ?' => $token,
+                ));
                 $conn->insert(self::TABLE_NAME, Array(
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
