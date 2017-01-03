@@ -273,7 +273,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                 },
                 'cardNumber'
             );
-            $("#edit_form").stop();
             return false;
         });
     }

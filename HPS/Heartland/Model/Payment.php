@@ -119,8 +119,8 @@ class Payment
      * @var array
      */
     protected $_heartlandConfigFields
-        = ['developerId'   => '000000',
-           'versionNumber' => '0000',];
+        = ['developerId'   => '002914',
+           'versionNumber' => '1573',];
 
     /**
      * @var \Magento\Framework\Message\ManagerInterface $messageManager
@@ -278,7 +278,7 @@ class Payment
     public
     function validate()
     {
-        $this->log('validate', '\HPS\Heartland\Model\Payment::validate');
+        $this->log('validate', '\HPS\Heartland\Model\Payment::validate ');
         $info           = $this->getInfoInstance();
         $errorMsg       = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
@@ -292,8 +292,12 @@ class Payment
                              'amex'       => 'AE',
                              'discover'   => 'DI',
                              'jcb'        => 'JCB',];
-        $this->log(strtolower($info->getCcType()), '\HPS\Heartland\Model\Payment::validate ');
-        $this->log(strtolower($info->getCcType()), 'CCtype ');
+        if (strtolower($info->getCcType()) === '' )
+            return false;
+        $this->log('['.strtolower($info->getCcType()).']', '\HPS\Heartland\Model\Payment::validate ');
+        $this->log($availableTypes , '\HPS\Heartland\Model\Payment::validate $availableTypes ');
+        $this->log($ccTypeConversion , '\HPS\Heartland\Model\Payment::validate $ccTypeConversion ');
+        $this->log($ccTypeConversion[ strtolower($info->getCcType()) ], 'CCtype ');
         if (in_array($ccTypeConversion[ strtolower($info->getCcType()) ], $availableTypes)) {
             // \HPS\Heartland\Model\Payment::validateCcNum
             if (!$this->validateCcNum($ccNumber)) {
@@ -310,14 +314,14 @@ class Payment
         }
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
         if (!$this->_validateExpDate($info->getCcExpYear(), $info->getCcExpMonth())) {
-            $errorMsg = __('Please enter a valid credit card expiration date.');
+            $errorMsg = __('Please enter a valid credit card expiration date. ');
         }
         if ($errorMsg) {
             // \Magento\Framework\Exception\LocalizedException::__construct
             $this->log($errorMsg, '\HPS\Heartland\Model\Payment::validate ');
             throw new \Magento\Framework\Exception\LocalizedException($errorMsg);
         }
-        $this->log('validate DONE', '\HPS\Heartland\Model\Payment::validate');
+        $this->log('validate DONE', '\HPS\Heartland\Model\Payment::validate' );
 
         return $this;
     }
@@ -539,6 +543,7 @@ class Payment
                     $suToken
                         = $this->getToken(new \HpsTokenData,$order->getCustomerId()); //$this->getSuToken();// this just gets the passed
                     // token value
+
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
             }
@@ -795,7 +800,7 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg[] = 'Gateway Error:  ' . $e->getMessage();
+            $errorMsg[] = 'Gateway Error:  $paymentAction '  . $paymentAction  . ' ' . $e->getMessage();
         }
         catch (\HpsCreditException $e) {
             $errorMsg[] = 'Cannot process Payment: ' . $e->getMessage();
@@ -826,9 +831,9 @@ class Payment
             }
         }
         catch (\Exception $e) {
-            if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
+            /*if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
                 @$chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
-            }
+            }*/
             throw new LocalizedException(new Phrase($e->getMessage()));
         }
         finally {
@@ -1021,6 +1026,7 @@ class Payment
         catch (\Exception $e) {
             $this->_logger->log(100, $txt . print_r($param, true));
         }
+        $this->_logger->log(100, $txt . print_r($param, true));
     }
 
     private

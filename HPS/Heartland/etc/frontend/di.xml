@@ -26,5 +26,4 @@
         </arguments>
     </type>
 
-    <preference for="\Magento\Vault\Block\CreditCards" type="\HPS\Heartland\Block\CreditCards" />
 </config>
