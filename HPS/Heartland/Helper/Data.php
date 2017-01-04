@@ -97,11 +97,12 @@ class Data extends AbstractHelper
         $inputs = json_decode((string) file_get_contents((string)'php://input'),(bool) true);;
 
         if (empty($inputs) === true && $_SERVER['REQUEST_METHOD'] === 'POST'){
-            $post = $_POST;
+            $post = $_POST; // $post['order']['billing_address']['customer_address_id']
             if(array_key_exists('payment',$post)){$inputs['paymentMethod']['additional_data'] = $post['payment'];;}
 
             //$inputs['paymentMethod']['additional_data'] = _save_token_value;;
             if(array_key_exists('securesubmit_token',$post)){$inputs['paymentMethod']['additional_data']['token_value'] = $post['securesubmit_token'];;}
+
 
         }
 

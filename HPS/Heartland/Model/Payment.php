@@ -291,12 +291,13 @@ class Payment
                              'mastercard' => 'MC',
                              'amex'       => 'AE',
                              'discover'   => 'DI',
-                             'jcb'        => 'JCB',];
-        if (strtolower($info->getCcType()) === '' )
+                             'jcb'        => 'JCB'];
+        if (strtolower($info->getCcType()) === '') {
             return false;
-        $this->log('['.strtolower($info->getCcType()).']', '\HPS\Heartland\Model\Payment::validate ');
-        $this->log($availableTypes , '\HPS\Heartland\Model\Payment::validate $availableTypes ');
-        $this->log($ccTypeConversion , '\HPS\Heartland\Model\Payment::validate $ccTypeConversion ');
+        }
+        $this->log('[' . strtolower($info->getCcType()) . ']', '\HPS\Heartland\Model\Payment::validate ');
+        $this->log($availableTypes, '\HPS\Heartland\Model\Payment::validate $availableTypes ');
+        $this->log($ccTypeConversion, '\HPS\Heartland\Model\Payment::validate $ccTypeConversion ');
         $this->log($ccTypeConversion[ strtolower($info->getCcType()) ], 'CCtype ');
         if (in_array($ccTypeConversion[ strtolower($info->getCcType()) ], $availableTypes)) {
             // \HPS\Heartland\Model\Payment::validateCcNum
@@ -321,7 +322,7 @@ class Payment
             $this->log($errorMsg, '\HPS\Heartland\Model\Payment::validate ');
             throw new \Magento\Framework\Exception\LocalizedException($errorMsg);
         }
-        $this->log('validate DONE', '\HPS\Heartland\Model\Payment::validate' );
+        $this->log('validate DONE', '\HPS\Heartland\Model\Payment::validate');
 
         return $this;
     }
@@ -357,6 +358,7 @@ class Payment
     private
     function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
+
         $cardHolder = new \HpsCardHolder();
         // \Magento\Sales\Model\Order\Address::getName
         //$splitName = explode(' ', $billing->getName());
@@ -535,13 +537,15 @@ class Payment
                 $order = $payment->getOrder();
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
+
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
                     $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
                     // \HPS\Heartland\Model\Payment::$_token_value
 
                     $suToken
-                        = $this->getToken(new \HpsTokenData,$order->getCustomerId()); //$this->getSuToken();// this just gets the passed
+                        = $this->getToken(new \HpsTokenData,
+                                          $order->getCustomerId()); //$this->getSuToken();// this just gets the passed
                     // token value
 
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
@@ -685,14 +689,15 @@ class Payment
                 if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
                     /**This call will automatically make sure the expire date is updated on a save*/
                     $chargeService->updateTokenExpiration($response->tokenData->tokenValue,
-                        $this->getAdditionalData()['cc_exp_month'],
-                        $this->getAdditionalData()['cc_exp_year']);
+                                                          $this->getAdditionalData()['cc_exp_month'],
+                                                          $this->getAdditionalData()['cc_exp_year']);
                     // \HPS\Heartland\Model\StoredCard::setStoredCards
                     HPS_STORED_CARDS::setStoredCards($response->tokenData->tokenValue,
-                        strtolower($info->getCcType()),
-                        $CcL4,
-                        $this->getAdditionalData()['cc_exp_month'],
-                        $this->getAdditionalData()['cc_exp_year']);
+                                                     strtolower($info->getCcType()),
+                                                     $CcL4,
+                                                     $this->getAdditionalData()['cc_exp_month'],
+                                                     $this->getAdditionalData()['cc_exp_year'],
+                                                     $order->getData('customer_id'));
                     $successMsg[] = __("Payment token saved for future purchases");
                 }/**/
             }
@@ -700,14 +705,15 @@ class Payment
                 // \Psr\Log\LoggerInterface::error
                 $this->_logger->error(__('Payment MultiUse Token: Error Unknown could not save token or one was
                     not returned. The most likely cause would be that Multi-use tokens need to be enabled by
-                    Heartland - %1',$e->getMessage()));
+                    Heartland - %1',
+                                         $e->getMessage()));
                 $noticeMsg[] = __('We could not save your payment information for later use.');
             }
             // \Psr\Log\LoggerInterface::error
             // an error any where here will it seems not get picked up by Magento2 error handlers.
 
             $this->log($response,
-                'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
+                       'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue ');
 
 
             $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
@@ -718,17 +724,17 @@ class Payment
                     /** @var \HpsReversal $response Properties found in the HpsReversal */
                     $successMsg[] = __("The amount authorised for Transaction ID: %1 for
                         [\$%2] was reduced to [\$%3] successfully",
-                        $payment->getCcTransId(),
-                        $reportTxnDetail->settlementAmount,
-                        $requestedAmount);
+                                       $payment->getCcTransId(),
+                                       $reportTxnDetail->settlementAmount,
+                                       $requestedAmount);
                     break;
 
                 case 'HpsRefund':
                     /** @var \HpsRefund $response Properties found in the HpsRefund */
                     $successMsg[] = __("The Transaction ID: %1 was refunded for \$%2
                         successfully",
-                        $payment->getCcTransId(),
-                        $requestedAmount);
+                                       $payment->getCcTransId(),
+                                       $requestedAmount);
                     $payment->setBaseAmountRefunded($requestedAmount);
 
                     break;
@@ -759,13 +765,13 @@ class Payment
                     //Build a message to show the user what is happening
                     $successMsg[]
                         = __("The %1 ending in %2 which expires on: %3 \\ %4 was %5 \$%6 successfully. Your approval code is %7",
-                        $response->cardType,
-                        $CcL4,
-                        $this->getAdditionalData() ['cc_exp_month'],
-                        $this->getAdditionalData()['cc_exp_year'],
-                        $actionVerb,
-                        $requestedAmount,
-                        $response->authorizationCode);
+                             $response->cardType,
+                             $CcL4,
+                             $this->getAdditionalData() ['cc_exp_month'],
+                             $this->getAdditionalData()['cc_exp_year'],
+                             $actionVerb,
+                             $requestedAmount,
+                             $response->authorizationCode);
 
                     break;
 
@@ -774,9 +780,9 @@ class Payment
                     $payment->setAmountPaid($response->settlementAmount);
                     $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
                     $successMsg[] = __("The %1 ending in %2 was Invoiced successfully \$%3",
-                        $response->cardType,
-                        substr($response->maskedCardNumber,-4),
-                        $response->settlementAmount);
+                                       $response->cardType,
+                                       substr($response->maskedCardNumber, -4),
+                                       $response->settlementAmount);
 
                     break;
 
@@ -800,7 +806,14 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            $errorMsg[] = 'Gateway Error:  $paymentAction '  . $paymentAction  . ' ' . $e->getMessage();
+            if (!empty($suToken->tokenValue)
+                && $e->getMessage() != 'Transaction rejected because the lookup of the supplied token failed. ETS
+                ResultCode: 2097161'
+            ) {
+                $errorMsg[] = 'Gateway Error: ' . $e->getMessage();
+            }
+            $errorMsg[] = 'Gateway Error: ' . $e->getMessage();
+
         }
         catch (\HpsCreditException $e) {
             $errorMsg[] = 'Cannot process Payment: ' . $e->getMessage();
@@ -949,7 +962,7 @@ class Payment
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
         $this->getTokenValue();
         if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
-            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value,$custID);
+            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value, $custID);
         }
         //First identify if we have a singleuse token in memory already
         if (!$this->validateSuToken() && !$this->validateMuToken()) {

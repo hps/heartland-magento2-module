@@ -157,7 +157,7 @@ echo $code; ?>"
                     <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this
                     .parentNode.parentNode)"
                     style="color:red;font-size:
-                    2em" type="button"
+                    2em;background-color: transparent;border: none" type="button"
                      value="X"></td>
                 </tr>
 
@@ -168,7 +168,7 @@ TROW;
         ?>
 
 
-        <tr id="hps_heartland_NewCard" onclick="return <?php /* @noEscape */
+        <tr id="hps_heartland_NewCard" style="" onclick="return <?php /* @noEscape */
         echo $code; ?>.hpsNewCard()">
             <td><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="SelectNewCardHPS"></td>
             <th title="Click to enter a new Payment Method"
@@ -212,7 +212,11 @@ TROW;
         <dd>
             <div id="iframesCardCvv"></div>
         </dd>
-
+<label> <input type="checkbox" id="saveCardCheck"
+               onchange="document.querySelector('#<?php /* @noEscape */
+               echo $code; ?>_save_token_value').value
+                       = (this.checked?1:0)"
+    /> Save this Card? </label>
     </span>
     <input id="securesubmit_token" name="securesubmit_token" type="hidden">
 
@@ -227,6 +231,16 @@ TROW;
     <div class="field-number required admin__field _required">
 
         <div class="admin__field-control">
+            <input type="text" id="<?php /* @noEscape */
+            echo $code; ?>_save_token_value" name="payment[_save_token_value]"
+                   title="<?php echo $block->escapeHtml(__('Credit Card Number')); ?>"
+
+                   class="admin__control-text required-entry"/>
+        </div>
+    </div>
+    <div class="field-number required admin__field _required">
+
+        <div class="admin__field-control">
             <input type="hidden" id="<?php /* @noEscape */
             echo $code; ?>_cc_number" name="payment[cc_number]"
                    title="<?php echo $block->escapeHtml(__('Credit Card Number')); ?>"
@@ -236,16 +250,6 @@ TROW;
     </div>
 
     <div class="field-date admin__field _required">
-        <?php /* <label class="admin__field-label" for="
-        echo $code; ?>_expiration">
-            <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
-        </label>*/?>
-
-
-
-
-
-
         <div class="admin__field-control">
             <div class="fields group group-2">
                 <div class="field no-label month">

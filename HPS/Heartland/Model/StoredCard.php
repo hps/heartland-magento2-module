@@ -190,7 +190,7 @@ class StoredCard {
      *
      * @throws \Exception
      */
-    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year) {
+    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID) {
         /*$args = func_get_args();
         foreach ($args as $argName=>$arg) {
             if ( preg_match('/[\W]/', $arg) !== 1){
@@ -198,17 +198,17 @@ class StoredCard {
             }
         }*/
         $conn = Db::db_connect();
-        if (Customer::isLoggedIn()) {
+        if ($customerID) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 // try to prevent duplicat records in the table
                 $conn->delete(self::TABLE_NAME, array(
-                    'customer_id = ?'   => (int)Customer::getCustID(),
+                    'customer_id = ?'   => (int)$customerID,
                     'token_value = ?' => $token,
                 ));
                 $conn->insert(self::TABLE_NAME, Array(
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
-                        'customer_id'   => Customer::getCustID(),
+                        'customer_id'   => $customerID,
                         'token_value'   => (string)$token,
                         'cc_type'       => (string)$cc_type,
                         'cc_last4'      => (string)$last4,
