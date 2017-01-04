@@ -806,12 +806,7 @@ class Payment
                 contact Heartland: ' . $e->getMessage();
         }
         catch (\HpsGatewayException $e) {
-            if (!empty($suToken->tokenValue)
-                && $e->getMessage() != 'Transaction rejected because the lookup of the supplied token failed. ETS
-                ResultCode: 2097161'
-            ) {
-                $errorMsg[] = 'Gateway Error: ' . $e->getMessage();
-            }
+
             $errorMsg[] = 'Gateway Error: ' . $e->getMessage();
 
         }
