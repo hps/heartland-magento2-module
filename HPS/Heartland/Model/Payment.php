@@ -571,14 +571,20 @@ class Payment
 
                     $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
                     /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
+                    ;
                     $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount),
                                                           $currency,
                                                           $suToken,
                                                           $validCardHolder,
-                                                          true,
+                        ($this->validateSuToken() ? true : false),
                                                           null,
                                                           $storeName);
-                    if (isset($response->tokenData) && $response->tokenData->tokenValue){$payment->setCcNumberEnc($response->tokenData->tokenValue);}
+                    if (isset($response->tokenData) && $response->tokenData->tokenValue){
+                        $payment->setCcNumberEnc($response->tokenData->tokenValue);
+                    }
+                    if(!$this->validateSuToken()){
+                        $payment->setCcNumberEnc($suToken->tokenValue);
+                    }
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -594,6 +600,7 @@ class Payment
                      */
                     try {
                         if (\HpsInputValidation::checkAmount($reportTxnDetail->settlementAmount) > \HpsInputValidation::checkAmount($requestedAmount)) {
+                            $theToken = null;
                             $this->log($suToken, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $this->log($parentPaymentID, 'HPS\Heartland\Model\Payment reverse Method Called: ');
                             $this->log(\HpsInputValidation::checkAmount($reportTxnDetail->authorizedAmount),
@@ -606,6 +613,13 @@ class Payment
                                                     null,
                                                     \HpsInputValidation::checkAmount($requestedAmount));
                             $theToken = $payment->getCcNumberEnc();
+                            if (!empty($theToken)){
+                                /** @var \HpsAuthorization $newAuthResp*/
+                                /*$newAuthResp = $this->authorize($payment, \HpsInputValidation::checkAmount
+                                ($reportTxnDetail->authorizedAmount) - \HpsInputValidation::checkAmount
+                                                         ($requestedAmount));
+                                $newAuthResp->responseCode;*/
+                            }
                         }
                     }
                     catch (\Exception $e) {
