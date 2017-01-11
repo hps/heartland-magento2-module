@@ -570,13 +570,15 @@ class Payment
                 case (\HpsTransactionType::AUTHORIZE): // Portico CreditAuth \HpsTransactionType::AUTHORIZE
 
                     $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
+                    /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
                     $response = $chargeService->authorize(\HpsInputValidation::checkAmount($requestedAmount),
                                                           $currency,
                                                           $suToken,
                                                           $validCardHolder,
-                                                          $canSaveToken,
+                                                          true,
                                                           null,
                                                           $storeName);
+                    if (isset($response->tokenData) && $response->tokenData->tokenValue){$payment->setCcNumberEnc($response->tokenData->tokenValue);}
                     break;
                 /*
                  * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
@@ -603,6 +605,7 @@ class Payment
                                                     $currency,
                                                     null,
                                                     \HpsInputValidation::checkAmount($requestedAmount));
+                            $theToken = $payment->getCcNumberEnc();
                         }
                     }
                     catch (\Exception $e) {
