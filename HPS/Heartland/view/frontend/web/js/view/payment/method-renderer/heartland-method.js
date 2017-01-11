@@ -88,7 +88,6 @@ define(
                         self.hpsNewCard();
                     }
                 }
-                //return true;
             },
             drawTable: function(data) {
                 var self = this;
@@ -179,6 +178,9 @@ define(
 
             getToken: function (data, event) {
                 var self = this;
+                if ($("#onestepcheckout-button-place-order")) {
+                    $("#onestepcheckout-button-place-order").unbind("click");
+                }
                 self.hpsBusy();
                 if ($("#securesubmit_token").val() == ''){
                     $("#bValidateButton").click();
@@ -190,6 +192,16 @@ define(
             /**
              * Place order.
              */
+            isOSC: function(){
+                var self = this;
+                if ($("#onestepcheckout-button-place-order")){
+                    $("#onestepcheckout-button-place-order").bind("click",self,function(){self.getToken()});
+                    return false;
+                }
+                return true;
+
+
+            },
             placeOrder: function (data, event) {
 
                 var self = this,
