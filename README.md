@@ -2,13 +2,13 @@
 ![image](heartland-logo.png)
 ### Welcome to Heartland Magento2 Extension:
 
-This project is in BETA. It works but you should be aware that there may be some rough code and some not so expected results. It is also an MVP. That is a Minimum Viable Product.
+This project is in ready.
 
 ### Prerequisites:
 
 We have laid out some basic requirements that you should absolutely have before working with this extension:
 
-* Magento v2.1.1+ (at the time of this development effort this was the current release of Magento2)
+* Magento v2.1.3+ (at the time of this development effort this was the current release of Magento2)
 * Experience in debugging if problems arise.
 * SSH access to server as file system owner of web directory
 * Keys for [Magento connect](https://marketplace.magento.com/customer/accessKeys/list/)
@@ -17,16 +17,16 @@ We have laid out some basic requirements that you should absolutely have before 
 
 ### Feature list:
 
-First a little about why we think you will be interested in our beta. Heartland supports several industry leading platforms. Magento2 is one of many.
-Let's review what is and isn't ready for use:
+Heartland supports several industry leading platforms. Magento2 is one of many.
+Let's review what is ready for use:
 
 * Checkout
 * Card Saving
+* Online Auth/Capture(invoice)
+* Online Partial Capture
+* Administrative Card delete for customer
+* Online Charge
 * Online Refund
-
-What isn't ready yet:
-
-* Ability to delete saved cards
 
 With a Heartland integration:
 
@@ -41,7 +41,7 @@ If you're still with us, you have decided that this sounds like something you wa
 #### Installation:
 Please review the updated [Magento 2.1.1 requirements](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements.html). It is critical that your installation meets all of these before continuing
 
-* While it was unclear if a WAMP stack was ever supported, Magento 2.1.1 now officially only supports a Linux x86-64 deployment.
+* While it was unclear if a WAMP stack was ever supported, Magento 2.1.3 now officially only supports a Linux x86-64 deployment.
 * While the documentation suggests that setting up a swap file if you have less than 2 GB, we found that there were failures during the basic Magento 2 installation when the server had less than 2 GB. 
 * While Magento2 documentation on [versioning](http://devdocs.magento.com/guides/v2.1/architecture/versioning.html) indicates the difference between 2.0.x and 2.1.x should be backward compatible changes 2.1.x no longer allows php 5.5.22 or greater.
 [2.0.x](http://devdocs.magento.com/guides/v2.0/install-gde/system-requirements.html) vs [2.1.x](http://devdocs.magento.com/guides/v2.1/install-gde/system-requirements-tech.html)
