@@ -861,7 +861,10 @@ class Payment
             }*/
             throw new LocalizedException(new Phrase($e->getMessage()));
         }
-        finally {
+        finally { // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
+            if (! property_exists($response, 'transactionID') || ! ($response->transactionId > 0 ) ){
+                throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be completed!"));
+            }
         }
 
         return $this; // goes back to
