@@ -287,7 +287,7 @@ class Payment
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
-        $ccTypeConversion = ['visa'       => 'VI',
+        /*$ccTypeConversion = ['visa'       => 'VI',
                              'mastercard' => 'MC',
                              'amex'       => 'AE',
                              'discover'   => 'DI',
@@ -298,8 +298,9 @@ class Payment
         $this->log('[' . strtolower($info->getCcType()) . ']', '\HPS\Heartland\Model\Payment::validate ');
         $this->log($availableTypes, '\HPS\Heartland\Model\Payment::validate $availableTypes ');
         $this->log($ccTypeConversion, '\HPS\Heartland\Model\Payment::validate $ccTypeConversion ');
-        $this->log($ccTypeConversion[ strtolower($info->getCcType()) ], 'CCtype ');
+        $this->log(strtolower($info->getCcType()), 'CCtypes ');
         if (in_array($ccTypeConversion[ strtolower($info->getCcType()) ], $availableTypes)) {
+            $this->log($ccTypeConversion[ strtolower($info->getCcType()) ], 'CCtype ');
             // \HPS\Heartland\Model\Payment::validateCcNum
             if (!$this->validateCcNum($ccNumber)) {
                 $errorMsg = __('Invalid Credit Card Number.');
@@ -307,8 +308,7 @@ class Payment
         }
         else {
             $errorMsg = __('This credit card type is not allowed for this payment method.');
-        }
-        $this->log(strtolower($info->getCcType()), 'CCtypes ');
+        }*/
         // \HPS\Heartland\Model\Payment::getToken
         if (!$this->getToken(new \HpsTokenData)) {
             $errorMsg = __('No valid token.');
