@@ -152,8 +152,7 @@
                             click: getToken,
                         attr: {title: $t('Place Order')},
                         css: {disabled: !isPlaceOrderActionAllowed()},
-                        enable: (getCode() == isChecked()),
-                        visible: isOSC()
+                        enable: (getCode() == isChecked())
                         "
                         >
                     <span data-bind="text: $t('Place Order')"></span>
