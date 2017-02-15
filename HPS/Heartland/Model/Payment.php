@@ -386,7 +386,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                                     'discover' => 'DI',
                                     'jcb' => 'JCB',
                                     );
-        $this->log(strtolower($info->getCcType()),'\HPS\Heartland\Model\Payment::validate');
+        /*$this->log(strtolower($info->getCcType()),'\HPS\Heartland\Model\Payment::validate');
         $this->log(strtolower($info->getCcType()),'CCtype ');
         if (in_array($ccTypeConversion[strtolower($info->getCcType())], $availableTypes)) {
             // \HPS\Heartland\Model\Payment::validateCcNum
@@ -395,7 +395,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             }
         } else {
             $errorMsg = __('This credit card type is not allowed for this payment method.');
-        }
+        }*/
         // \HPS\Heartland\Model\Payment::getToken
         if (!$this->getToken() ){
              $errorMsg = __('No valid token.');
