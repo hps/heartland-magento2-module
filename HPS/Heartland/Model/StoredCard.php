@@ -95,20 +95,21 @@ class StoredCard {
                         ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
                     )
                     ->where('o.customer_id = ?', (int)Customer::getCustID())
-                ->group('o.token_value')
-                ;
+                ->group('o.token_value');
                 $tdata = (array)$conn->fetchAll($select);
                 self::validate($tdata);
-                foreach ($tdata as $item) {
-                    $conn = Db::db_connect();
+                if (!empty($tdata)) {
+                    foreach ($tdata as $item) {
+                        $conn = Db::db_connect();
                         $select2 = $conn->select()
-                            ->from(['o' => self::TABLE_NAME])
-                            ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array)$conn->fetchAll($select2);
+                                ->from(['o' => self::TABLE_NAME])
+                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
+                        $sdata = (array) $conn->fetchAll($select2);
                         self::validate($sdata);
-                    $data[] = $sdata[0];
+                        $data[] = $sdata[0];
+                    }
+                    self::validate($data); /**/
                 }
-                self::validate($data);/**/
             }
         }
         else {
@@ -134,20 +135,21 @@ class StoredCard {
                         ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
                     )
                     ->where('o.customer_id = ?', (int)$custID)
-                ->group('o.token_value')
-                ;
+                    ->group('o.token_value');
                 $tdata = (array)$conn->fetchAll($select);
-                self::validate($tdata);
-                foreach ($tdata as $item) {
-                    $conn = Db::db_connect();
+                if (!empty($tdata)) {
+                    self::validate($tdata);
+                    foreach ($tdata as $item) {
+                        $conn = Db::db_connect();
                         $select2 = $conn->select()
-                            ->from(['o' => self::TABLE_NAME])
-                            ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array)$conn->fetchAll($select2);
+                                ->from(['o' => self::TABLE_NAME])
+                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
+                        $sdata = (array) $conn->fetchAll($select2);
                         self::validate($sdata);
-                    $data[] = $sdata[0];
+                        $data[] = $sdata[0];
+                    }
+                    self::validate($data); /**/
                 }
-                self::validate($data);/**/
             }
         }
         else {
@@ -173,7 +175,7 @@ class StoredCard {
                     ->where('o.path = ?', (string)'payment/hps_heartland/save_cards');
                 $data = (array)$conn->fetchAll($select);
 
-                $retVal = (int)$data[0]['value'];
+                $retVal = (!empty($data[0])) ? (int)$data[0]['value'] : (int) 0;
             }
         }
 
@@ -230,20 +232,20 @@ class StoredCard {
      * @throws \Exception
      */
     private static function validate($data) {
-
-        // some very basic validation.
-        //simply dont want invalid arrays of data
-        foreach ($data as $item) {
-            if (preg_match('/[\D]/', $item['heartland_storedcard_id']) === 1) {
-                throw new \Exception(__('heartland_storedcard_id does not have a valid value.'));
-            }
-            foreach ($item as $columnName => $columnValue) {
-                if ($columnValue === null || $columnValue === '' || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
-                    throw new \Exception(__($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id']));
+        if (!empty($data)) {
+            // some very basic validation.
+            //simply dont want invalid arrays of data
+            foreach ($data as $item) {
+                if (preg_match('/[\D]/', $item['heartland_storedcard_id']) === 1) {
+                    throw new \Exception(__('heartland_storedcard_id does not have a valid value.'));
+                }
+                foreach ($item as $columnName => $columnValue) {
+                    if ($columnValue === null || $columnValue === '' || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
+                        throw new \Exception(__($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id']));
+                    }
                 }
             }
         }
-
         return true;
     }
 }
