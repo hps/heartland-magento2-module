@@ -49,15 +49,16 @@ class Get extends Action
         if ( HPS_STORED_CARDS::getCanStoreCards()){
             // \HPS\Heartland\Model\StoredCard::getStoredCards
             $data = HPS_STORED_CARDS::getStoredCards(); /**/
-            $data = HPS_STORED_CARDS::getStoredCards(); /**/
-            foreach ($data as $row) {
-                $jsonData[] = array (
-                    'token_value'  => $row["heartland_storedcard_id"] ,
-                    'cc_last4'     => $row["cc_last4"]      ,
-                    'cc_type'      => $row["cc_type"]       ,
-                    'cc_exp_month' => $row["cc_exp_month"]  ,
-                    'cc_exp_year'  => $row["cc_exp_year"]   ,
-                );
+            if (!empty($data)) {
+                foreach ($data as $row) {
+                    $jsonData[] = array(
+                        'token_value' => $row["heartland_storedcard_id"],
+                        'cc_last4' => $row["cc_last4"],
+                        'cc_type' => $row["cc_type"],
+                        'cc_exp_month' => $row["cc_exp_month"],
+                        'cc_exp_year' => $row["cc_exp_year"],
+                    );
+                }
             }
         }
         echo(json_encode($jsonData));
