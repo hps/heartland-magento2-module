@@ -807,11 +807,6 @@ class Payment
                     break;
             }
 
-            foreach ($successMsg as $msg) {
-                if (trim($msg)) {
-                    $this->messageManager->addSuccessMessage($msg);
-                }
-            }
         }
         catch (\HpsInvalidRequestException $e) {
             $errorMsg[] = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your log files and contact Heartland:
@@ -834,35 +829,69 @@ class Payment
             $errorMsg[]
                 = 'General Error on line: ' . $e->getLine() . '. The problem will require troubleshooting: ' . $e->getMessage();
         }
-        try {
+        catch (\Exception $e) {
+
+            $errorMsg[]
+                = $e->getMessage();
+        }
+        finally { // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
+            if (count($errorMsg) || ! property_exists($response, 'transactionId') || ! ($response->transactionId > 0
+                ) ) {
+
+                        $errorMsg[]
+                            = 'Please contact this retailer to complete your transaction';
+                //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
+                //completed!"));
+            }
+
+
+            if (count($errorMsg) && property_exists($response, 'transactionId') && ($response->transactionId > 0
+                ) ) {
+
+                if (($paymentAction === \HpsTransactionType::CHARGE
+                     || $paymentAction === \HpsTransactionType::AUTHORIZE)
+                    && ($response->transactionId > 0)
+                ) {
+                    //Reverse any auth
+                    try{
+
+                        $chargeService = $this->getHpsCreditService();
+                        $chargeService->reverse($response->transactionId,
+                                                $requestedAmount,
+                                                $currency);
+                        unset($successMsg);
+                        $successMsg[] = 'Your transaction was reversed and will not be charged.';
+                    }catch (\Exception $e) {
+                        $errorMsg[]
+                            = $e->getMessage();
+                        $errorMsg[]
+                            = 'Please contact this retailer to complete your transaction';   }
+                }
+                //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
+                //completed!"));
+            }
+            if (count($successMsg)) {
+                foreach ($successMsg as $msg) {
+                    if (trim($msg)) {
+                        $this->messageManager->addSuccessMessage($msg);
+                    }
+                }
+            }
+
+            if (count($noticeMsg)) {
+                foreach ($noticeMsg as $msg) {
+                    if (trim($msg)) {
+                        $this->messageManager->addNoticeMessage($msg);
+                    }
+                }
+            }
             if (count($errorMsg)) {
                 foreach ($errorMsg as $msg) {
                     if (trim($msg)) {
-                        //$this->messageManager->addErrorMessage($msg);
-                        throw new LocalizedException(new Phrase($msg));
+                        $this->messageManager->addErrorMessage($msg);
                     }
                 }
-                $payment->deny(true);
-            }
-            else {
-                if (count($noticeMsg)) {
-                    foreach ($noticeMsg as $msg) {
-                        if (trim($msg)) {
-                            $this->messageManager->addNoticeMessage($msg);
-                        }
-                    }
-                }
-            }
-        }
-        catch (\Exception $e) {
-            /*if ($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) {
-                @$chargeService->reverse($suToken, \HpsInputValidation::checkAmount($requestedAmount), 'usd');
-            }*/
-            throw new LocalizedException(new Phrase($e->getMessage()));
-        }
-        finally { // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
-            if (! property_exists($response, 'transactionID') || ! ($response->transactionId > 0 ) ){
                 throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be completed!"));
             }
         }
