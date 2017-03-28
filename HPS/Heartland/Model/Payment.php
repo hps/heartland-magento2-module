@@ -781,14 +781,13 @@ class Payment
                     }
                     //Build a message to show the user what is happening
                     $successMsg[]
-                        = __("The %1 ending in %2 which expires on: %3 \\ %4 was %5 \$%6 successfully. Your approval code is %7",
+                        = __("The %1 ending in %2 which expires on: %3 \\ %4 was %5 \$%6 successfully.",
                              $response->cardType,
                              $CcL4,
                              $this->getAdditionalData() ['cc_exp_month'],
                              $this->getAdditionalData()['cc_exp_year'],
                              $actionVerb,
-                             $requestedAmount,
-                             $response->authorizationCode);
+                             $requestedAmount);
 
                     break;
 
