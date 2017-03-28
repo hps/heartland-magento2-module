@@ -70,13 +70,16 @@ echo $code; ?>"
                         },
                         deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
                             // "cc_exp_month":"2","cc_exp_year":"2025"}
-                            $("#iframes").fadeOut();
-                            $.ajax({
-                                url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
-                                , success: function (data) {
-                                        e.remove()
-                                }
-                            });
+                            $("#iframes").fadeOut();                            
+                            if(confirm('Are you sure you want to delete the stored card?')){
+                                $.ajax({
+                                    url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
+                                    , success: function (data) {
+                                            e.remove();
+                                            alert('Your saved card has been removed from our records ');
+                                    }
+                                });
+                            }
 
                         },
 

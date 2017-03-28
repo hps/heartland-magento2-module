@@ -33,14 +33,16 @@
 
 
                         deleteCard: function (id,e) {
-                            $.ajax({
-                                url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
-                                , success: function (data) {
-                                    e.remove()
-                                }
-                            });
-                            alert('Your saved card has been removed from our records ');
-                            location.reload();
+                            if(confirm('Are you sure you want to delete the stored card?')){
+                                $.ajax({
+                                    url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
+                                    , success: function (data) {
+                                        e.remove();
+                                        alert('Your saved card has been removed from our records ');
+                                        location.reload();
+                                    }
+                                });
+                            }
 
                         }
 
