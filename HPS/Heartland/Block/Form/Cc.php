@@ -35,7 +35,6 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @throws \Exception
      */
     public function getCcTokens(){
-
         return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id'));
     }
 
