@@ -2,12 +2,7 @@
 
 namespace HPS\Heartland\Block\Customer;
 
-/**
- * Created by PhpStorm.
- * User: ttnnkkrr
- * Date: 3/16/17
- * Time: 8:38 PM
- */
+
 class CreditCards extends \Magento\Vault\Block\Customer\CreditCards {
 
     public $_template = 'HPS_Heartland::cards_list.phtml';
