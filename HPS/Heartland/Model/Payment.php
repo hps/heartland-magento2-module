@@ -916,9 +916,9 @@ class Payment
         if (array_key_exists('_save_token_value', $data)) {
             $this->_save_token_value = (int) $data['_save_token_value'];
         }
-        $this->log((int) $this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
+        $this->log($this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
 
-        return (int) $this->_save_token_value;
+        return $this->_save_token_value;
     }
 
     /** returns additional_data element of paymentMethod
@@ -946,7 +946,7 @@ class Payment
     {
         /**
          * @var array $data
-         * Holds submited JSOn data in a PHP associative array
+         * Holds submitted JSOn data in a PHP associative array
          */
         static $data = [];
         if (count($data) < 1) {
