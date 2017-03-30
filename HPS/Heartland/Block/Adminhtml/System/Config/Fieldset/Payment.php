@@ -9,12 +9,6 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
-/**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 1/8/2016
- * Time: 3:56 PM
- */
 namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;
 
 /**

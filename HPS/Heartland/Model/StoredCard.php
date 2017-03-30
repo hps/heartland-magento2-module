@@ -9,13 +9,6 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
-/**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 3/16/2016
- * Time: 12:43 PM
- */
-
 namespace HPS\Heartland\Model;
 
 use \HPS\Heartland\Helper\Customer;

@@ -9,12 +9,6 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
-/**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 3/28/2016
- * Time: 11:47 PM
- */
 namespace HPS\Heartland\Block\Form;
 use Magento\Payment\Model\MethodInterface;
 

@@ -9,13 +9,6 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
-/**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 3/23/2016
- * Time: 4:16 PM
- */
-
 namespace app\code\HPS\Heartland\Model\Config\Source\Order\Status\Processing;
 use \Magento\Sales\Model\Config\Source\Order\Status\Processing as OProcess;
 

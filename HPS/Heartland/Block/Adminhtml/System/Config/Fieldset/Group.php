@@ -10,13 +10,6 @@
  */
 
 /**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 1/8/2016
- * Time: 4:04 PM
- */
-
-/**
  * Fieldset renderer for PayPal solutions group
  */
 namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;

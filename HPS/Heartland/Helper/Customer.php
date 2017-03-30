@@ -8,13 +8,6 @@
  *  @copyright   Heartland (http://heartland.us)
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
-
-/**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 3/16/2016
- * Time: 9:46 AM
- */
 namespace HPS\Heartland\Helper;
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 
