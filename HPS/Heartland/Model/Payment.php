@@ -697,10 +697,7 @@ class Payment
             if ($payment->isCaptureFinal($requestedAmount)) {
                 $payment->setShouldCloseParentTransaction(false);
             }
-            if (isset($suToken->tokenValue)) {
-                $payment->setTransactionAdditionalInfo('token', $suToken->tokenValue);
-            }
-
+            
             // token saving should just work but just in case we dont want to stop the transaction if it didnt
             try {
                 if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
