@@ -85,7 +85,6 @@ echo $code; ?>"
 
                         hpsNewCard: function () {
                             $('#securesubmit_token').removeAttr('value');
-                            ;
                             $("#SelectNewCardHPS").prop('checked', true);
                             <?php /* @noEscape */ echo $code; ?>.
                             hpsBusy();
@@ -153,19 +152,20 @@ echo $code; ?>"
             $tokenJson = addslashes(json_encode($token));
             //{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
             $ccTypeHPS = strtoupper($token['cc_type']);
-            $jpsTokenTableRow = <<<TROW
-                <tr onclick='return {$code}._HPS_setHssTransaction1(JSON.parse("{$tokenJson}"));'>
-                    <td width="width:100px" ><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="hssCardSelected{$token['token_value']}"></td>
-                    <th align="left" id="image_holder_{$token['token_value']}">{$ccTypeHPS} ending in {$token['cc_last4']}<br />Expiring on {$token['cc_exp_month']}/{$token['cc_exp_year']}<span class="card-type-{$token['cc_type']}" /></th>
-                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this
-                    .parentNode.parentNode)"
-                    style="color:red;font-size:
-                    2em;background-color: transparent;border: none" type="button"
-                     value="X"></td>
+            ?>
+                <tr onclick='return <?php echo $code;?>._HPS_setHssTransaction1(JSON.parse("<?php echo $tokenJson;?>"));'>
+                    <td width="width:100px" ><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="hssCardSelected<?php echo $token['token_value'];?>"></td>
+                    <th align="left" id="image_holder_<?php echo $token['token_value'];?>">
+                        <?php echo $ccTypeHPS;?> ending in <?php echo $token['cc_last4'];?><br />Expiring on <?php echo $token['cc_exp_month'] . '/' .$token['cc_exp_year']?>
+                        <span class="card-type-<?php echo $token['cc_type'];?>" />
+                    </th>
+                    <td width="width:50px" >
+                        <input onclick="return <?php echo $code; ?>.deleteCard(<?php echo $token['token_value'];?>,this.parentNode.parentNode)"
+                    style="color:red;font-size:2em;background-color: transparent;border: none" type="button" value="X">
+                    </td>
                 </tr>
 
-TROW;
-            echo $jpsTokenTableRow;
+            <?php    
         }
 
         ?>
@@ -182,7 +182,7 @@ TROW;
         </tbody>
     </table>
 
-    <span id="iframes" action="">
+    <span id="iframes">
 
         <div generated="true" id="iframesCardError"></div>
         <!-- #iframesCardNumber is the target element for the cardNumber iframe -->
