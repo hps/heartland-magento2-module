@@ -1068,8 +1068,7 @@ class Payment
      *
      * @return null
      */
-    private
-    function log($param, $txt = '')
+    private function log($param, $txt = '')
     {
         try {
             getenv('MAGE_MODE') == 'developer'
@@ -1080,18 +1079,6 @@ class Payment
             $this->_logger->log(100, $txt . print_r($param, true));
         }
         $this->_logger->log(100, $txt . print_r($param, true));
-    }
-
-    private
-    function porticoTransaction()
-    {
-
-    }
-
-    private
-    function userNotification()
-    {
-
     }
 
 }
