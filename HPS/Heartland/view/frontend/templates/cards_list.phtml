@@ -1,13 +1,12 @@
 
 <script>
-    var <?php
-
-            $code = \HPS\Heartland\Model\Payment::CODE;
-            /* @noEscape */ echo $code; ?>;
+    var <?php 
+        $code = \HPS\Heartland\Model\Payment::CODE;
+        /* @noEscape */ echo $code;
+        ?>;
     require([
-                'jquery'
-            ],
-
+        'jquery'
+    ],
             /*
              *  Heartland payment method model
              *
@@ -18,81 +17,73 @@
              *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
              */
 
-            /*browser:true*/
-            /*global define*/
-            function ($) {
-                'use strict';
-                /**
-                 * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
-                 * if there is any form of error we disable the payment form
-                 *
-                 */
-                $(document).ready(function ($) {
-                    $("#iframes").fadeOut();
-                    <?php /* @noEscape */ echo $code; ?> = {
+                    /*browser:true*/
+                            /*global define*/
+                                    function ($) {
+                                        'use strict';
+                                        /**
+                                         * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                                         * if there is any form of error we disable the payment form
+                                         *
+                                         */
+                                        $(document).ready(function ($) {
+                                            $("#iframes").fadeOut();
+                                                <?php /* @noEscape */ echo $code; ?> = {
+
+                                                deleteCard: function (id, e) {
+                                                    if (confirm('Are you sure you want to delete the stored card?')) {
+                                                        $.ajax({
+                                                            url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=" + id
+                                                            , success: function (data) {
+                                                                e.remove();
+                                                                alert('Your saved card has been removed from our records ');
+                                                                location.reload();
+                                                            }
+                                                        });
+                                                    }
+
+                                                }
+                                            }
+                                        });
 
 
-                        deleteCard: function (id,e) {
-                            if(confirm('Are you sure you want to delete the stored card?')){
-                                $.ajax({
-                                    url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id
-                                    , success: function (data) {
-                                        e.remove();
-                                        alert('Your saved card has been removed from our records ');
-                                        location.reload();
                                     }
-                                });
-                            }
-
-                        }
-
-
-
-
-                    }
-                });
-
-
-            }
-    );
+                            );
 
 
 </script>
 <table id="SavedCardsTable">
     <caption>Stored Payments for this customer(if any)</caption>
     <tbody>
-    <?php
-    $hpsTokens = \HPS\Heartland\Model\StoredCard::getStoredCards();;
-    if (count($hpsTokens)){
-        foreach ($hpsTokens as $token) {
-            $token['token_value'] = $token['heartland_storedcard_id'];
-            unset($token['heartland_storedcard_id'], $token['dt'], $token['customer_id']);
-            $tokenJson = addslashes(json_encode($token));
-            //{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
-            $ccTypeHPS = strtoupper($token['cc_type']);
-            $jpsTokenTableRow
-                       = <<<TROW
+<?php
+$hpsTokens = \HPS\Heartland\Model\StoredCard::getStoredCards();
+if (count($hpsTokens)) {
+    foreach ($hpsTokens as $token) {
+        $token['token_value'] = $token['heartland_storedcard_id'];
+        unset($token['heartland_storedcard_id'], $token['dt'], $token['customer_id']);
+        $tokenJson = addslashes(json_encode($token));
+        //{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
+        $ccTypeHPS = strtoupper($token['cc_type']);
+        ?>
                 <tr>
                     <td width="width:100px" > </td>
-                    <th align="left" id="image_holder_{$token['token_value']}">{$ccTypeHPS} ending in {$token['cc_last4']}<br />Expiring on {$token['cc_exp_month']}/{$token['cc_exp_year']}<span class="card-type-{$token['cc_type']}" /></th>
-                    <td width="width:50px" ><input onclick="return {$code}.deleteCard({$token['token_value']},this
-                    .parentNode.parentNode)"
-                    style="color:red;font-size:
-                    2em;background-color: transparent;border: none" type="button"
-                     value="X"></td>
+                    <th align="left" id="image_holder_<?php echo $token['token_value'] ?>"><?php echo $ccTypeHPS . ' ending in ' . $token['cc_last4']; ?><br />Expiring on <?php echo $token['cc_exp_month'] . '/' . $token['cc_exp_year']; ?><span class="card-type-<?php echo $token['cc_type'] ?>" /></th>
+                    <td width="width:50px" >
+                        <input onclick="return <?php echo $code; ?>.deleteCard(<?php echo $token['token_value'] ?>, this.parentNode.parentNode)"
+                                                   style="color:red;font-size:
+                                                   2em;background-color: transparent;border: none" type="button"
+                                                   value="X">
+                    </td>
                 </tr>
 
-TROW;
-            echo $jpsTokenTableRow;
-        }
+                <?php
+            }
+        } else {
+            ?>
+            <tr>
+                <td width="width:100px">You have no saved cards</td></tr><?php
     }
-    else{
-    ?>
-    <tr>
-        <td width="width:100px">You have no saved cards</td></tr><?php
-        }
-
-    ?>
+        ?>
 
 
     </tbody>
