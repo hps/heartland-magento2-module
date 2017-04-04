@@ -888,7 +888,7 @@ class Payment
                         $this->messageManager->addErrorMessage($msg);
                     }
                 }
-                throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be completed!"));
+                throw new LocalizedException(new Phrase($errorMsg . " Your transaction could not be completed!"));
             }
         }
 
@@ -982,7 +982,7 @@ class Payment
     private
     function __sanitize($data)
     {
-        return trim(filter_var(@print_r($data, true), FILTER_SANITIZE_STRING));
+        return trim(filter_var($data, FILTER_SANITIZE_STRING));
     }
 
     /**
