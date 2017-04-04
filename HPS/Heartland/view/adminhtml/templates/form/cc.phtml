@@ -270,15 +270,7 @@ echo $code; ?>"
         </div>
     </div>
 
-        <div class="field-number required admin__field _required">
-            <div class="admin__field-control">
-                <input type="hidden" title="<?php echo $block->escapeHtml(__('Card Verification Number')); ?>"
-                       id="<?php /* @noEscape */
-                       echo $code; ?>_cc_cid"
-                       name="payment[cc_cid]" value="<?php /* @noEscape */
-                echo $block->getInfoData('cc_cid') ?>"/>
-            </div>
-        </div>
+        
 
 
 </fieldset>
