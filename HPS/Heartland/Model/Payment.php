@@ -459,10 +459,8 @@ class Payment
         $response        = null;
         $details         = null;
         $newAuthAmount   = null;
-        $suToken         = null;
-        $validCardHolder = null;
-        $reportTxnDetail = null;
-        $response        = null;
+        $suToken         = null;        
+        
         try {
 
 
@@ -898,10 +896,10 @@ class Payment
     }
 
     /**
-     * saveMuToken checks the Json string from the HTTP POST to see if
+     * saveMuToken checks the JSON string from the HTTP POST to see if
      * the checkbox was checked
      *
-     * @return int This is evaluated when the soap message is buiot
+     * @return int This is evaluated when the soap message is built
      * by \HpsCreditService::charge
      *
      */
@@ -1001,11 +999,12 @@ class Payment
     {
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
         $this->getTokenValue();
-        if (preg_match('/^[\w]{11,253}$/', (string) $this->_token_value) !== 1) {
+        //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
+        if (!empty($this->_token_value) && is_numeric($this->_token_value) && HPS_STORED_CARDS::getCanStoreCards()) {            
             $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value, $custID);
         }
-        //First identify if we have a singleuse token in memory already
-        if (!$this->validateSuToken() && !$this->validateMuToken()) {
+       
+        if (empty($this->_token_value)) {
             $this->_token_value = (string) '';
         }
         $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
@@ -1025,7 +1024,9 @@ class Payment
         if (count($data) < 1) {
             $data = (array) $this->getAdditionalData();
         }
-        $r = '';
+        $this->log($data, '\HPS\Heartland\Model\Payment::getTokenValue data:  ');
+        
+        $r = '';        
         if (key_exists('token_value', $data)) {
             $r = (string) $data['token_value'];
         }
@@ -1041,24 +1042,10 @@ class Payment
     private
     function validateSuToken()
     {
-        return (bool) (preg_match('/^su[\w]{5,253}$/',
-                                  (string) $this->_token_value) === 1); //supt_5EvfbSaBCj9r9HLlP3CauZ5t
+        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::validateSuToken preg:  ');
+        return (!empty($this->_token_value));
     }
-
-    /**
-     * Just verifies the current token is not blank
-     * multi-use tokens are always non blank strings
-     * these get stored in hps_heartland_storedcard
-     * by app/code/HPS/Heartland/Model/StoredCard.php
-     *
-     * @return bool
-     */
-    private
-    function validateMuToken()
-    {
-        return (bool) (preg_match('/^[\w]{5,253}$/', (string) $this->_token_value) === 1);
-    }
-
+   
     /**
      * Logs to the var/log/debug.log
      * Commented out unless development is needed
