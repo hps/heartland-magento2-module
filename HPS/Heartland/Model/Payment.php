@@ -484,6 +484,7 @@ class Payment
 
             if ($parentPaymentID && is_integer($parentPaymentID)) {
                 $reportTxnDetail = $chargeService->get($parentPaymentID);
+                $this->log($reportTxnDetail, 'HPS\Heartland\Model\Payment reportTxnDetail: ');
                 if ($paymentAction === \HpsTransactionType::CHARGE) {
 
                     if ($reportTxnDetail->transactionStatus != 'A'
@@ -500,20 +501,9 @@ class Payment
                     // set to do a capture
                     $paymentAction = \HpsTransactionType::CAPTURE;
                 }
-                elseif ($paymentAction === \HpsTransactionType::REFUND) {
-
-                    if ($reportTxnDetail->transactionStatus == 'A') {
-                        // refunds are only appropriate if the transaction is no longer active
-                        // fortunately if we want to return less than was authorized we can simply reduce the amount
-                        if ($requestedAmount < $reportTxnDetail->settlementAmount) {
-                            $paymentAction = \HpsTransactionType::REVERSE;
-                        }
-                        else {
-                            $paymentAction = \HpsTransactionType::VOID;
-                        }
-                    } // validated acceptable authorization
-
-
+                elseif ($paymentAction === \HpsTransactionType::REFUND && $reportTxnDetail->transactionStatus == 'A') {                    
+                    //perform the reversal when transactionStatus is Active
+                    $paymentAction = \HpsTransactionType::REVERSE;
                 }
             }// end of verifying that we have something that looks like  transaction ID to use
             // these are the only 2 transaction types where Magento2 does not need a transaction ID to reference
