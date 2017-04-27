@@ -648,7 +648,7 @@ class Payment
             $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[ $paymentAction ]);
             $payment->setAdditionalInformation(serialize($response));
             if ($payment->isCaptureFinal($requestedAmount)) {
-                $payment->setShouldCloseParentTransaction(false);
+                $payment->setShouldCloseParentTransaction(true);
             }
             
             // token saving should just work but just in case we dont want to stop the transaction if it didnt
