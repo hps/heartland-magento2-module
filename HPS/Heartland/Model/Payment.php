@@ -471,9 +471,7 @@ class Payment
              * ID */
             //list($parentPaymentID) = explode('-', $payment->getParentTransactionId());
             $parentPaymentID = (int) $payment->getCcTransId();
-            $canSaveToken    = $this->saveMuToken()
-                ? true
-                : false;
+            $canSaveToken    = $this->saveMuToken() ? true : false;
 
             $this->log(func_num_args(), 'HPS\Heartland\Model\Payment Capture Method Called: ');
 
@@ -531,7 +529,7 @@ class Payment
                     $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
                     // \HPS\Heartland\Model\Payment::$_token_value
 
-                    $suToken
+                    $suToken 
                         = $this->getToken(new \HpsTokenData,
                                           $order->getCustomerId()); //$this->getSuToken();// this just gets the passed
                     // token value
@@ -564,16 +562,13 @@ class Payment
                                                           $currency,
                                                           $suToken,
                                                           $validCardHolder,
-                        ($this->validateSuToken() ? true : false),
+                                                          $canSaveToken,
                                                           null,
                                                           $storeName);
                     $this->log($response, 'HPS\Heartland\Model\Payment authorize Method response: ');
                     
                     if (isset($response->tokenData) && $response->tokenData->tokenValue){
                         $payment->setCcNumberEnc($response->tokenData->tokenValue);
-                    }
-                    if(!$this->validateSuToken()){
-                        $payment->setCcNumberEnc($suToken->tokenValue);
                     }
                     break;
                 /*
@@ -586,12 +581,6 @@ class Payment
                 case (\HpsTransactionType::CAPTURE): // Portico CreditAddtoBatch \HpsTransactionType::CAPTURE                    
                     $this->log($suToken, 'HPS\Heartland\Model\Payment capture Method Called: ');
                     $response = $chargeService->capture($parentPaymentID, $requestedAmount);
-
-                    /*
-                     * at this stage if additional captures are needed  new authorizations are required
-                     *
-                     *
-                     */
                     break;
                 /*
                  * This transaction will request an approval code from the issuer and then add it to the daily
@@ -783,21 +772,14 @@ class Payment
             $errorMsg[]
                 = $e->getMessage();
         }
-        finally { // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
+        finally { 
+            // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
-            if (count($errorMsg) || ! property_exists($response, 'transactionId') || ! ($response->transactionId > 0
-                ) ) {
-
-                        $errorMsg[]
-                            = 'Please contact this retailer to complete your transaction';
-                //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
-                //completed!"));
+            if (count($errorMsg) || empty($response->transactionId) ) {
+                $errorMsg[] = 'Please contact this retailer to complete your transaction';                
             }
-
-
-            if (count($errorMsg) && property_exists($response, 'transactionId') && ($response->transactionId > 0
-                ) ) {
-
+            
+            if (count($errorMsg) && !empty($response->transactionId) ) {
                 if (($paymentAction === \HpsTransactionType::CHARGE
                      || $paymentAction === \HpsTransactionType::AUTHORIZE)
                     && ($response->transactionId > 0)
@@ -841,7 +823,7 @@ class Payment
                         $this->messageManager->addErrorMessage($msg);
                     }
                 }
-                throw new LocalizedException(new Phrase($errorMsg . " Your transaction could not be completed!"));
+                throw new LocalizedException(new Phrase("Your transaction could not be completed!"));
             }
         }
 
@@ -949,42 +931,34 @@ class Payment
      *
      * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
      */
-    private
-    function getToken(\HpsTokenData $suToken, $custID = null)
-    {
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method initial value:  ');
+    private function getToken(\HpsTokenData $suToken, $custID = null)
+    {        
         $this->getTokenValue();
+        $this->log(HPS_STORED_CARDS::getCanStoreCards(), '\HPS\Heartland\Model\Payment::is_numeric:  ');                    
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
-        if (!empty($this->_token_value) && is_numeric($this->_token_value) && HPS_STORED_CARDS::getCanStoreCards()) {            
+        if (!empty($this->_token_value) && is_numeric($this->_token_value) && HPS_STORED_CARDS::getCanStoreCards()) {  
+            $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getTokenfgfggfg Method initial value:  ');            
             $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value, $custID);
         }
        
-        if (empty($this->_token_value)) {
-            $this->_token_value = (string) '';
-        }
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method final value:  ');
-
         // \HPS\Heartland\Model\Payment::$_token_value
-        $suToken->tokenValue = $this->_token_value; //$this->getSuToken();// this just gets the passed token value
+        $suToken->tokenValue = $this->_token_value; 
+        $this->log($suToken, '\HPS\Heartland\Model\Payment::getToken Method suToken:  ');
+        
         return $suToken;
     }
 
     /**
      * gets/assigns $this->_token_value from post data
      */
-    private
-    function getTokenValue()
-    {
+    private function getTokenValue()  {
         static $data = [];
         if (count($data) < 1) {
             $data = (array) $this->getAdditionalData();
         }
         $this->log($data, '\HPS\Heartland\Model\Payment::getTokenValue data:  ');
         
-        $r = '';        
-        if (key_exists('token_value', $data)) {
-            $r = (string) $data['token_value'];
-        }
+        $r = (!empty($data['token_value'])) ? $data['token_value'] : ''; 
         // ensure that the string is clean and has not leading or trailing whitespace
         $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
     }
