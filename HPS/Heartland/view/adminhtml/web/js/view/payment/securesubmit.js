@@ -28,13 +28,30 @@ function _HPS_removeClass(element, klass) {
     element.className = element.className.replace(klass, '');
 }
 
-function _HPS_setHssTransaction(response){
-    document.querySelector('#securesubmit_token').value = response.token_value.trim();
+function setElementValue(selector, propertyToSet, valueToSet){
+    var element = document.querySelector(selector);
+    
+    if(element !== null){
+        switch(propertyToSet.toLowerCase()){
+            case 'value':
+                element.value = valueToSet;
+                break;
+            case 'disabled':
+                element.disabled = valueToSet;
+                break;
+             case 'innerhtml':
+                element.innerHTML = valueToSet;
+                break;   
+        }
+    }
+}
 
-    document.querySelector('#hps_heartland_cc_number').value = response.last_four.trim();
-    document.querySelector('#hps_heartland_cc_type').value = response.card_type.trim();
-    document.querySelector('#hps_heartland_expiration').value = response.exp_month.trim();
-    document.querySelector('#hps_heartland_expiration_yr').value = response.exp_year.trim();
+function _HPS_setHssTransaction(response){
+    setElementValue('#securesubmit_token', 'value', response.token_value.trim());
+    setElementValue('#hps_heartland_cc_number', 'value', response.last_four.trim());
+    setElementValue('#hps_heartland_cc_type', 'value', response.card_type.trim());
+    setElementValue('#hps_heartland_expiration', 'value', response.exp_month.trim());
+    setElementValue('#hps_heartland_expiration_yr', 'value', response.exp_year.trim());    
     //document.querySelector('#bPlaceOrderNow').click();
 }
 
@@ -42,15 +59,15 @@ function _HPS_DisablePlaceOrder(){
     try{
         var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';
         _HPS_addClass(document.querySelector(element), 'disabled');
-        document.querySelector('#bPlaceOrderNow').disabled=true;
-        document.querySelector('#bPlaceOrderNow').disabled='disabled';
+        setElementValue('#bPlaceOrderNow', 'disabled', true);
+        setElementValue('#bPlaceOrderNow', 'disabled', 'disabled');
     }catch(e){}
 }
 function _HPS_EnablePlaceOrder(){
     try{
         var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';_HPS_removeClass(document.querySelector(element), 'disabled');
-        document.querySelector('#bPlaceOrderNow').disabled=false;
-        document.querySelector('#bPlaceOrderNow').disabled='';
+        setElementValue('#bPlaceOrderNow', 'disabled', false);
+        setElementValue('#bPlaceOrderNow', 'disabled', '');
     }catch(e){}
 }
 function HPS_SecureSubmit($,document, Heartland, publicKey) {
