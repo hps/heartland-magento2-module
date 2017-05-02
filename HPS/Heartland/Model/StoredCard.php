@@ -157,8 +157,8 @@ class StoredCard {
      * @return bool
      */
     public static function getCanStoreCards() {
-        $retVal = (int)0;
-        if (Customer::isLoggedIn()) {
+        $retVal = (int)0;        
+        if (Customer::isLoggedIn() || Admin::isLoggedIn()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
