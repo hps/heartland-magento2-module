@@ -679,7 +679,7 @@ class Payment
                 case 'HpsReversal':
                     /** @var \HpsReversal $response Properties found in the HpsReversal */
                     $successMsg[] = __("The amount authorised for Transaction ID: %1 for
-                        [\$%2] was reduced to [\$%3] successfully",
+                        \$%2 was refunded by \$%3 successfully",
                                        $payment->getCcTransId(),
                                        $reportTxnDetail->settlementAmount,
                                        $requestedAmount);
@@ -953,17 +953,6 @@ class Payment
         $r = (!empty($data['token_value'])) ? $data['token_value'] : ''; 
         // ensure that the string is clean and has not leading or trailing whitespace
         $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
-    }
-
-    /**
-     * Performs regex based validation on the single-use token
-     *
-     * @return bool
-     */
-    private function validateSuToken()
-    {
-        $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::validateSuToken preg:  ');
-        return (!empty($this->_token_value));
     }
    
     /**
