@@ -61,20 +61,20 @@ define(
                 var self = this;
                 $("#SavedCardsTable").fadeIn();
 
-
                 if ($("#SavedCardsTable tr").length < 2) {
-                    self.hpsBusy();
+                    self.hpsBusy();                    
                     if(customer.isLoggedIn()){
                         $.ajax({
                             url: "../heartland/creditcard/get"
                             , success: function (data) {
                                 if (data != '[]') {
-
+                                    $("#iframes").fadeOut();
                                     // process json string to table rows
                                     //$("#SavedCardsTable").append(JSON.parse(data));
                                     self.drawTable(JSON.parse(data))
                                     // $("#SavedCardsTable").append($("<tr></tr>"));
                                     self.hpsNotBusy();
+                                    $("#iframes").fadeOut();
 
                                 } else {
                                     $("#SavedCardsTable").append($("<tr />"));
@@ -115,7 +115,7 @@ define(
                 $('#securesubmit_token').removeAttr('value');;
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
-                if ($("#SavedCardsTable tr").length > 1){
+                if ($("#SavedCardsTable tr").length > 1){ 
                     $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success( function(publicKey) {
                             self.hpsShowCcForm(publicKey);
@@ -162,7 +162,6 @@ define(
                 return data
             },
             getCode: function () {
-                try{$("#iframes").fadeOut();}catch(e){}
                 return 'hps_heartland';
 
             },
