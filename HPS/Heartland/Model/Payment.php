@@ -720,13 +720,7 @@ class Payment
                     }
                     //Build a message to show the user what is happening
                     $successMsg[]
-                        = __("The %1 ending in %2 which expires on: %3 \\ %4 was %5 \$%6 successfully.",
-                             $response->cardType,
-                             $CcL4,
-                             $this->getAdditionalData() ['cc_exp_month'],
-                             $this->getAdditionalData()['cc_exp_year'],
-                             $actionVerb,
-                             $requestedAmount);
+                        = __("Your order placed successfully.");
 
                     break;
 
@@ -734,9 +728,7 @@ class Payment
                     /** @var \HpsReportTransactionDetails $response Properties found in the HpsReportTransactionDetails */
                     $payment->setAmountPaid($response->settlementAmount);
                     $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[ $paymentAction ]);
-                    $successMsg[] = __("The %1 ending in %2 was Invoiced successfully \$%3",
-                                       $response->cardType,
-                                       substr($response->maskedCardNumber, -4),
+                    $successMsg[] = __("The order Invoiced successfully for \$%1",                                       
                                        $response->settlementAmount);
 
                     break;
