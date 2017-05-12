@@ -641,8 +641,8 @@ class Payment
             }
             
             // token saving should just work but just in case we dont want to stop the transaction if it didnt
-            try {
-                if (((bool) $canSaveToken) && isset($response->tokenData) && $response->tokenData->tokenValue) {
+            try {               
+                if (((bool) $canSaveToken) && isset($response->tokenData) && !empty($response->tokenData->tokenValue)) {
                     /**This call will automatically make sure the expire date is updated on a save*/
                     $chargeService->updateTokenExpiration($response->tokenData->tokenValue,
                                                           $this->getAdditionalData()['cc_exp_month'],
@@ -717,10 +717,9 @@ class Payment
                         /** @var \HpsReportTransactionDetails $detail Properties found in the as a result of capture or get */
                         $detail = $chargeService->get($response->transactionId);
                         $payment->setAmountPaid($detail->settlementAmount);
-                    }
+                    }                  
                     //Build a message to show the user what is happening
-                    $successMsg[]
-                        = __("Your order placed successfully.");
+                    $successMsg[] = __("Your order placed successfully.");
 
                     break;
 
