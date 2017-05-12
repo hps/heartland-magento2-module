@@ -954,6 +954,7 @@ class Payment
         // ensure that the string is clean and has not leading or trailing whitespace
         $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
     }
+
    
     /**
      * Logs to the var/log/debug.log

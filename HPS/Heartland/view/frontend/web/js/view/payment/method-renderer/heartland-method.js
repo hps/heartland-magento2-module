@@ -201,7 +201,7 @@ define(
 
 
             },
-            placeOrder: function (data, event) {
+            placeOrder: function (data, event) { 
 
                 var self = this,
                     placeOrder;
@@ -209,7 +209,7 @@ define(
                 if (event) {
                     event.preventDefault();
                 }
-                if ($("#securesubmit_token").val() !== ''){
+                if ($("#securesubmit_token").val() !== ''){ 
                     if (this.validate() && additionalValidators.validate()) {
                         this.isPlaceOrderActionAllowed(false);
 

@@ -29,7 +29,9 @@ echo $code; ?>"
     <script>
         var <?php /* @noEscape */ echo $code; ?>;
         require([
-                'jquery'
+                'jquery',
+                'ko',
+                'module'
             ],
 
             /*
@@ -44,7 +46,7 @@ echo $code; ?>"
 
             /*browser:true*/
             /*global define*/
-            function ($) {
+            function ($, ko, module) {
                 'use strict';
                 /**
                  * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
@@ -136,8 +138,7 @@ echo $code; ?>"
 
                         }
                 });
-
-
+                
             }
         );
 
@@ -187,7 +188,7 @@ echo $code; ?>"
         <!-- #iframesCardNumber is the target element for the cardNumber iframe -->
         <dt>
             <label for="iframesCardNumber" class="label">
-                <span><!-- ko i18n: 'Card Number:'--><!-- /ko --></span>
+                <span><?php /* @escapeNotVerified */ echo __('Card Number') ?>:</span>
             </label>
         </dt>
 
@@ -198,7 +199,7 @@ echo $code; ?>"
         <!-- #iframesCardExpiration is the target element for the cardExpiration iframe -->
         <dt>
             <label for="iframesCardExpiration" class="label">
-                <span><!-- ko i18n: 'Card Expiration:'--><!-- /ko --></span>
+                <span><?php /* @escapeNotVerified */ echo __('Card Expiration') ?>:</span>
             </label>
         </dt>
         <dd>
@@ -208,7 +209,7 @@ echo $code; ?>"
         <!-- #iframesCardCvv is the target element for the cardCvv iframe -->
         <dt>
             <label for="iframesCardCvv" class="label">
-                <span id="iframesCardCvvLabel"><!-- ko i18n: 'Card CVV:'--><!-- /ko --></span>
+                <span id="iframesCardCvvLabel"><?php /* @escapeNotVerified */ echo __('Card CVV') ?>:</span>
             </label>
         </dt>
         <dd>
@@ -269,8 +270,5 @@ echo $code; ?>"
             </div>
         </div>
     </div>
-
-        
-
 
 </fieldset>
