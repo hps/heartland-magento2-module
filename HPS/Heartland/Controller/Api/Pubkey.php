@@ -11,17 +11,42 @@
 
 namespace HPS\Heartland\Controller\Api;
 
+use \HPS\Heartland\Helper\Data as HPS_DATA;
+
 /**
  * Class Pubkey
  *
  * @package HPS\Heartland\Controller\Hss
  *
  */
-use \HPS\Heartland\Helper\Data as HPS_DATA;
 // \HPS\Heartland\Controller\Api\Pubkey
 class Pubkey extends \Magento\Framework\App\Action\Action
 {
-    public function execute(){ // void
-        echo((string) HPS_DATA::getPublicKey());
+    /**
+     * @var \Magento\Framework\Controller\Result\Raw
+     */
+    private $resultRawFactory;
+
+    /**
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
+     */
+    public function __construct(
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
+    ) {
+        parent::__construct($context);
+        $this->resultRawFactory = $resultRawFactory;
+    }
+
+    /**
+     * @return \Magento\Framework\Controller\Result\Raw
+     */
+    public function execute()
+    {
+        /** @var \Magento\Framework\Controller\Result\Raw $resultRaw */
+        $resultRaw = $this->resultRawFactory->create();
+
+        return $resultRaw->setContents((string) HPS_DATA::getPublicKey());
     }
 }

@@ -62,33 +62,38 @@ define(
                 $("#SavedCardsTable").fadeIn();
 
                 if ($("#SavedCardsTable tr").length < 2) {
-                    self.hpsBusy();                    
-                    if(customer.isLoggedIn()){
-                        $.ajax({
-                            url: "../heartland/creditcard/get",
-                            showLoader: true,
-                            context: $('#SavedCardsTable'),
-                            success: function (data) {
-                                if (data != '[]') {
-                                    $("#iframes").fadeOut();
-                                    // process json string to table rows
-                                    //$("#SavedCardsTable").append(JSON.parse(data));
-                                    self.drawTable(JSON.parse(data))
-                                    // $("#SavedCardsTable").append($("<tr></tr>"));
-                                    self.hpsNotBusy();
-                                    $("#iframes").fadeOut();
-
-                                } else {
-                                    $("#SavedCardsTable").append($("<tr />"));
-                                    self.hpsNewCard();
-                                }
-                                $("#hps_heartland_NewCard").insertAfter($("#SavedCardsTable tr").last());
-                            }
-                        });
-                    }else{
+                    self.hpsBusy();
+                    if (!customer.isLoggedIn()){
                         $("#SavedCardsTable").append($("<tr />"));
                         self.hpsNewCard();
+                        return;
                     }
+
+                    $.ajax({
+                        url: "../heartland/creditcard/get",
+                        showLoader: true,
+                        context: $('#SavedCardsTable'),
+                        success: function (data) {
+                            if (typeof data === 'string') {
+                              data = JSON.parse(data);
+                            }
+
+                            if (data.length !== 0) {
+                                $("#iframes").fadeOut();
+
+                                // process json string to table rows
+                                self.drawTable(data);
+                                self.hpsNotBusy();
+
+                                $("#iframes").fadeOut();
+
+                            } else {
+                                $("#SavedCardsTable").append($("<tr />"));
+                                self.hpsNewCard();
+                            }
+                            $("#hps_heartland_NewCard").insertAfter($("#SavedCardsTable tr").last());
+                        }
+                    });
                 }
             },
             drawTable: function(data) {
@@ -101,7 +106,7 @@ define(
             drawRow: function(rowData) {
 
                 var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
-                var row = $("<tr " + rOnClick + " />")
+                var row = $("<tr " + rOnClick + " />");
                 $("#SavedCardsTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
                 // {"token_value":"1","cc_last4":"1111","cc_type":"visa","cc_exp_month":"02","cc_exp_year":"2021"}
                 row.append($("<td width=\"width:100px\" ><input style=\"width:100px;cursor:pointer;\" type=\"radio\" name=\"HPSTokens[]\" id=\"hssCardSelected" + rowData.token_value + "\"></td>"));
@@ -117,7 +122,7 @@ define(
                 $('#securesubmit_token').removeAttr('value');;
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
-                if ($("#SavedCardsTable tr").length > 1){ 
+                if ($("#SavedCardsTable tr").length > 1){
                     $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success( function(publicKey) {
                             self.hpsShowCcForm(publicKey);
@@ -133,7 +138,8 @@ define(
                 $("#checkout-loader-iframeEdition").fadeIn();
             },
             hpsNotBusy: function(){
-                $("#checkout-loader-iframeEdition").fadeOut();_HPS_EnablePlaceOrder()
+                $("#checkout-loader-iframeEdition").fadeOut();
+                _HPS_EnablePlaceOrder();
             },
             hpsShowCcForm: function(publicKey){
                 if ( publicKey ){
@@ -161,7 +167,7 @@ define(
 
                     });
                 }
-                return data
+                return data;
             },
             getCode: function () {
                 return 'hps_heartland';
@@ -196,14 +202,16 @@ define(
             isOSC: function(){
                 var self = this;
                 if ($("#onestepcheckout-button-place-order")){
-                    $("#onestepcheckout-button-place-order").bind("click",self,function(){self.getToken()});
+                    $("#onestepcheckout-button-place-order").bind("click", self, function(){
+                        self.getToken();
+                    });
                     return false;
                 }
                 return true;
 
 
             },
-            placeOrder: function (data, event) { 
+            placeOrder: function (data, event) {
 
                 var self = this,
                     placeOrder;
@@ -211,7 +219,7 @@ define(
                 if (event) {
                     event.preventDefault();
                 }
-                if ($("#securesubmit_token").val() !== ''){ 
+                if ($("#securesubmit_token").val() !== ''){
                     if (this.validate() && additionalValidators.validate()) {
                         this.isPlaceOrderActionAllowed(false);
 
@@ -233,7 +241,7 @@ define(
                     }
 
                 }else{
-                    $("#iframesCardError").text("Token lookup failed. Please try again.")
+                    $("#iframesCardError").text("Token lookup failed. Please try again.");
                     self.hpsNotBusy();
                 }
                 return false;
