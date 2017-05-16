@@ -28,8 +28,18 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @return array
      * @throws \Exception
      */
-    public function getCcTokens(){
-        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id'));
+    public function getCcTokens(){    
+       $customer_id = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');       
+       $customer_email = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
+       //customer id not available since magento 2.1.5 version. so customer id retrieved from customer mail id
+       if($customer_id === null && !empty($customer_email)){
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
+            $customer = $customerFactory->get($customer_email);
+            $customer_id = $customer->getId();
+        }
+
+        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customer_id);
     }
     
     /**

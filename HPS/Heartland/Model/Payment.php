@@ -521,6 +521,9 @@ class Payment
                 || $paymentAction === \HpsTransactionType::REFUND
             ) {
                 $order = $payment->getOrder();
+                //get current customer id
+                $orderCustomerId = $this->_getOrderCustomerId($order);
+                $this->log($orderCustomerId, 'order details getCustomerId:');
                 // \HpsCardHolder
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
 
@@ -530,8 +533,7 @@ class Payment
                     // \HPS\Heartland\Model\Payment::$_token_value
 
                     $suToken 
-                        = $this->getToken(new \HpsTokenData,
-                                          $order->getCustomerId()); //$this->getSuToken();// this just gets the passed
+                        = $this->getToken(new \HpsTokenData, $orderCustomerId); //$this->getSuToken();// this just gets the passed
                     // token value
 
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
@@ -641,7 +643,8 @@ class Payment
             }
             
             // token saving should just work but just in case we dont want to stop the transaction if it didnt
-            try {               
+            
+            try {                    
                 if (((bool) $canSaveToken) && isset($response->tokenData) && !empty($response->tokenData->tokenValue)) {
                     /**This call will automatically make sure the expire date is updated on a save*/
                     $chargeService->updateTokenExpiration($response->tokenData->tokenValue,
@@ -653,7 +656,7 @@ class Payment
                                                      $CcL4,
                                                      $this->getAdditionalData()['cc_exp_month'],
                                                      $this->getAdditionalData()['cc_exp_year'],
-                                                     $order->getData('customer_id'));
+                                                     $orderCustomerId);
                     $successMsg[] = __("Payment token saved for future purchases");
                 }/**/
             }
@@ -821,6 +824,22 @@ class Payment
         return $this; // goes back to
 
 
+    }
+    /*
+     * This method will be called when customer id is not used in current order object
+     * 
+     */
+    private function _getOrderCustomerId($orderObj){
+        $customerId = $orderObj->getCustomerId();
+        $customerEmail = $orderObj->getCustomerEmail();        
+       //customer id not available since magento 2.1.5 version. so customer id retrieved from customer mail id
+       if($customerId === null && !empty($customerEmail)){
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
+            $customer = $customerFactory->get($customerEmail);
+            $customerId = $customer->getId();
+        }
+        return $customerId;
     }
 
     /**

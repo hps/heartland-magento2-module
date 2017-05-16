@@ -105,17 +105,15 @@ class StoredCard {
                 }
             }
         }
-        else {
-            throw new \Exception(__('No valid User Logged On!! Cannot get saved cards.'));
-        }
 
         return (array)$data;
-    }/** looks up existing stored cards for the currently logged on user
+    }
+    
+    /** looks up existing stored cards for the currently logged on user
      *
      * @return array
      *
-     *
-     * @throws \Exception
+     *     
      */
     public static function getStoredCardsAdmin($custID = null) {
         $data = [];
@@ -144,9 +142,6 @@ class StoredCard {
                     self::validate($data); /**/
                 }
             }
-        }
-        else {
-            throw new \Exception(__('No valid User Logged On!! Cannot get saved cards.'));
         }
 
         return (array)$data;
