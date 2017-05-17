@@ -23,8 +23,7 @@ $ccExpYear = $block->getInfoData('cc_exp_year'); //
 //var_dump($hpsTokens);
 ?>
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */
-echo $code; ?>"
-          style="display:none">
+echo $code; ?>" style="display:none">
 
     <script>
         var <?php /* @noEscape */ echo $code; ?>;
@@ -53,8 +52,7 @@ echo $code; ?>"
                  * if there is any form of error we disable the payment form
                  *
                  */
-                $(document).ready(function ($) {
-                    $("#iframes").fadeOut();
+                
                     //assign the methods in code variable so, that it can be verified as code._HPS_setHssTransaction1
                     <?php /* @noEscape */ echo $code; ?> = {
 
@@ -133,10 +131,10 @@ echo $code; ?>"
                             return true;
                         },
 
-
-
-
-                        }
+                    }
+                $(document).ready(function ($) {
+                    $("#iframes").fadeOut();
+                    $('#hps_heartland_NewCard').click(function(){<?php /* @noEscape */ echo $code; ?>.hpsNewCard()});
                 });
                 
             }
@@ -171,8 +169,7 @@ echo $code; ?>"
             }
         }
         ?>
-        <tr id="hps_heartland_NewCard" style="" onclick="return <?php /* @noEscape */
-        echo $code; ?>.hpsNewCard()">
+        <tr id="hps_heartland_NewCard" style="">
             <td><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="SelectNewCardHPS"></td>
             <th title="Click to enter a new Payment Method"
                 style="position: relative;text-align: left;border-left-style:groove;cursor:pointer;"> New Card / Update Saved Card ...
