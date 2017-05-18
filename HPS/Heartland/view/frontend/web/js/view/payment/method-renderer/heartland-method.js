@@ -65,8 +65,10 @@ define(
                     self.hpsBusy();                    
                     if(customer.isLoggedIn()){
                         $.ajax({
-                            url: "../heartland/creditcard/get"
-                            , success: function (data) {
+                            url: "../heartland/creditcard/get",
+                            showLoader: true,
+                            context: $('#SavedCardsTable'),
+                            success: function (data) {
                                 if (data != '[]') {
                                     $("#iframes").fadeOut();
                                     // process json string to table rows
