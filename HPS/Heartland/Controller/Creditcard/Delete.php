@@ -12,7 +12,6 @@
 
 namespace HPS\Heartland\Controller\Creditcard;
 
-
 use \Magento\Framework\App\Action\Action;
 use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 
@@ -27,7 +26,8 @@ class Delete extends Action
     /** Provides and ajax callable way to delete a saved token by id
      * @throws \Exception
      */
-    public function execute(){
-        HPS_STORED_CARDS::deleteStoredCards( (int) $this->getRequest()->getParam('t'));
+    public function execute()
+    {
+        HPS_STORED_CARDS::deleteStoredCards((int) $this->getRequest()->getParam('t'));
     }
 }
