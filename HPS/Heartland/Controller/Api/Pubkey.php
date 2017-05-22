@@ -28,11 +28,11 @@ class Pubkey extends \Magento\Framework\App\Action\Action
     private $resultRawFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
     ) {
         parent::__construct($context);
