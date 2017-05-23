@@ -313,10 +313,12 @@ class Payment
         if (!$this->getToken(new \HpsTokenData)) {
             $errorMsg = __('No valid token.');
         }
+        /*
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
         if (!$this->_validateExpDate($info->getCcExpYear(), $info->getCcExpMonth())) {
             $errorMsg = __('Please enter a valid credit card expiration date. ');
-        }
+        }        
+        */
         if ($errorMsg) {
             // \Magento\Framework\Exception\LocalizedException::__construct
             $this->log($errorMsg, '\HPS\Heartland\Model\Payment::validate ');
