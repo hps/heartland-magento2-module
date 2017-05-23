@@ -529,13 +529,9 @@ class Payment
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
-                    $this->log($suToken, 'HPS\Heartland\Model\Payment getToken Method Called: ');
-                    // \HPS\Heartland\Model\Payment::$_token_value
-
-                    $suToken 
-                        = $this->getToken(new \HpsTokenData, $orderCustomerId); //$this->getSuToken();// this just gets the passed
+                    
+                    $suToken = $this->getToken(new \HpsTokenData, $orderCustomerId); 
                     // token value
-
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
             }
@@ -826,18 +822,23 @@ class Payment
 
     }
     /*
-     * This method will be called when customer id is not used in current order object
+     * This method is a fix for the issue when customer id is not present in current order object
+     * This issue faced in admin order / reorder page
      * 
      */
     private function _getOrderCustomerId($orderObj){
         $customerId = $orderObj->getCustomerId();
         $customerEmail = $orderObj->getCustomerEmail();        
-       //customer id not available since magento 2.1.5 version. so customer id retrieved from customer mail id
+       //Retrieve customer id from customer mail id
        if($customerId === null && !empty($customerEmail)){
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
-            $customer = $customerFactory->get($customerEmail);
-            $customerId = $customer->getId();
+            try{
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
+                $customer = $customerFactory->get($customerEmail);
+                $customerId = $customer->getId();
+            }catch (\Exception $e) {
+                $customerId = null;
+            }
         }
         return $customerId;
     }

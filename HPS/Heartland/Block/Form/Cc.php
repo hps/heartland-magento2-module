@@ -29,17 +29,21 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @throws \Exception
      */
     public function getCcTokens(){    
-       $customer_id = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');       
-       $customer_email = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
-       //customer id not available since magento 2.1.5 version. so customer id retrieved from customer mail id
-       if($customer_id === null && !empty($customer_email)){
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
-            $customer = $customerFactory->get($customer_email);
-            $customer_id = $customer->getId();
+       $customerId = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');       
+       $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
+       //Retrieve customer id from customer mail id
+       if($customerId === null && !empty($customerEmail)){
+            try{
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
+                $customer = $customerFactory->get($customerEmail);
+                $customerId = $customer->getId();
+            }catch (\Exception $e) {
+                $customerId = null;
+            }
         }
 
-        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customer_id);
+        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customerId);
     }
     
     /**

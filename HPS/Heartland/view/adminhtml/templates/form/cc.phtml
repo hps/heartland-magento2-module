@@ -223,11 +223,12 @@ echo $code; ?>" style="display:none">
         <dd>
             <div id="iframesCardCvv"></div>
         </dd>
-<label> <input type="checkbox" id="saveCardCheck"
+        <label> 
+            <input type="checkbox" id="saveCardCheck"
                onchange="document.querySelector('#<?php /* @noEscape */
                echo $code; ?>_save_token_value').value
-                       = (this.checked?1:0)"
-    /> Save this Card? </label>
+                       = (this.checked?1:0)"/> Save this Card? 
+        </label>
     </span>
     <input id="securesubmit_token" name="securesubmit_token" type="hidden">
 
