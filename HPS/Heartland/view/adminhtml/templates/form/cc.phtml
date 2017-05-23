@@ -19,8 +19,10 @@ $pubApiKey = \HPS\Heartland\Helper\Data::getPublicKey();
 $code = $block->escapeHtml($block->getMethodCode());
 $ccType = $block->getInfoData('cc_type');
 $ccExpMonth = $block->getInfoData('cc_exp_month');
-$ccExpYear = $block->getInfoData('cc_exp_year'); //
+$ccExpYear = $block->getInfoData('cc_exp_year'); 
+$getCanSaveCards = $block->getCanSaveCards();
 //var_dump($hpsTokens);
+
 ?>
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */
 echo $code; ?>" style="display:none">
@@ -223,7 +225,7 @@ echo $code; ?>" style="display:none">
         <dd>
             <div id="iframesCardCvv"></div>
         </dd>
-        <label> 
+        <label style="display: <?php echo ($getCanSaveCards) ? 'block' : 'none'; ?>" > 
             <input type="checkbox" id="saveCardCheck"
                onchange="document.querySelector('#<?php /* @noEscape */
                echo $code; ?>_save_token_value').value

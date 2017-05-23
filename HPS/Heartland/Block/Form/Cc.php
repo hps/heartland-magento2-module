@@ -46,6 +46,10 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customerId);
     }
     
+    public function getCanSaveCards(){
+        return (int) \HPS\Heartland\Model\StoredCard::getCanStoreCards();
+    }
+    
     /**
      * Internal constructor, that is called from real constructor
      *
