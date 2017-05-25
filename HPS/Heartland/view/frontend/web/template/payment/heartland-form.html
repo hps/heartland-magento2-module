@@ -1,15 +1,12 @@
 <!--
-/**
- * HPS_Heartland Template
-*
-* @category    HPS
-* @package     HPS_Heartland
-* @author      Charles Simmons <charles.simmons@e-hps.com>
-* @copyright   HPS (http://heartland.us)
-* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-based on part on Magento/Payment/view/frontend/web/template/payment/cc-form.html
-*/
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
     <div class="payment-method-title field choice">
@@ -34,7 +31,7 @@ based on part on Magento/Payment/view/frontend/web/template/payment/cc-form.html
         <table id="SavedCardsTable">
             <tbody>
             <tr id="hps_heartland_NewCard" data-bind="click: hpsNewCard"><td><input style="width:100px;cursor:pointer;" type="radio" name="HPSTokens[]" id="SelectNewCardHPS"></td>
-                <th  title="Click to enter a new Payment Method"  style="position: relative;text-align: left;border-left-style:groove;cursor:pointer;"> New Card ... </th></td>
+                <th  title="Click to enter a new Payment Method"  style="position: relative;text-align: left;border-left-style:groove;cursor:pointer;"> New Card / Update Saved Card ... </th></td>
             </tr>
             </tbody>
         </table>
@@ -157,7 +154,7 @@ based on part on Magento/Payment/view/frontend/web/template/payment/cc-form.html
                         css: {disabled: !isPlaceOrderActionAllowed()},
                         enable: (getCode() == isChecked())
                         "
-                        disabled>
+                        >
                     <span data-bind="text: $t('Place Order')"></span>
                 </button>
                 <input id="bPlaceOrderNow" type="submit"

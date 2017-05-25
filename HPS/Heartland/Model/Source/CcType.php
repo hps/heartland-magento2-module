@@ -1,12 +1,12 @@
 <?php
 /**
- * Payment CC Types Source Model
+ *  Heartland payment method model
  *
- * @category	Inchoo
- * @package		Inchoo_Stripe
- * @author		Ivan Weiler <ivan.weiler@inchoo.net> & Stjepan Udovičić <stjepan.udovicic@inchoo.net>
- * @copyright	Inchoo (http://inchoo.net)
- * @license		https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Model\Source;

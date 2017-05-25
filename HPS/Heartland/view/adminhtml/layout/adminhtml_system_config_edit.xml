@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="HPS_Heartland::styles.css"/>

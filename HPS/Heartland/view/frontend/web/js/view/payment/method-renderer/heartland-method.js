@@ -1,11 +1,11 @@
-/**
- * Heartland payment method model
+/*
+ *  Heartland payment method model
  *
- * @category    HPS
- * @package     HPS_Heartland
- * @author      Charlie Simmons <charles.simmons@e-hps.com>
- * @copyright   Heartland (http://heartland.us)
- * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 /*browser:true*/
@@ -25,7 +25,8 @@ define(
         'uiRegistry',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/model/messages',
-        'uiLayout'
+        'uiLayout',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
     function (
 
@@ -43,8 +44,8 @@ define(
         registry,
         additionalValidators,
         Messages,
-        layout
-
+        layout,
+        redirectOnSuccessAction
     ) {
         'use strict';
         /**
@@ -61,34 +62,40 @@ define(
                 var self = this;
                 $("#SavedCardsTable").fadeIn();
 
-
                 if ($("#SavedCardsTable tr").length < 2) {
                     self.hpsBusy();
-                    if(customer.isLoggedIn()){
-                        $.ajax({
-                            url: "../heartland/creditcard/get"
-                            , success: function (data) {
-                                if (data) {
-
-                                    // process json string to table rows
-                                    //$("#SavedCardsTable").append(JSON.parse(data));
-                                    self.drawTable(JSON.parse(data))
-                                    // $("#SavedCardsTable").append($("<tr></tr>"));
-                                    self.hpsNotBusy();
-
-                                } else {
-                                    $("#SavedCardsTable").append($("<tr />"));
-                                    self.hpsNewCard();
-                                }
-                                $("#hps_heartland_NewCard").insertAfter($("#SavedCardsTable tr").last());
-                            }
-                        });
-                    }else{
+                    if (!customer.isLoggedIn()){
                         $("#SavedCardsTable").append($("<tr />"));
                         self.hpsNewCard();
+                        return;
                     }
+
+                    $.ajax({
+                        url: "../heartland/creditcard/get",
+                        showLoader: true,
+                        context: $('#SavedCardsTable'),
+                        success: function (data) {
+                            if (typeof data === 'string') {
+                              data = JSON.parse(data);
+                            }
+
+                            if (data.length !== 0) {
+                                $("#iframes").fadeOut();
+
+                                // process json string to table rows
+                                self.drawTable(data);
+                                self.hpsNotBusy();
+
+                                $("#iframes").fadeOut();
+
+                            } else {
+                                $("#SavedCardsTable").append($("<tr />"));
+                                self.hpsNewCard();
+                            }
+                            $("#hps_heartland_NewCard").insertAfter($("#SavedCardsTable tr").last());
+                        }
+                    });
                 }
-                //return true;
             },
             drawTable: function(data) {
                 var self = this;
@@ -100,7 +107,7 @@ define(
             drawRow: function(rowData) {
 
                 var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
-                var row = $("<tr " + rOnClick + " />")
+                var row = $("<tr " + rOnClick + " />");
                 $("#SavedCardsTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
                 // {"token_value":"1","cc_last4":"1111","cc_type":"visa","cc_exp_month":"02","cc_exp_year":"2021"}
                 row.append($("<td width=\"width:100px\" ><input style=\"width:100px;cursor:pointer;\" type=\"radio\" name=\"HPSTokens[]\" id=\"hssCardSelected" + rowData.token_value + "\"></td>"));
@@ -132,7 +139,8 @@ define(
                 $("#checkout-loader-iframeEdition").fadeIn();
             },
             hpsNotBusy: function(){
-                $("#checkout-loader-iframeEdition").fadeOut();_HPS_EnablePlaceOrder()
+                $("#checkout-loader-iframeEdition").fadeOut();
+                _HPS_EnablePlaceOrder();
             },
             hpsShowCcForm: function(publicKey){
                 if ( publicKey ){
@@ -160,10 +168,9 @@ define(
 
                     });
                 }
-                return data
+                return data;
             },
             getCode: function () {
-                try{$("#iframes").fadeOut();}catch(e){}
                 return 'hps_heartland';
 
             },
@@ -179,6 +186,9 @@ define(
 
             getToken: function (data, event) {
                 var self = this;
+                if ($("#onestepcheckout-button-place-order")) {
+                    $("#onestepcheckout-button-place-order").unbind("click");
+                }
                 self.hpsBusy();
                 if ($("#securesubmit_token").val() == ''){
                     $("#bValidateButton").click();
@@ -190,6 +200,18 @@ define(
             /**
              * Place order.
              */
+            isOSC: function(){
+                var self = this;
+                if ($("#onestepcheckout-button-place-order")){
+                    $("#onestepcheckout-button-place-order").bind("click", self, function(){
+                        self.getToken();
+                    });
+                    return false;
+                }
+                return true;
+
+
+            },
             placeOrder: function (data, event) {
 
                 var self = this,
@@ -211,16 +233,27 @@ define(
                         pData.additional_data.token_value = $('#securesubmit_token').val();
 
                         pData.additional_data._save_token_value = (document.querySelector('#saveCardCheck').checked?1:0);
-                        placeOrder = placeOrderAction(pData, this.redirectAfterPlaceOrder, this.messageContainer);
+                        placeOrder = placeOrderAction(pData, false);
 
-                        $.when(placeOrder).fail(function () {
-                            self.isPlaceOrderActionAllowed(true);
-                        }).done(window.location.replace('../checkout/onepage/success/'));
+                        $.when(placeOrder)
+                            .fail(function() {
+                                self.isPlaceOrderActionAllowed(true);
+                                self.hpsNotBusy();
+                                $('#hps_heartland_NewCard').click();
+                            })
+                            .done(function() {
+                                redirectOnSuccessAction.execute()
+                            });
+
                         return true;
                     }
 
+                    $("#iframesCardError").text("Invalid payment data.");
+                    self.hpsNotBusy();
+                    $('#hps_heartland_NewCard').click();
+
                 }else{
-                    $("#iframesCardError").text("Token lookup failed. Please try again.")
+                    $("#iframesCardError").text("Token lookup failed. Please try again.");
                     self.hpsNotBusy();
                 }
                 return false;

@@ -1,9 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: charles.simmons
- * Date: 2/22/2016
- * Time: 1:24 PM
+ *  Heartland payment method model
+ *
+ *  @category    HPS
+ *  @package     HPS_Heartland
+ *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ *  @copyright   Heartland (http://heartland.us)
+ *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Helper;
@@ -77,19 +80,39 @@ class Data extends AbstractHelper
     public static function getCanSave(){
         return (int) self::getConfig(self::S_CARDS);
     }
-    /**
+
+    /** Customer facing will generate JSON input while admin side will send post this function returns the relevent
+     * payment data either way
      * @return array
      */
     public static function jsonData()    {
-        return (array) json_decode((string) file_get_contents((string)'php://input'),(bool) true);
+
+        $inputs = json_decode((string) file_get_contents((string)'php://input'),(bool) true);;
+
+        if (empty($inputs) === true && $_SERVER['REQUEST_METHOD'] === 'POST'){
+            $post = $_POST; // $post['order']['billing_address']['customer_address_id']
+            if(array_key_exists('payment',$post)){$inputs['paymentMethod']['additional_data'] = $post['payment'];;}
+
+            //$inputs['paymentMethod']['additional_data'] = _save_token_value;;
+            if(array_key_exists('securesubmit_token',$post)){$inputs['paymentMethod']['additional_data']['token_value'] = $post['securesubmit_token'];;}
+
+
+        }
+
+
+        return (array) $inputs;
     }
     public static function getRoot()    {
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_DIRECTORY_LIST)->getRoot();
     }
     public static function getBaseUrl()    {
-        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();;
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getBaseUrl();
     }
 
-
-
+    public static function getCurrencyCode() {
+        return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getCurrentCurrency()->getCode();
+    }
 }
+
+
+

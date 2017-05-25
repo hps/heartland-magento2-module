@@ -1,17 +1,15 @@
 <?xml version="1.0"?>
 <!--
-/**
-* HPS_Heartland module dependency
-*
-* @category    HPS
-* @package     HPS_Heartland
-* @author      Charles Simmons <charles.simmons@e-hps.com>
-* @copyright   HPS (http://heartland.us)
-* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-*/
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/Module/etc/module.xsd">
-    <module name="HPS_Heartland" setup_version="1.0.0">
+    <module name="HPS_Heartland" setup_version="1.0.10">
         <sequence>
             <module name="Magento_Sales" />
             <module name="Magento_Payment" />

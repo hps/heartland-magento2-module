@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
+
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="config" type="configType"/>
+  <xs:complexType name="groupType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="fieldType" name="field"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id"/>
+    <xs:attribute type="xs:string" name="showInDefault"/>
+    <xs:attribute type="xs:string" name="showInStore"/>
+    <xs:attribute type="xs:string" name="showInWebsite"/>
+    <xs:attribute type="xs:string" name="sortOrder"/>
+    <xs:attribute type="xs:string" name="translate"/>
+  </xs:complexType>
+  <xs:complexType name="systemType">
+    <xs:sequence>
+      <xs:element type="tabType" name="tab"/>
+      <xs:element type="sectionType" name="section"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="tabType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id"/>
+    <xs:attribute type="xs:string" name="sortOrder"/>
+    <xs:attribute type="xs:string" name="translate"/>
+  </xs:complexType>
+  <xs:complexType name="sectionType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="xs:string" name="tab"/>
+      <xs:element type="xs:string" name="resource"/>
+      <xs:element type="groupType" name="group"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id"/>
+    <xs:attribute type="xs:string" name="showInDefault"/>
+    <xs:attribute type="xs:string" name="showInStore"/>
+    <xs:attribute type="xs:string" name="showInWebsite"/>
+    <xs:attribute type="xs:string" name="sortOrder"/>
+    <xs:attribute type="xs:string" name="translate"/>
+  </xs:complexType>
+  <xs:complexType name="configType">
+    <xs:sequence>
+      <xs:element type="systemType" name="system"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="fieldType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="xs:string" name="comment"/>
+      <xs:element type="xs:string" name="backend_model"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id"/>
+    <xs:attribute type="xs:string" name="showInDefault"/>
+    <xs:attribute type="xs:string" name="showInStore"/>
+    <xs:attribute type="xs:string" name="showInWebsite"/>
+    <xs:attribute type="xs:string" name="sortOrder"/>
+    <xs:attribute type="xs:string" name="translate"/>
+    <xs:attribute type="xs:string" name="type"/>
+  </xs:complexType>
+</xs:schema>

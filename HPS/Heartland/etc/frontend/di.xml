@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <!--
-/**
-* HPS_Heartland DI definitions
-*
-* @category    HPS
-* @package     HPS Heartland
-* @author      Charlie Simmons <charles.simmons@e-hps.com>
-* @copyright   Heartland (http://heartland.us)
-* @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-*/
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
 
     <virtualType name="HPS\Heartland\Model\ConfigProvider" type="Magento\Payment\Model\CcGenericConfigProvider">
@@ -27,5 +25,6 @@
             </argument>
         </arguments>
     </type>
+    <preference for="\Magento\Vault\Block\Customer\CreditCards" type="\HPS\Heartland\Block\Customer\CreditCards" />
 
 </config>

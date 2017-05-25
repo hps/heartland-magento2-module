@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- * User: charles.simmons
- * Date: 1/8/2016
- */
--->
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="heartland_section" translate="label" type="text" sortOrder="1.9" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="heartland_section" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Heartland SecureSubmit</label>
                 <comment><![CDATA[Accept credit/debit cards in your Magento store. Your customers never leave your store to complete the purchase.]]></comment>
                 <attribute type="expanded">1</attribute>
@@ -63,7 +64,7 @@
                             <label>Save Cards</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/hps_heartland/save_cards</config_path>
-                            <comment><![CDATA[Please insure your account is configured for multi-use tokens!!]]></comment>
+                            <comment><![CDATA[Please ensure your account is configured for multi-use tokens!!]]></comment>
                         </field>
                         <field id="cctypes" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Credit Card Types</label>
@@ -86,13 +87,13 @@
                             <config_path>payment/hps_heartland/fraud_notification</config_path>
                         </field>
 
-                        <field id="fraud_email" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Email Notification</label>
-                            <comment>Used for fraud notification. A valid Email address is required</comment>
-                            <depends><field id="fraudnotification">1</field><field id="fraudprotection">1</field></depends>
-                            <config_path>payment/hps_heartland/fraud_email</config_path>
-                        </field>
--->
+                                                <field id="fraud_email" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                                                    <label>Email Notification</label>
+                                                    <comment>Used for fraud notification. A valid Email address is required</comment>
+                                                    <depends><field id="fraudnotification">1</field><field id="fraudprotection">1</field></depends>
+                                                    <config_path>payment/hps_heartland/fraud_email</config_path>
+                                                </field>
+                        -->
                         <field id="debug" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Debug</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
