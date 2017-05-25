@@ -25,7 +25,8 @@ define(
         'uiRegistry',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/model/messages',
-        'uiLayout'
+        'uiLayout',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
     function (
 
@@ -43,8 +44,8 @@ define(
         registry,
         additionalValidators,
         Messages,
-        layout
-
+        layout,
+        redirectOnSuccessAction
     ) {
         'use strict';
         /**
@@ -232,13 +233,24 @@ define(
                         pData.additional_data.token_value = $('#securesubmit_token').val();
 
                         pData.additional_data._save_token_value = (document.querySelector('#saveCardCheck').checked?1:0);
-                        placeOrder = placeOrderAction(pData, this.redirectAfterPlaceOrder, this.messageContainer);
+                        placeOrder = placeOrderAction(pData, false);
 
-                        $.when(placeOrder).fail(function () {
-                            self.isPlaceOrderActionAllowed(true);
-                        }).done(window.location.replace('../checkout/onepage/success/'));
+                        $.when(placeOrder)
+                            .fail(function() {
+                                self.isPlaceOrderActionAllowed(true);
+                                self.hpsNotBusy();
+                                $('#hps_heartland_NewCard').click();
+                            })
+                            .done(function() {
+                                redirectOnSuccessAction.execute()
+                            });
+
                         return true;
                     }
+
+                    $("#iframesCardError").text("Invalid payment data.");
+                    self.hpsNotBusy();
+                    $('#hps_heartland_NewCard').click();
 
                 }else{
                     $("#iframesCardError").text("Token lookup failed. Please try again.");
