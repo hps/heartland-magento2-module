@@ -278,7 +278,6 @@ class Payment
     public
     function validate()
     {
-        $this->log('validate', '\HPS\Heartland\Model\Payment::validate ');
         $info           = $this->getInfoInstance();
         $errorMsg       = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
@@ -310,8 +309,9 @@ class Payment
             $errorMsg = __('This credit card type is not allowed for this payment method.');
         }*/
         // \HPS\Heartland\Model\Payment::getToken
-        if (!$this->getToken(new \HpsTokenData)) {
-            $errorMsg = __('No valid token.');
+        $suToken = $this->getToken(new \HpsTokenData);
+        if (empty($suToken->tokenValue)) {
+            $errorMsg = __('Token error.');
         }
         /*
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
