@@ -70,7 +70,7 @@ function _HPS_EnablePlaceOrder(){
         setElementValue('#bPlaceOrderNow', 'disabled', '');
     }catch(e){}
 }
-function HPS_SecureSubmit($,document, Heartland, publicKey) {
+function HPS_SecureSubmit($,document, Heartland, publicKey) { 
     //if (arguments.callee.count > 0 )
     //    return;
     if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
@@ -127,7 +127,11 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);
-                    document.getElementById('edit_form').submit()
+                    //document.getElementById('edit_form').submit();
+                    //$('#edit_form').trigger('processStart');
+                    //$('#edit_form').trigger('submitOrder');
+                    $('#edit_form').trigger('realOrder');
+                    return true;
                 }
         }
 
@@ -167,7 +171,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         };
         window.securesubmitLoadEvents();
         // Create a new `HPS` object with the necessary configuration
-        var hps = new Heartland.HPS({
+        hps = new Heartland.HPS({
             // Change the publicKey below to match your account's credential.
             // Ensure the publicKey is changed on line 96 as well.
             publicKey: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
@@ -276,23 +280,9 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              console.log('There was an error: ' + resp.error.message);
              }*/
         });
-        // Attach a handler to interrupt the form submission
-        $("#edit_form").submit(function(e){
-            e.preventDefault();
-            $("#edit_form").unbind("submit");
-            // Tell the iframes to tokenize the data
-            hps.Messages.post(
-                {
-                    accumulateData: true,
-                    action: 'tokenize',
-                    message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-                },
-                'cardNumber'
-            );
-            return false;
-        });
+        
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
-
+    return hps;
 
 };

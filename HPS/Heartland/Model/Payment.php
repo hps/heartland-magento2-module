@@ -311,7 +311,7 @@ class Payment
         // \HPS\Heartland\Model\Payment::getToken
         $suToken = $this->getToken(new \HpsTokenData);
         if (empty($suToken->tokenValue)) {
-            $errorMsg = __('Token error.');
+            $errorMsg = __('Token not found');
         }
         /*
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
