@@ -137,12 +137,12 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     
                 }
                 isTokenGenerated = 1;
-                var start = new Date().getTime();
+                /*var start = new Date().getTime();
                 var end = start;
                 while(end < start + 7000 && isTokenGenerated === 0) {
                   end = new Date().getTime();
                   console.log(end);
-                }
+                }*/
                 responseHandlerDef.resolve();
         }
 
@@ -294,20 +294,14 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
-    // Attach a handler to interrupt the form submission
+    // Attach a handler to interrupt the form submission    
     $('#edit_form')
             .off('submitOrder')
             .on('submitOrder', function(e){  
-        //alert('token');
-        $('#edit_form').trigger('processStop');
         e.preventDefault();
         e.stopImmediatePropagation(); 
-        //alert('stopimmediatepropagation');
-        responseHandlerDef = $.Deferred();        
-        //e.preventDefault();
-        //$("#edit_form").unbind("submit");
-        // Tell the iframes to tokenize the data
-        console.log(hps);
+        $('#edit_form').trigger('processStop');      
+        responseHandlerDef = $.Deferred();  
         hps.Messages.post(
             {
                 accumulateData: true,
@@ -317,17 +311,15 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
             'cardNumber'
         );
 
-        
+        e.preventDefault();
+        e.stopImmediatePropagation();
         
         $.when(responseHandlerDef).done(function(){
             //alert('after responseHandler');
             $('#edit_form').trigger('processStart');
             $('#edit_form').trigger('realOrder');
         }).promise();
-        //$('#edit_form').trigger('processStart');
-        //jQuery(this).trigger('realOrder');
-        //e.cancelBubble = true;
-        //e.stopPropagation();
-    });
-
+        
+    });   
+    
 };
