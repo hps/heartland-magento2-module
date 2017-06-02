@@ -112,7 +112,7 @@ echo $code; ?>" style="display:none">
                             if (publicKey) {
 
                                 $("#iframes").fadeIn();
-                                //HPS_SecureSubmit($,document, Heartland, publicKey);
+                                HPS_SecureSubmit($,document, Heartland, publicKey);
 
 
                             }
@@ -147,32 +147,7 @@ echo $code; ?>" style="display:none">
                     $('.hps_deletecard').click(function(){
                         var tokenValue = $(this).data('token-value');
                         <?php echo $code; ?>.deleteCard(tokenValue,this.parentNode.parentNode)
-                    });
-                    var hps = HPS_SecureSubmit($,document, Heartland, '<?php echo $pubApiKey; ?>');                    
-                    // Attach a handler to interrupt the form submission
-                    //$(document).on('submit', '#edit_form', function() {
-                    jQuery('#edit_form')
-                            .on('submitOrder', function(e){
-                                 
-                        //$('#edit_form').trigger('processStop');
-                        //e.preventDefault();
-                        //$("#edit_form").unbind("submit");
-                        // Tell the iframes to tokenize the data
-                        console.log(hps);
-                        hps.Messages.post(
-                            {
-                                accumulateData: true,
-                                action: 'tokenize',
-                                message: '<?php echo $pubApiKey; ?>', //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-                            },
-                            'cardNumber'
-                        );
-                        //$('#edit_form').trigger('processStart');
-                        //jQuery(this).trigger('realOrder');
-                        //e.cancelBubble = true;
-                        //e.stopPropagation();
-                        return false;
-                    });
+                    });                    
                 });
                 
             }
