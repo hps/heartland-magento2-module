@@ -110,11 +110,8 @@ echo $code; ?>" style="display:none">
 
                         hpsShowCcForm: function (publicKey) {
                             if (publicKey) {
-
                                 $("#iframes").fadeIn();
                                 HPS_SecureSubmit($,document, Heartland, publicKey);
-
-
                             }
 
                         }
@@ -139,6 +136,10 @@ echo $code; ?>" style="display:none">
                     }
                 $(document).ready(function ($) {
                     $("#iframes").fadeOut();
+                    if ($("#SavedCardsTable tr").length < 2) {
+                        <?php /* @noEscape */ echo $code; ?>.hpsNewCard();
+                        return;
+                    }
                     $('#hps_heartland_NewCard').click(function(){<?php /* @noEscape */ echo $code; ?>.hpsNewCard()});
                     $('.hps_storedcard').click(function(){
                         var jsonCode = $(this).data("card-details");                        

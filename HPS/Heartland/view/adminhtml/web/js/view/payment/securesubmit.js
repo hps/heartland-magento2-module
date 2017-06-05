@@ -78,7 +78,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         && publicKey) {
 
         var responseHandlerDef = null;
-        var isTokenGenerated = 0;
 
         //var addHandler = Heartland.Events.addHandler;
         function enablePlaceOrder(disabled)
@@ -119,7 +118,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
 
         // Handles tokenization response
         function responseHandler(response) {
-                //alert('in responseHandler');
                 if (response.error) {
                     _HPS_addClass(errElement, 'mage-error');
                     errElement.innerText = response.error.message;
@@ -128,21 +126,8 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     try{_HPS_removeClass( document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');}catch(e){}
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
-                    _HPS_setHssTransaction(response);
-                    
-                    //document.getElementById('edit_form').submit();
-                    //$('#edit_form').trigger('processStart');
-                    //$('#edit_form').trigger('submitOrder');
-                    
-                    
-                }
-                isTokenGenerated = 1;
-                /*var start = new Date().getTime();
-                var end = start;
-                while(end < start + 7000 && isTokenGenerated === 0) {
-                  end = new Date().getTime();
-                  console.log(end);
-                }*/
+                    _HPS_setHssTransaction(response);                    
+                }                
                 responseHandlerDef.resolve();
         }
 
@@ -315,7 +300,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         e.stopImmediatePropagation();
         
         $.when(responseHandlerDef).done(function(){
-            //alert('after responseHandler');
             $('#edit_form').trigger('processStart');
             $('#edit_form').trigger('realOrder');
         }).promise();
