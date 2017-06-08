@@ -24,138 +24,9 @@ $getCanSaveCards = $block->getCanSaveCards();
 //var_dump($hpsTokens);
 
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */
-echo $code; ?>" style="display:none">
 
-    <script>
-        var <?php /* @noEscape */ echo $code; ?>;
-        require([
-                'jquery',
-                'ko',
-                'module'
-            ],
-
-            /*
-             *  Heartland payment method model
-             *
-             *  @category    HPS
-             *  @package     HPS_Heartland
-             *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
-             *  @copyright   Heartland (http://heartland.us)
-             *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-             */
-
-            /*browser:true*/
-            /*global define*/
-            function ($, ko, module) {
-                'use strict';
-                /**
-                 * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
-                 * if there is any form of error we disable the payment form
-                 *
-                 */
-                
-                    //assign the methods in code variable so, that it can be verified as code._HPS_setHssTransaction1
-                    <?php /* @noEscape */ echo $code; ?> = {
-
-                        _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}                            
-                            
-                            if($("#hssCardSelected" + response.token_value.trim()))
-                            {
-                                $("#iframes").fadeOut();
-                                $("#hssCardSelected" + response.token_value.trim()).attr('checked', true);
-                                $('#securesubmit_token').val( response.token_value.trim() );
-
-                                $('#hps_heartland_cc_number').val( response.cc_last4.trim() );
-                                $('#hps_heartland_cc_type').val( response.cc_type.trim() );
-                                $('#hps_heartland_expiration').val( response.cc_exp_month.trim() );
-                                $('#hps_heartland_expiration_yr').val( response.cc_exp_year.trim() );
-                            }
-                        },
-                        deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
-                            // "cc_exp_month":"2","cc_exp_year":"2025"}
-                            $("#iframes").fadeOut();                            
-                            if(confirm('Are you sure you want to delete the stored card?')){
-                                $.ajax({
-                                    url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id,
-                                    showLoader: true,
-                                    context: $('#SavedCardsTable'),
-                                    success: function (data) {
-                                            e.remove();
-                                            alert('Your saved card has been removed from our records ');
-                                    }
-                                });
-                            }
-
-                        },
-
-                        hpsNewCard: function () {
-                            $('#securesubmit_token').removeAttr('value');
-                            $("#SelectNewCardHPS").prop('checked', true);
-                            <?php /* @noEscape */ echo $code; ?>.
-                            hpsBusy();
-                            <?php /* @noEscape */ echo $code; ?>.
-                            hpsShowCcForm('<?php /* @noEscape */ echo $pubApiKey?>');
-                            return true;
-                        },
-
-                        hpsBusy: function () {
-                            $("#checkout-loader-iframeEdition").fadeIn();
-                        },
-
-                        hpsNotBusy: function () {
-                            $("#checkout-loader-iframeEdition").fadeOut();
-                            _HPS_EnablePlaceOrder()
-                        },
-
-                        hpsShowCcForm: function (publicKey) {
-                            if (publicKey) {
-                                $("#iframes").fadeIn();
-                                HPS_SecureSubmit($,document, Heartland, publicKey);
-                            }
-
-                        }
-                        ,
-                        hideNewCardForm: function () {
-                            $("#iframes").fadeOut();
-                        },
-
-                        getCode: function () {
-                            try {
-                                $("#iframes").fadeOut();
-                            } catch (e) {
-                            }
-                            return '<?php /* @noEscape */ echo $code; ?>';
-
-                        },
-
-                        isActive: function () {
-                            return true;
-                        },
-
-                    }
-                $(document).ready(function ($) {
-                    $("#iframes").fadeOut();
-                    if ($("#SavedCardsTable tr").length < 2) {
-                        <?php /* @noEscape */ echo $code; ?>.hpsNewCard();
-                        return;
-                    }
-                    $('#hps_heartland_NewCard').click(function(){<?php /* @noEscape */ echo $code; ?>.hpsNewCard()});
-                    $('.hps_storedcard').click(function(){
-                        var jsonCode = $(this).data("card-details");                        
-                        <?php /* @noEscape */ echo $code; ?>._HPS_setHssTransaction1(JSON.parse(jsonCode.replace(/\\/g, "")));
-                    });
-                    $('.hps_deletecard').click(function(){
-                        var tokenValue = $(this).data('token-value');
-                        <?php echo $code; ?>.deleteCard(tokenValue,this.parentNode.parentNode)
-                    });                    
-                });
-                
-            }
-        );
-
-
-    </script>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none">
+    
     <table id="SavedCardsTable">
         <tbody>
         <?php
@@ -284,3 +155,160 @@ echo $code; ?>" style="display:none">
     </div>
 
 </fieldset>
+
+
+
+<script>
+    //<![CDATA[
+    require(
+        [
+            'HPS_Heartland/js/hpsheartland',
+            'jquery',
+            'domReady!'
+        ], function(HPS_Heartland, $) {
+            var config,
+                payment,
+                form = $('#payment_form_hps_heartland');               
+
+            config = {
+                       active: form.length > 0 && !form.is(':hidden'), 
+                       publicKey:'<?php /* @noEscape */ echo $pubApiKey; ?>',
+                       code: '<?php /* @noEscape */ echo $code; ?>'
+                   };            
+            payment = new HPS_Heartland(config);
+        });
+    //]]>
+</script>
+
+    <script>
+        var responseHandlerDef = null;
+        var <?php /* @noEscape */ echo $code; ?>;
+        require([
+                'jquery'
+            ],
+
+            /*
+             *  Heartland payment method model
+             *
+             *  @category    HPS
+             *  @package     HPS_Heartland
+             *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+             *  @copyright   Heartland (http://heartland.us)
+             *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+             */
+
+            /*browser:true*/
+            /*global define*/
+            function ($) {
+                'use strict';
+                
+                var hps;
+            
+                /**
+                 * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                 * if there is any form of error we disable the payment form
+                 *
+                 */
+                
+                    //assign the methods in code variable so, that it can be verified as code._HPS_setHssTransaction1
+                    <?php /* @noEscape */ echo $code; ?> = {
+
+                        _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}                            
+                            
+                            if($("#hssCardSelected" + response.token_value.trim()))
+                            {
+                                $("#iframes").fadeOut();
+                                $("#hssCardSelected" + response.token_value.trim()).attr('checked', true);
+                                $('#securesubmit_token').val( response.token_value.trim() );
+
+                                $('#hps_heartland_cc_number').val( response.cc_last4.trim() );
+                                $('#hps_heartland_cc_type').val( response.cc_type.trim() );
+                                $('#hps_heartland_expiration').val( response.cc_exp_month.trim() );
+                                $('#hps_heartland_expiration_yr').val( response.cc_exp_year.trim() );
+                            }
+                        },
+                        deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
+                            // "cc_exp_month":"2","cc_exp_year":"2025"}
+                            $("#iframes").fadeOut();                            
+                            if(confirm('Are you sure you want to delete the stored card?')){
+                                $.ajax({
+                                    url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t="+id,
+                                    showLoader: true,
+                                    context: $('#SavedCardsTable'),
+                                    success: function (data) {
+                                            e.remove();
+                                            alert('Your saved card has been removed from our records ');
+                                    }
+                                });
+                            }
+
+                        },
+
+                        hpsNewCard: function () {
+                            $('#securesubmit_token').removeAttr('value');
+                            $("#SelectNewCardHPS").prop('checked', true);
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsBusy();
+                            <?php /* @noEscape */ echo $code; ?>.
+                            hpsShowCcForm('<?php /* @noEscape */ echo $pubApiKey?>');
+                            return true;
+                        },
+
+                        hpsBusy: function () {
+                            $("#checkout-loader-iframeEdition").fadeIn();
+                        },
+
+                        hpsNotBusy: function () {
+                            $("#checkout-loader-iframeEdition").fadeOut();
+                            _HPS_EnablePlaceOrder()
+                        },
+
+                        hpsShowCcForm: function (publicKey) {
+                            if (publicKey) {
+                                $("#iframes").fadeIn();
+                                HPS_SecureSubmit($,document, Heartland, publicKey);
+                            }
+
+                        }
+                        ,
+                        hideNewCardForm: function () {
+                            $("#iframes").fadeOut();
+                        },
+
+                        getCode: function () {
+                            try {
+                                $("#iframes").fadeOut();
+                            } catch (e) {
+                            }
+                            return '<?php /* @noEscape */ echo $code; ?>';
+
+                        },
+
+                        isActive: function () {
+                            return true;
+                        },
+
+                    }
+                $(document).ready(function ($) {
+                    $("#iframes").fadeOut();
+                    if ($("#SavedCardsTable tr").length < 2) {
+                        <?php /* @noEscape */ echo $code; ?>.hpsNewCard();
+                        return;
+                    }
+                    $('#hps_heartland_NewCard').click(function(){<?php /* @noEscape */ echo $code; ?>.hpsNewCard()});
+                    $('.hps_storedcard').click(function(){
+                        var jsonCode = $(this).data("card-details");                        
+                        <?php /* @noEscape */ echo $code; ?>._HPS_setHssTransaction1(JSON.parse(jsonCode.replace(/\\/g, "")));
+                    });
+                    $('.hps_deletecard').click(function(){
+                        var tokenValue = $(this).data('token-value');
+                        <?php echo $code; ?>.deleteCard(tokenValue,this.parentNode.parentNode)
+                    });                         
+                });
+                
+            }
+        );
+
+
+    </script>
+    

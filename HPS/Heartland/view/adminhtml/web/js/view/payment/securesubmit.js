@@ -77,8 +77,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
         && publicKey) {
 
-        var responseHandlerDef = null;
-
         //var addHandler = Heartland.Events.addHandler;
         function enablePlaceOrder(disabled)
         {
@@ -127,8 +125,13 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);                    
-                }                
-                responseHandlerDef.resolve();
+                }       
+                //trigger the main form submission
+                if($('##securesubmit_token').val() !== ''){
+                    $('#edit_form').trigger('realOrder');
+                } else {
+                    throw new Error("HPS Token not generated! Try again later");
+                }
         }
 
         // Load function to attach event handlers when WC refreshes payment fields
@@ -167,7 +170,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         };
         window.securesubmitLoadEvents();
         // Create a new `HPS` object with the necessary configuration
-        var hps = new Heartland.HPS({
+        hps = new Heartland.HPS({
             // Change the publicKey below to match your account's credential.
             // Ensure the publicKey is changed on line 96 as well.
             publicKey: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
@@ -277,33 +280,10 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              }*/
         });
         
+        
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
     // Attach a handler to interrupt the form submission    
-    $('#edit_form')
-            .off('submitOrder')
-            .on('submitOrder', function(e){  
-        e.preventDefault();
-        e.stopImmediatePropagation(); 
-        $('#edit_form').trigger('processStop');      
-        responseHandlerDef = $.Deferred();  
-        hps.Messages.post(
-            {
-                accumulateData: true,
-                action: 'tokenize',
-                message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-            },
-            'cardNumber'
-        );
-
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        
-        $.when(responseHandlerDef).done(function(){
-            $('#edit_form').trigger('processStart');
-            $('#edit_form').trigger('realOrder');
-        }).promise();
-        
-    });   
+    
     
 };
