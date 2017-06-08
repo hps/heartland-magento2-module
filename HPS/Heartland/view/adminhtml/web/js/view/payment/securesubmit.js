@@ -124,14 +124,11 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     try{_HPS_removeClass( document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');}catch(e){}
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
-                    _HPS_setHssTransaction(response);                    
-                }       
-                //trigger the main form submission
-                if($('##securesubmit_token').val() !== ''){
+                    _HPS_setHssTransaction(response);   
+                    //trigger the main form submission
                     $('#edit_form').trigger('realOrder');
-                } else {
-                    throw new Error("HPS Token not generated! Try again later");
-                }
+                }       
+                
         }
 
         // Load function to attach event handlers when WC refreshes payment fields
