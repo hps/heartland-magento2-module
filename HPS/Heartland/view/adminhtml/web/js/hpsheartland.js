@@ -137,11 +137,11 @@ define([
          * Trigger order submit
          */
         submitOrder: function (e) {
-            console.log($('#securesubmit_token').val());
             if($('#securesubmit_token').val() !== ''){
                 this.placeOrder();
                 return true;
             }
+            //generate a new Token and submit order
             this.$selector.trigger('afterValidate.beforeSubmit');
             $('body').trigger('processStop');
             this.initHpsToken();
