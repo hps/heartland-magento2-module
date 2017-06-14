@@ -67,14 +67,13 @@ define([
             try {
                 $('body').trigger('processStart');
                 hps.Messages.post(
-                        {
+                    {
                             accumulateData: true,
                             action: 'tokenize',
                             message: this.publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
                         },
-                        'cardNumber'
-                        );
-
+                    'cardNumber'
+                );
             } catch (e) {
                 $('body').trigger('processStop');
                 self.error(e.message);
@@ -137,7 +136,7 @@ define([
          * Trigger order submit
          */
         submitOrder: function (e) {
-            if($('#securesubmit_token').val() !== ''){
+            if ($('#securesubmit_token').val() !== '') {
                 this.placeOrder();
                 return true;
             }

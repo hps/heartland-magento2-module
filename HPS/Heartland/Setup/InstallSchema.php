@@ -2,11 +2,11 @@
 /**
  *  Heartland payment method model
  *
- *  @category    HPS
- *  @package     HPS_Heartland
- *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
- *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Setup;
@@ -35,7 +35,7 @@ class InstallSchema implements InstallSchemaInterface
             'heartland_storedcard_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
-            array('identity' => true,'nullable' => false,'primary' => true,'unsigned' => true,),
+            ['identity' => true,'nullable' => false,'primary' => true,'unsigned' => true,],
             'Entity ID'
         );
 
@@ -45,7 +45,7 @@ class InstallSchema implements InstallSchemaInterface
             'token_value',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             255,
-            ['nullable' => False],
+            ['nullable' => false],
             'token_value'
         );
 
@@ -55,7 +55,7 @@ class InstallSchema implements InstallSchemaInterface
             'customer_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
-            ['nullable' => False],
+            ['nullable' => false],
             'customer_id'
         );
 
@@ -85,14 +85,14 @@ class InstallSchema implements InstallSchemaInterface
             'cc_exp_month',
             \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
             null,
-            ['unsigned' => True],
+            ['unsigned' => true],
             'cc_exp_month'
         );
         $table_hps_heartland_storedcard->addColumn(
             'cc_exp_year',
             \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
             null,
-            ['unsigned' => True],
+            ['unsigned' => true],
             'cc_exp_year'
         );
 
