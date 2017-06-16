@@ -35,13 +35,5 @@
         "psr-4": {
             "HPS\\Heartland\\": ""
         }
-    },
-    "extra": {
-        "map": [
-            [
-                "*",
-                "HPS/Heartland"
-            ]
-        ]
     }
 }
