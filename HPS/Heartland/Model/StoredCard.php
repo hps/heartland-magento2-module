@@ -45,15 +45,12 @@ class StoredCard
                     )
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
-                $data = (array)$conn->fetchAll($select);
-                self::validate($data);
-                if (count($data) && key_exists('token_value', $data[0])) {
-                    $MuToken = $data[0]['token_value'];
+                $data = (array)$conn->fetchRow($select);                
+                if (count($data) && key_exists('token_value', $data)) {
+                    $MuToken = $data['token_value'];
                 }
             }
         }
-
-        //}
         return $MuToken;
     }
 
@@ -88,25 +85,10 @@ class StoredCard
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME],
-                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
+                        ['o' => self::TABLE_NAME]
                     )
-                    ->where('o.customer_id = ?', (int)Customer::getCustID())
-                ->group('o.token_value');
-                $tdata = (array)$conn->fetchAll($select);
-                self::validate($tdata);
-                if (!empty($tdata)) {
-                    foreach ($tdata as $item) {
-                        $conn = Db::db_connect();
-                        $select2 = $conn->select()
-                                ->from(['o' => self::TABLE_NAME])
-                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array) $conn->fetchAll($select2);
-                        self::validate($sdata);
-                        $data[] = $sdata[0];
-                    }
-                    self::validate($data); /**/
-                }
+                    ->where('o.customer_id = ?', (int)Customer::getCustID());
+                $data = (array)$conn->fetchAll($select);
             }
         }
 
@@ -127,25 +109,10 @@ class StoredCard
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME],
-                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
+                        ['o'=>self::TABLE_NAME]
                     )
-                    ->where('o.customer_id = ?', (int)$custID)
-                    ->group('o.token_value');
-                $tdata = (array)$conn->fetchAll($select);
-                if (!empty($tdata)) {
-                    self::validate($tdata);
-                    foreach ($tdata as $item) {
-                        $conn = Db::db_connect();
-                        $select2 = $conn->select()
-                                ->from(['o' => self::TABLE_NAME])
-                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array) $conn->fetchAll($select2);
-                        self::validate($sdata);
-                        $data[] = $sdata[0];
-                    }
-                    self::validate($data); /**/
-                }
+                    ->where('o.customer_id = ?', (int)$custID);
+                $data = (array)$conn->fetchAll($select);
             }
         }
 
@@ -187,13 +154,7 @@ class StoredCard
      * @throws \Exception
      */
     public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
-    {
-        /*$args = func_get_args();
-        foreach ($args as $argName=>$arg) {
-            if ( preg_match('/[\W]/', $arg) !== 1){
-                throw new \Exception(__( $argName . ' must contain a value that includes only word characters' ));
-            }
-        }*/
+    {        
         $conn = Db::db_connect();
         if ($customerID) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
@@ -241,5 +202,5 @@ class StoredCard
             }
         }
         return true;
-    }
+    }    
 }
