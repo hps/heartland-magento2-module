@@ -283,28 +283,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // remove credit card number delimiters such as "-" and space
         $ccNumber = preg_replace('/[\-\s]+/', '', $ccNumber);
         $info->setCcNumber($ccNumber);
-        /*$ccTypeConversion = ['visa'       => 'VI',
-                             'mastercard' => 'MC',
-                             'amex'       => 'AE',
-                             'discover'   => 'DI',
-                             'jcb'        => 'JCB'];
-        if (strtolower($info->getCcType()) === '') {
-            return false;
-        }
-        $this->log('[' . strtolower($info->getCcType()) . ']', '\HPS\Heartland\Model\Payment::validate ');
-        $this->log($availableTypes, '\HPS\Heartland\Model\Payment::validate $availableTypes ');
-        $this->log($ccTypeConversion, '\HPS\Heartland\Model\Payment::validate $ccTypeConversion ');
-        $this->log(strtolower($info->getCcType()), 'CCtypes ');
-        if (in_array($ccTypeConversion[ strtolower($info->getCcType()) ], $availableTypes)) {
-            $this->log($ccTypeConversion[ strtolower($info->getCcType()) ], 'CCtype ');
-            // \HPS\Heartland\Model\Payment::validateCcNum
-            if (!$this->validateCcNum($ccNumber)) {
-                $errorMsg = __('Invalid Credit Card Number.');
-            }
-        }
-        else {
-            $errorMsg = __('This credit card type is not allowed for this payment method.');
-        }*/
+        
         // \HPS\Heartland\Model\Payment::getToken
         $suToken = $this->getToken(new \HpsTokenData);
         if (empty($suToken->tokenValue)) {
@@ -631,8 +610,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
              */
             $info = $this->getInfoInstance();
             $CcL4 = $info->getCcNumber();
-            ;
-
+            
             $this->log($response, 'setStatus ');
             // set items always found in the response header
             /** @var \HpsTransaction $response Properties found in the header */
