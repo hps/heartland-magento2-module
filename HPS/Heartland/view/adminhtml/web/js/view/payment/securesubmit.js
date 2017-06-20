@@ -70,13 +70,12 @@ function _HPS_EnablePlaceOrder(){
         setElementValue('#bPlaceOrderNow', 'disabled', '');
     }catch(e){}
 }
-function HPS_SecureSubmit($,document, Heartland, publicKey) {
+function HPS_SecureSubmit($,document, Heartland, publicKey) { 
     //if (arguments.callee.count > 0 )
     //    return;
     if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
         && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
         && publicKey) {
-
 
         //var addHandler = Heartland.Events.addHandler;
         function enablePlaceOrder(disabled)
@@ -117,7 +116,6 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
 
         // Handles tokenization response
         function responseHandler(response) {
-
                 if (response.error) {
                     _HPS_addClass(errElement, 'mage-error');
                     errElement.innerText = response.error.message;
@@ -126,9 +124,11 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
                     try{_HPS_removeClass( document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');}catch(e){}
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
-                    _HPS_setHssTransaction(response);
-                    document.getElementById('edit_form').submit()
-                }
+                    _HPS_setHssTransaction(response);   
+                    //trigger the main form submission
+                    $('#edit_form').trigger('realOrder');
+                }       
+                
         }
 
         // Load function to attach event handlers when WC refreshes payment fields
@@ -167,7 +167,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
         };
         window.securesubmitLoadEvents();
         // Create a new `HPS` object with the necessary configuration
-        var hps = new Heartland.HPS({
+        hps = new Heartland.HPS({
             // Change the publicKey below to match your account's credential.
             // Ensure the publicKey is changed on line 96 as well.
             publicKey: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
@@ -276,23 +276,11 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              console.log('There was an error: ' + resp.error.message);
              }*/
         });
-        // Attach a handler to interrupt the form submission
-        $("#edit_form").submit(function(e){
-            e.preventDefault();
-            $("#edit_form").unbind("submit");
-            // Tell the iframes to tokenize the data
-            hps.Messages.post(
-                {
-                    accumulateData: true,
-                    action: 'tokenize',
-                    message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-                },
-                'cardNumber'
-            );
-            return false;
-        });
+        
+        
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
-
-
+    // Attach a handler to interrupt the form submission    
+    
+    
 };

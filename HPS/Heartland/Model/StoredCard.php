@@ -117,7 +117,7 @@ class StoredCard {
      */
     public static function getStoredCardsAdmin($custID = null) {
         $data = [];
-        if ($custID !== null && $custID > 0) {
+        if ($custID !== null && $custID > 0 && self::getCanStoreCards()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()

@@ -199,8 +199,7 @@ class Payment
      * @return \HPS\Heartland\Model\Payment        $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public
-    function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::AUTHORIZE);
     }
@@ -218,20 +217,17 @@ class Payment
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     //\Magento\Sales\Model\Order\Payment::canCapture
-    public
-    function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::CHARGE);
     }
 
-    public
-    function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::$CAPTURE);
     }
 
-    public
-    function void(\Magento\Payment\Model\InfoInterface $payment)
+    public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
         return $this->_payment($payment, null, \HpsTransactionType::VOID);
     }
@@ -245,8 +241,7 @@ class Payment
      *
      * @return \HPS\Heartland\Model\Payment         $this
      */
-    public
-    function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         return $this->_payment($payment, $amount, \HpsTransactionType::REFUND);
     }
@@ -257,8 +252,7 @@ class Payment
      *
      * @return bool
      */
-    public
-    function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if (!$this->getConfigData('private_key')) {
             return false;
@@ -275,10 +269,8 @@ class Payment
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public
-    function validate()
+    public function validate()
     {
-        $this->log('validate', '\HPS\Heartland\Model\Payment::validate ');
         $info           = $this->getInfoInstance();
         $errorMsg       = false;
         $availableTypes = explode(',', $this->getConfigData('cctypes'));
@@ -310,8 +302,9 @@ class Payment
             $errorMsg = __('This credit card type is not allowed for this payment method.');
         }*/
         // \HPS\Heartland\Model\Payment::getToken
-        if (!$this->getToken(new \HpsTokenData)) {
-            $errorMsg = __('No valid token.');
+        $suToken = $this->getToken(new \HpsTokenData);       
+        if(empty($suToken->tokenValue)){
+            $errorMsg = __('Token error! Please try again.');
         }
         /*
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
@@ -335,8 +328,7 @@ class Payment
      *
      * @return bool
      */
-    public
-    function validateCcNum($ccNumber)
+    public function validateCcNum($ccNumber)
     { // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
         return preg_match('/^[\d]{4}$/', $ccNumber) === 1;
     }
@@ -344,8 +336,7 @@ class Payment
     /**
      * @return \HpsCreditService
      */
-    private
-    function getHpsCreditService()
+    private function getHpsCreditService()
     {
         // \HPS\Heartland\Model\Payment::$_heartlandApi
         // \HpsCreditService::__construct
@@ -357,8 +348,7 @@ class Payment
      *
      * @return \HpsCardHolder
      */
-    private
-    function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
+    private function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
 
         $cardHolder = new \HpsCardHolder();
@@ -384,8 +374,7 @@ class Payment
      *
      * @return \HpsAddress
      */
-    private
-    function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
+    private function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
         $address = new \HpsAddress();
         // \Magento\Sales\Model\Order\Address::getStreetLine
@@ -853,8 +842,7 @@ class Payment
      * by \HpsCreditService::charge
      *
      */
-    private
-    function saveMuToken()
+    private function saveMuToken()
     {
         $data                    = $this->getAdditionalData();
         $this->_save_token_value = 0;
@@ -870,8 +858,7 @@ class Payment
      *
      * @return array
      */
-    private
-    function getAdditionalData()
+    private function getAdditionalData()
     {
 
         static $data = [];
@@ -886,8 +873,7 @@ class Payment
      *
      * @return array
      * */
-    private
-    function getPaymentMethod()
+    private function getPaymentMethod()
     {
         /**
          * @var array $data
@@ -909,8 +895,7 @@ class Payment
      *
      * @return array
      */
-    private
-    function elementFromArray($data, $element)
+    private function elementFromArray($data, $element)
     {
         $r = [];
         if (key_exists($element, $data)) {
@@ -927,8 +912,7 @@ class Payment
      *
      * @return string
      */
-    private
-    function __sanitize($data)
+    private function __sanitize($data)
     {
         return trim(filter_var($data, FILTER_SANITIZE_STRING));
     }
@@ -947,10 +931,10 @@ class Payment
     private function getToken(\HpsTokenData $suToken, $custID = null)
     {        
         $this->getTokenValue();
-        $this->log(HPS_STORED_CARDS::getCanStoreCards(), '\HPS\Heartland\Model\Payment::is_numeric:  ');                    
+        $this->log(HPS_STORED_CARDS::getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  '); 
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
-        if (!empty($this->_token_value) && is_numeric($this->_token_value) && HPS_STORED_CARDS::getCanStoreCards()) {  
-            $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getTokenfgfggfg Method initial value:  ');            
+        if (!empty($this->_token_value) && is_numeric($this->_token_value) && !empty($custID) && HPS_STORED_CARDS::getCanStoreCards()) {  
+            $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');            
             $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value, $custID);
         }
        

@@ -14,4 +14,12 @@
         <link src="HPS_Heartland/js/view/payment/securesubmit.js" id="HPS_SECURESUBMIT_IFRAME_CODE"/>
         <css  src="HPS_Heartland/creditForm.css" />
     </head>
+    <body>    
+        <referenceBlock name="order_create_billing_form">
+            <action method="setMethodFormTemplate">
+                <argument name="method" xsi:type="string">hps_heartland</argument>
+                <argument name="template" xsi:type="string">HPS_Heartland::form/cc.phtml</argument>
+            </action>
+        </referenceBlock>          
+    </body>
 </page>
