@@ -2,14 +2,15 @@
 /**
  *  Heartland payment method model
  *
- *  @category    HPS
- *  @package     HPS_Heartland
- *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
- *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Block\Form;
+
 use Magento\Payment\Model\MethodInterface;
 
 /**
@@ -28,17 +29,18 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      * @return array
      * @throws \Exception
      */
-    public function getCcTokens(){    
-       $customerId = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');       
-       $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
+    public function getCcTokens()
+    {
+        $customerId = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');
+        $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
        //Retrieve customer id from customer mail id
-       if($customerId === null && !empty($customerEmail)){
-            try{
+        if ($customerId === null && !empty($customerEmail)) {
+            try {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
                 $customer = $customerFactory->get($customerEmail);
                 $customerId = $customer->getId();
-            }catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $customerId = null;
             }
         }
@@ -46,7 +48,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customerId);
     }
     
-    public function getCanSaveCards(){
+    public function getCanSaveCards()
+    {
         return (int) \HPS\Heartland\Model\StoredCard::getCanStoreCards();
     }
     
@@ -55,7 +58,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      *
      * @return void
      */
-    protected function _construct() {
-        parent::_construct(); 
-    }   
+    protected function _construct()
+    {
+        parent::_construct();
+    }
 }

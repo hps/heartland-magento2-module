@@ -2,13 +2,14 @@
 /**
  *  Heartland payment method model
  *
- *  @category    HPS
- *  @package     HPS_Heartland
- *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
- *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 namespace HPS\Heartland\Helper;
+
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 
 /**
@@ -22,28 +23,31 @@ class Admin
     /**
      * @return \Magento\Backend\Model\Auth\Session
      */
-    public static function getSession(){
+    public static function getSession()
+    {
         return HPS_OM::getObjectManager()->get('Magento\Backend\Model\Auth\Session');
     }
 
     /**
      * @return bool
      */
-    public static function isLoggedIn(){
+    public static function isLoggedIn()
+    {
         return self::getSession()->isLoggedIn();
     }
 
     /**
      * @return bool|\Magento\User\Model\User
      */
-    public static function getAdmin(){
+    public static function getAdmin()
+    {
         return self::isLoggedIn() ? (int)self::getSession()->getUser() : false;
     }
     /**
      * @return bool|int
      */
-    public static function getAdminID(){
+    public static function getAdminID()
+    {
         return self::isLoggedIn() ? (int)self::getAdmin()->getId() : false;
     }
-
 }

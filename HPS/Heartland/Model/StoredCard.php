@@ -2,11 +2,11 @@
 /**
  *  Heartland payment method model
  *
- *  @category    HPS
- *  @package     HPS_Heartland
- *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
- *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 
 namespace HPS\Heartland\Model;
@@ -20,7 +20,8 @@ use \HPS\Heartland\Helper\Db;
  *
  * @package HPS\Heartland\Model
  */
-class StoredCard {
+class StoredCard
+{
     const TABLE_NAME = 'hps_heartland_storedcard';
 
     /** performs a db lookup for the current customer within the db given a specific token ID
@@ -29,9 +30,10 @@ class StoredCard {
      * @return bool|array
      * @throws \Exception
      */
-    public static function getToken($id,$custID = null) {
+    public static function getToken($id, $custID = null)
+    {
         $MuToken = false;
-        if(empty($custID) && Customer::isLoggedIn() ){
+        if (empty($custID) && Customer::isLoggedIn()) {
             $custID = Customer::getCustID();
         }
         if (!empty($custID)) {
@@ -43,15 +45,12 @@ class StoredCard {
                     )
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
-                $data = (array)$conn->fetchAll($select);
-                self::validate($data);
-                if (count($data) && key_exists('token_value', $data[0])) {
-                    $MuToken = $data[0]['token_value'];
+                $data = (array)$conn->fetchRow($select);                
+                if (count($data) && key_exists('token_value', $data)) {
+                    $MuToken = $data['token_value'];
                 }
             }
         }
-
-        //}
         return $MuToken;
     }
 
@@ -61,13 +60,14 @@ class StoredCard {
      *
      * @throws \Exception
      */
-    public static function deleteStoredCards($id) {
+    public static function deleteStoredCards($id)
+    {
             $conn = Db::db_connect();
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
-                $conn->delete(self::TABLE_NAME, array(
-                    'heartland_storedcard_id = ?' => (int)$id,
-                ));
-            }
+        if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+            $conn->delete(self::TABLE_NAME, [
+            'heartland_storedcard_id = ?' => (int)$id,
+            ]);
+        }
     }
 
     /** looks up existing stored cards for the currently logged on user
@@ -77,32 +77,18 @@ class StoredCard {
      *
      * @throws \Exception
      */
-    public static function getStoredCards() {
+    public static function getStoredCards()
+    {
         $data = [];
         if (Customer::isLoggedIn()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME],
-                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
+                        ['o' => self::TABLE_NAME]
                     )
-                    ->where('o.customer_id = ?', (int)Customer::getCustID())
-                ->group('o.token_value');
-                $tdata = (array)$conn->fetchAll($select);
-                self::validate($tdata);
-                if (!empty($tdata)) {
-                    foreach ($tdata as $item) {
-                        $conn = Db::db_connect();
-                        $select2 = $conn->select()
-                                ->from(['o' => self::TABLE_NAME])
-                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array) $conn->fetchAll($select2);
-                        self::validate($sdata);
-                        $data[] = $sdata[0];
-                    }
-                    self::validate($data); /**/
-                }
+                    ->where('o.customer_id = ?', (int)Customer::getCustID());
+                $data = (array)$conn->fetchAll($select);
             }
         }
 
@@ -113,34 +99,20 @@ class StoredCard {
      *
      * @return array
      *
-     *     
+     *
      */
-    public static function getStoredCardsAdmin($custID = null) {
+    public static function getStoredCardsAdmin($custID = null)
+    {
         $data = [];
         if ($custID !== null && $custID > 0 && self::getCanStoreCards()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME],
-                        ['heartland_storedcard_id' => 'max(heartland_storedcard_id)']
+                        ['o'=>self::TABLE_NAME]
                     )
-                    ->where('o.customer_id = ?', (int)$custID)
-                    ->group('o.token_value');
-                $tdata = (array)$conn->fetchAll($select);
-                if (!empty($tdata)) {
-                    self::validate($tdata);
-                    foreach ($tdata as $item) {
-                        $conn = Db::db_connect();
-                        $select2 = $conn->select()
-                                ->from(['o' => self::TABLE_NAME])
-                                ->where('o.heartland_storedcard_id = ?', $item["heartland_storedcard_id"]);
-                        $sdata = (array) $conn->fetchAll($select2);
-                        self::validate($sdata);
-                        $data[] = $sdata[0];
-                    }
-                    self::validate($data); /**/
-                }
+                    ->where('o.customer_id = ?', (int)$custID);
+                $data = (array)$conn->fetchAll($select);
             }
         }
 
@@ -151,8 +123,9 @@ class StoredCard {
      *
      * @return bool
      */
-    public static function getCanStoreCards() {
-        $retVal = (int)0;        
+    public static function getCanStoreCards()
+    {
+        $retVal = (int)0;
         if (Customer::isLoggedIn() || Admin::isLoggedIn()) {
             $conn = Db::db_connect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
@@ -180,22 +153,17 @@ class StoredCard {
      *
      * @throws \Exception
      */
-    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID) {
-        /*$args = func_get_args();
-        foreach ($args as $argName=>$arg) {
-            if ( preg_match('/[\W]/', $arg) !== 1){
-                throw new \Exception(__( $argName . ' must contain a value that includes only word characters' ));
-            }
-        }*/
+    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
+    {        
         $conn = Db::db_connect();
         if ($customerID) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 // try to prevent duplicat records in the table
-                $conn->delete(self::TABLE_NAME, array(
+                $conn->delete(self::TABLE_NAME, [
                     'customer_id = ?'   => (int)$customerID,
                     'token_value = ?' => $token,
-                ));
-                $conn->insert(self::TABLE_NAME, Array(
+                ]);
+                $conn->insert(self::TABLE_NAME, [
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
                         'customer_id'   => $customerID,
@@ -204,11 +172,9 @@ class StoredCard {
                         'cc_last4'      => (string)$last4,
                         'cc_exp_month'  => (string)$cc_exp_month,
                         'cc_exp_year'   => (string)$cc_exp_year,
-                    )
-                );
+                    ]);
             }
-        }
-        else {
+        } else {
             throw new \Exception(__('No valid User Logged On!! Cannot save card.'));
         }
     }
@@ -219,7 +185,8 @@ class StoredCard {
      * @return bool
      * @throws \Exception
      */
-    private static function validate($data) {
+    private static function validate($data)
+    {
         if (!empty($data)) {
             // some very basic validation.
             //simply dont want invalid arrays of data
@@ -235,5 +202,5 @@ class StoredCard {
             }
         }
         return true;
-    }
+    }    
 }

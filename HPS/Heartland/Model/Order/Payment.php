@@ -6,36 +6,36 @@
 
 
 namespace HPS\Heartland\Model\Order;
+
 /** Override these as Heartland wants to apply specific logic
  * Class Payment
  * @package HPS\Heartland\Model\Order
  */
-class Payment
-    extends \Magento\Sales\Model\Order\Payment {
+class Payment extends \Magento\Sales\Model\Order\Payment
+{
     private $_transactionRecord = null;
     /** Can Capture
      * @return bool
      */
 
-    public
-    function canCapture()
-    { //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
+    public function canCapture()
+    {
+ //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         try {
-
-            if (preg_match("/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
+            if (preg_match(
+                "/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
                            .\Magento\Sales\Api\Data\TransactionInterface::TYPE_ORDER.")$/",
-                           $this->getLastTransId()
-                ) === 1)
+                $this->getLastTransId()
+            ) === 1) {
                 return true;
+            }
             if ($this->getHPS() === null) {
                 return false;
-
             }
             return $this->_transactionRecord->settlementAmount > 0
                 ? false
                 : true;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -43,54 +43,46 @@ class Payment
     /**
      * @return bool
      */
-    public
-    function canVoid()
+    public function canVoid()
     {
         try {
-
             if ($this->getHPS() === null) {
                 return false;
-
             }
             return $this->_transactionRecord->transactionStatus === 'A'
                 ? true
                 : false;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
-
     }
 
     /** Heartlands gatewway does not ever support Multiple partial capture but does allow for 1 only. Attempts to do
      * multiple partial captures will result in a gateway error
      * @return bool
      */
-    public
-    function canCapturePartial()
+    public function canCapturePartial()
     {
         try {
-            if (preg_match("/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
+            if (preg_match(
+                "/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
                            .\Magento\Sales\Api\Data\TransactionInterface::TYPE_ORDER.")$/",
-                           $this->getLastTransId()
-                ) === 1)
+                $this->getLastTransId()
+            ) === 1) {
                 return true;
+            }
             if ($this->getHPS() === null) {
                 return false;
-
             }
             return $this->_transactionRecord->settlementAmount > 0
                 ? false
                 : true;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
-
     }
 
-    private
-    function getHPS()
+    private function getHPS()
     {
         try {
             /** @var \HpsServicesConfig $hps */
@@ -102,12 +94,11 @@ class Payment
                 $hps->versionNumber = $abs->getConfigData('versionNumber');
                 $creditService = new \HpsCreditService($hps);
                 $this->_transactionRecord = $creditService->get($this->getCcTransId());
-
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->_transactionRecord = null;
         }
-        finally{return $this->_transactionRecord;}
+        finally{return $this->_transactionRecord;
+        }
     }
 }
