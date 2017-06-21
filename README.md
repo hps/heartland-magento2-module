@@ -2,7 +2,7 @@
 ![image](heartland-logo.png)
 ### Welcome to Heartland Magento2 Extension:
 
-This project is in ready.
+Use Heartland Payment Systems SecureSubmit platform to charge, authorize, void, refund and partial refund credit cards. Allow customers to store their cards for reduced friction at next checkout using our multi-use card tokenization process which helps reduce PCI scope.
 
 ### Prerequisites:
 
