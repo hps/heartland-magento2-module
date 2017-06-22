@@ -101,17 +101,11 @@
                         </field>
                     </group>
                 </group>
-            </group>
-            
-            
-            
-            
-            
-            
+            </group>            
             <group id="hps_paypal" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Heartland Securesubmit Paypal</label>
                 <comment><![CDATA[<a href="http://developer.heartlandpaymentsystems.com/SecureSubmit" target="_blank">Click here to sign up for SecureSubmit account</a>]]></comment>
-                <attribute type="expanded">1</attribute>
+                <attribute type="expanded">0</attribute>
                 <field id="hps_paypal_active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enable this Solution</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -151,9 +145,29 @@
                     <depends>
                         <field id="use_sandbox">1</field>
                     </depends>
+                </field>                
+                <field id="device_id" translate="label" type="text" showInDefault="1" sortOrder="50" showInWebsite="1" showInStore="0">
+                    <label>Device ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
                 </field>
-                        
-                <field id="publicapikey" translate="label" type="text" showInDefault="1" sortOrder="60" showInWebsite="1" showInStore="0">
+                <field id="license_id" translate="label" type="text" showInDefault="1" sortOrder="55" showInWebsite="1" showInStore="0">
+                    <label>License ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field>
+                <field id="site_id" translate="label" type="text" showInDefault="1" sortOrder="60" showInWebsite="1" showInStore="0">
+                    <label>Site ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field> 
+                <field id="publicapikey" translate="label" type="text" showInDefault="1" sortOrder="65" showInWebsite="1" showInStore="0">
                     <label>Public Api Key</label>
                     <config_path>payment/hps_paypal/publicapikey</config_path>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
@@ -198,7 +212,7 @@
                     </comment>
                 </field>
 
-                <field id="use_http_proxy" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1">
+                <field id="use_http_proxy" translate="label" type="select" sortOrder="105" showInDefault="1" showInWebsite="1">
                     <label>Use HTTP Proxy</label>
                     <config_path>payment/hps_paypal/use_http_proxy</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -210,7 +224,8 @@
                         <field id="use_http_proxy">1</field>
                     </depends>
                     <attribute type="shared">1</attribute>
-                    <comment>Example: example.com</comment>
+                    <comment>Example: http://example.com</comment>
+                    <validate>validate-url</validate>
                 </field>
                 <field id="http_proxy_port" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1">
                     <label>HTTP Proxy Port</label>
@@ -220,6 +235,7 @@
                     </depends>
                     <attribute type="shared">1</attribute>
                     <comment>Example: 8888</comment>
+                    <validate>validate-number</validate>
                 </field>
                 <field id="debug" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
