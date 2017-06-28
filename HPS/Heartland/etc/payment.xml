@@ -13,5 +13,8 @@
         <method name="hps_heartland">
             <allow_multiple_address>1</allow_multiple_address>
         </method>
+        <method name="hps_paypal">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
     </methods>
 </payment>

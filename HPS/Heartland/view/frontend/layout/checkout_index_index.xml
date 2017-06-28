@@ -46,11 +46,11 @@
                                                                         <item name="hps_heartland" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
+                                                                        <item name="hps_paypal" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
                                                                     </item>
                                                                 </item>
-
-
-
                                                             </item>
                                                         </item>
                                                     </item>
