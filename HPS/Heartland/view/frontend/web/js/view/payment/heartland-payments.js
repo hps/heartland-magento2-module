@@ -24,16 +24,15 @@ define(
                     hpsPaymentMethod = 'hps_heartland',
                     hpsPaypalMethod = 'hps_paypal';
 
-            console.log(window.checkoutConfig);
 
             rendererList.push(
                     {
-                        type: 'hps_paypal',
-                        component: 'HPS_Heartland/js/view/payment/method-renderer/hpspaypal-method'
-                    },
-                    {
                         type: 'hps_heartland',
                         component: 'HPS_Heartland/js/view/payment/method-renderer/heartland-method'
+                    },
+                    {
+                        type: 'hps_paypal',
+                        component: 'HPS_Heartland/js/view/payment/method-renderer/hpspaypal-method'
                     }
             );
 
