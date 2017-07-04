@@ -187,23 +187,7 @@
                     <label>Credit Card Types</label>
                     <source_model>HPS\Heartland\Model\Source\CcType</source_model>
                     <config_path>payment/hps_paypal/cctypes</config_path>
-                </field>
-                <field id="paypal_credit" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable Paypal Credit</label>
-                    <comment><![CDATA[
-                                PayPal Express Checkout lets you give customers access to financing
-                                through Paypal Credit&#174; - at no additional cost to you.
-                                You get paid up front, even though customers have more time to pay.
-                                A pre-integrated payment button lets customers pay quickly with Paypal
-                                Credit&#174;.
-                                <a href="https://www.paypal.com/webapps/mpp/promotional-financing" target="_blank">Learn More</a>]]>
-                    </comment>
-                    <config_path>payment/hps_paypal_credit/active</config_path>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <requires>
-                        <field id="hps_paypal_active">0</field>
-                    </requires>
-                </field>
+                </field>                
                 <field id="custom_message" translate="label" type="textarea" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Custom Error Message</label>                            
                     <comment><![CDATA[

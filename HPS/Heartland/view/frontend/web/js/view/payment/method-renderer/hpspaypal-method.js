@@ -29,6 +29,8 @@ define(
         'Magento_Checkout/js/action/redirect-on-success'
     ],
     function (
+
+
         ko,
         $,
         Component,
@@ -53,7 +55,9 @@ define(
          */
         return Component.extend({
             defaults: {
-                template: 'HPS_Heartland/payment/heartland-paypal-form'
+                template: 'HPS_Heartland/payment/hpspaypal-form',
+                code: 'hps_paypal',
+                active: false,
 
             },
             
@@ -72,6 +76,25 @@ define(
                     self.hpsGetCanSave();
                 }
 
+            }
+            ,
+            hideNewCardForm: function(){
+                $("#iframes").fadeOut();
+            },
+            hpsGetCanSave: function(){
+                var data;
+                $("#saveCardCheck").parent().fadeOut();
+                if(customer.isLoggedIn()) {
+                    $.get("../heartland/creditcard/cansave/").success(function (data) {
+                        if (data === '1') {
+                            $("#saveCardCheck").parent().fadeIn();
+                        } else {
+                            $("#saveCardCheck").parent().fadeOut();
+                        }
+
+                    });
+                }
+                return data;
             },
             getCode: function () {
                 return 'hps_paypal';
@@ -123,8 +146,6 @@ define(
                 if (event) {
                     event.preventDefault();
                 }
-                console.log(this.getData());
-                return false;
                 if ($("#securesubmit_token").val() !== ''){
                     if (this.validate() && additionalValidators.validate()) {
                         this.isPlaceOrderActionAllowed(false);
