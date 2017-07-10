@@ -72,6 +72,20 @@ define(
                     console.log('in hps paypal');
                     console.log(this.getData());
                     console.log(quote.totals());
+                    
+                    //window.checkoutConfig
+                    
+                    $.ajax({
+                        url: "../heartland/paypal/createsession",
+                        showLoader: true,
+                        //data:window.checkoutConfig.quoteData,
+                        data:quote.getItems(),
+                        //context: $('#SavedCardsTable'),
+                        success: function (data) {
+                            console.log('From Server');
+                            console.log(data);
+                        }
+                    });
 
                     this.grandTotalAmount = quote.totals()['base_grand_total'];
 

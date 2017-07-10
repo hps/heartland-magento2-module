@@ -28,16 +28,20 @@ class CreateSession extends Action {
      * @var \Magento\Framework\Controller\Result\Json
      */
     private $resultJsonFactory;
+    private $createSessionModel;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-    \Magento\Framework\App\Action\Context $context, \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-    ) {
-        parent::__construct($context);
+    \Magento\Framework\App\Action\Context $context, 
+    \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory, 
+    \HPS\Heartland\Model\Paypal\CreateSession $createSessionModel            
+    ) {        
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->createSessionModel = $createSessionModel;
+        parent::__construct($context);
     }
 
     /** \HPS\Heartland\Controller\Hss\StoredCard::execute
@@ -50,9 +54,9 @@ class CreateSession extends Action {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
 
+        //$this->getRequest()->isAjax()
         // \HPS\Heartland\Model\StoredCard::getCanStoreCards
-        $response = [];
-        
+        $response = $this->createSessionModel->createPaypalSession();
 
         return $resultJson->setData($response);
     }
