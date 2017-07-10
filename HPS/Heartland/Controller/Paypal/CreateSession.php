@@ -53,11 +53,8 @@ class CreateSession extends Action {
     public function execute() {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
-
-        //$this->getRequest()->isAjax()
-        // \HPS\Heartland\Model\StoredCard::getCanStoreCards
+        //create the paypal session through model
         $response = $this->createSessionModel->createPaypalSession();
-
         return $resultJson->setData($response);
     }
 

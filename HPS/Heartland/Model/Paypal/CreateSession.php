@@ -17,6 +17,7 @@ use \HPS\Heartland\Helper\Admin;
 use \HPS\Heartland\Helper\Db;
 use \HPS\Heartland\Helper\Data as HPS_DATA;
 use Magento\Checkout\Model\Session;
+
 //use Magento\Quote\Api\CartItemRepositoryInterface as QuoteItemRepository;
 
 /**
@@ -33,7 +34,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
     private $request = false;
     private $checkoutSession;
     private $isSandboxMode = 0;
-    
+
     /**
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
@@ -44,41 +45,32 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
      */
     private $quoteItemRepository;
 
-
     public function __construct(
-            \Magento\Framework\Model\Context $context, 
-            \HpsServicesConfig $hpsConfig, 
-            \Magento\Framework\App\Request\Http $request,
-            Session $checkoutSession,
-            \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-            \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository
+    \Magento\Framework\Model\Context $context, \HpsServicesConfig $hpsConfig, \Magento\Framework\App\Request\Http $request, Session $checkoutSession, \Magento\Quote\Api\CartRepositoryInterface $quoteRepository, \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository
     ) {
         $this->heartlandApi = $hpsConfig;
         $this->request = $request;
         $this->checkoutSession = $checkoutSession;
         $this->quoteRepository = $quoteRepository;
-        $this->quoteItemRepository = $quoteItemRepository;  
+        $this->quoteItemRepository = $quoteItemRepository;
         $this->isSandboxMode = HPS_DATA::getConfig('payment/hps_paypal/use_sandbox');
     }
 
+    /*
+     * Create new paypal session using HPS portico service
+     */
     public function createPaypalSession() {
-
-        //$this->request->getParam('id')        
-        $quoteDetails = $this->request->getParams();
-        $response = [];
-        
-        $quoteData = [];
-        $quoteItemData = [];
+        $response = array();
+        $quoteItemData = array();
+        //get the quote details
         $quote = $this->checkoutSession->getQuote();
         $quoteId = $quote->getId();
-        if ($quoteId) {
+        if (!empty($quoteId)) {
             $quote = $this->quoteRepository->get($quoteId);
-            $quoteData = $quote->toArray();
-            
             $shippingAdress = $quote->getShippingAddress();
         }
-        
-        if (!empty($quoteDetails)) {
+        //create session when quote details not empty
+        if (!empty($quote)) {
             // Amount
             $amount = HPS_DATA::formatNumber2Precision($quote->getGrandTotal());
 
@@ -95,14 +87,14 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
             $payment->subtotal = HPS_DATA::formatNumber2Precision($quote->getSubtotal());
             $payment->shippingAmount = HPS_DATA::formatNumber2Precision($quote->getShippingAddress()->getShippingAmount());
             $payment->taxAmount = HPS_DATA::formatNumber2Precision($quote->getShippingAddress()->getTaxAmount());
-            $payment->paymentType = 'Sale'; 
-                        
+            $payment->paymentType = 'Sale';
+
 
             // Create ShippingInfo
             $shipping = new \HpsShippingInfo();
             $shipping->name = $shippingAdress->getName();
             $shipping->address = new \HpsAddress();
-            $shipping->address->address = $shippingAdress->getStreetLine(1) .', '. $shippingAdress->getStreetLine(2);
+            $shipping->address->address = $shippingAdress->getStreetLine(1) . ', ' . $shippingAdress->getStreetLine(2);
             $shipping->address->city = $shippingAdress->getCity();
             $shipping->address->state = $shippingAdress->getRegionCode();
             $shipping->address->zip = $shippingAdress->getPostcode();
@@ -111,7 +103,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
             // Line Items
             $items = array();
             $itemNumber = 1;
-            
+
             //get all items
             $quoteItems = $this->quoteItemRepository->getList($quoteId);
             foreach ($quoteItems as $index => $quoteItem) {
@@ -125,10 +117,10 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
                 $items[] = $item1;
             }
 
-            
+
             // Create session
             $config = new \HpsServicesConfig();
-            if($this->isSandboxMode == 1){
+            if ($this->isSandboxMode == 1) {
                 $config->username = HPS_DATA::getConfig('payment/hps_paypal/username');
                 $config->password = HPS_DATA::getConfig('payment/hps_paypal/password');
                 $config->deviceId = HPS_DATA::getConfig('payment/hps_paypal/device_id');
@@ -138,16 +130,45 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
             } else {
                 $config->secretApiKey = HPS_DATA::getConfig('payment/hps_paypal/secretapikey');
             }
-            
+            //call portico service
             $service = new \HpsPayPalService($config);
             $response = $service->createSession($amount, $currency, $buyer, $payment, $shipping, $items);
 
-            //$token = $response->sessionId;
-
-            return $response;
         }
+        return $this->sendResponse($response);
     }
     
-    
+    /*
+     * Process portico response. Send response to the controller
+     */
+    private function sendResponse($porticoResponse) {        
+        $finalResponse = array();
+        if (!empty($porticoResponse)) {
+            if ($porticoResponse->responseCode == 0) {
+                $finalResponse = array(
+                    'status' => 'success',
+                    'message' => __('Paypal session created successfully!'),
+                    'sessiondetails' => array(
+                        'sessionId' => $porticoResponse->sessionId,
+                        'redirectUrl' => $porticoResponse->redirectUrl,
+                        'transactionId' => $porticoResponse->transactionId
+                    )
+                );
+            } else {
+                $finalResponse = array(
+                    'status' => 'failure',
+                    'message' => __('Error in creating session'),
+                    'sessiondetails' => array()
+                );
+            }
+        } else {
+            $finalResponse = array(
+                'status' => 'failure',
+                'message' => __('Order details not found!'),
+                'sessiondetails' => array()
+            );
+        }
+        return $finalResponse;
+    }
 
 }
