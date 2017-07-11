@@ -1,10 +1,13 @@
 <!--
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
-<div class="payment-method paypal-class" data-bind="css: {'_active': (getCode() == isChecked())}">
+  ~  Heartland payment method model
+  ~
+  ~  @category    HPS
+  ~  @package     HPS_Heartland
+  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+  ~  @copyright   Heartland (http://heartland.us)
+  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+  -->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[method]"
@@ -22,48 +25,24 @@
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
-        </div>
-        <iframe width="0"
-                height="0"
-                data-bind="src: getSource(), attr: {id: getCode() + '-transparent-iframe', 'data-container': getCode() + '-transparent-iframe'}"
-                allowtransparency="true"
-                frameborder="0"
-                name="iframeTransparent"
-                class="payment-method-iframe">
-
-        </iframe>
-        <form class="form" id="co-transparent-form" action="#" method="post" data-bind="mageInit: {
-            'transparent':{
-                'context': context(),
-                'controller': getControllerName(),
-                'gateway': getCode(),
-                'orderSaveUrl':getPlaceOrderUrl(),
-                'cgiUrl': getCgiUrl(),
-                'dateDelim': getDateDelim(),
-                'cardFieldsMap': getCardFieldsMap(),
-                'nativeAction': getSaveOrderUrl()
-            }, 'validation':[]}">
-            <!-- ko template: 'Magento_Payment/payment/cc-form' --><!-- /ko -->
-        </form>
+        </div>        
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
+        <input id="hps_paypal_sessionId" name="hps_paypal_sessionId" type="hidden">
         <div class="actions-toolbar">
-            <div class="primary">
-                <button data-role="review-save"
-                        type="submit"
+            <div class="primary">                
+                <button class="action primary checkout"
                         data-bind="
+                            click: createPaypalSession,
                         attr: {title: $t('Place Order')},
-                        enable: (getCode() == isChecked()),
-                        click: placeOrder,
-                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        css: {disabled: !isPlaceOrderActionAllowed()},
+                        enable: (getCode() == isChecked())
                         "
-                        class="action primary checkout"
-                        disabled>
-                    <span data-bind="i18n: 'Place Order'"></span>
+                        >
+                    <span data-bind="text: $t('Place Order')"></span>
                 </button>
             </div>
         </div>
