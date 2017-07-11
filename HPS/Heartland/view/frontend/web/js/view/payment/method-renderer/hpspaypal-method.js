@@ -101,7 +101,7 @@ define(
                         method: 'POST',
                         success: function (data) {
                             if(data !== null){
-                                console.log(data);
+                                //console.log(data);
                                 if(data.status === 'success'){
                                     $('#hps_paypal_sessionId').val(data.sessiondetails.sessionId);
                                     //window.open(data.sessiondetails.redirectUrl,'WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700');

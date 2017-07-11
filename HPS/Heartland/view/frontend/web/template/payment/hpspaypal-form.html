@@ -32,6 +32,7 @@
             <!--/ko-->
         </div>
         <input id="hps_paypal_sessionId" name="hps_paypal_sessionId" type="hidden">
+        <span data-bind="text: $t('Note: You will be redirected to Paypal site!')"></span>
         <div class="actions-toolbar">
             <div class="primary">                
                 <button class="action primary checkout"
@@ -42,7 +43,7 @@
                         enable: (getCode() == isChecked())
                         "
                         >
-                    <span data-bind="text: $t('Place Order')"></span>
+                    <span data-bind="text: $t('Pay Via Paypal')"></span>
                 </button>
             </div>
         </div>
