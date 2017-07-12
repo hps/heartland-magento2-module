@@ -101,7 +101,133 @@
                         </field>
                     </group>
                 </group>
-            </group>
+            </group>            
+            <group id="hps_paypal" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Heartland Securesubmit Paypal</label>
+                <comment><![CDATA[<a href="http://developer.heartlandpaymentsystems.com/SecureSubmit" target="_blank">Click here to sign up for SecureSubmit account</a>]]></comment>
+                <attribute type="expanded">0</attribute>
+                <field id="hps_paypal_active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable this Solution</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/hps_paypal/active</config_path>
+                    <comment><![CDATA[All values in Heartland SecureSubmit Settings must be set]]></comment>
+                    <requires>
+                        <group id="heartland_required"/>
+                    </requires>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <config_path>payment/hps_paypal/title</config_path>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                    <config_path>payment/hps_paypal/order_status</config_path>
+                </field>
+                <field id="use_sandbox" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Use Sandbox</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/hps_paypal/use_sandbox</config_path>
+                    <comment><![CDATA[Please ensure your account is configured for multi-use tokens!!]]></comment>
+                </field>
+                <field id="username" translate="label" type="text" showInDefault="1" sortOrder="40" showInWebsite="1" showInStore="0">
+                    <label>Username</label>
+                    <config_path>payment/hps_paypal/username</config_path>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field>
+                <field id="password" translate="label" type="obscure" showInDefault="1" sortOrder="50" showInWebsite="1" showInStore="0">
+                    <label>Password</label>
+                    <config_path>payment/hps_paypal/password</config_path>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field>                
+                <field id="device_id" translate="label" type="text" showInDefault="1" sortOrder="50" showInWebsite="1" showInStore="0">
+                    <label>Device ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field>
+                <field id="license_id" translate="label" type="text" showInDefault="1" sortOrder="55" showInWebsite="1" showInStore="0">
+                    <label>License ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field>
+                <field id="site_id" translate="label" type="text" showInDefault="1" sortOrder="60" showInWebsite="1" showInStore="0">
+                    <label>Site ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">1</field>
+                    </depends>
+                </field> 
+                <field id="publicapikey" translate="label" type="text" showInDefault="1" sortOrder="65" showInWebsite="1" showInStore="0">
+                    <label>Public Api Key</label>
+                    <config_path>payment/hps_paypal/publicapikey</config_path>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">0</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="secretapikey" translate="label" type="obscure" showInDefault="1" sortOrder="70" showInWebsite="1" showInStore="0">
+                    <label>Secret Api Key</label>
+                    <config_path>payment/hps_paypal/secretapikey</config_path>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="use_sandbox">0</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="cctypes" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Credit Card Types</label>
+                    <source_model>HPS\Heartland\Model\Source\CcType</source_model>
+                    <config_path>payment/hps_paypal/cctypes</config_path>
+                </field>                
+                <field id="custom_message" translate="label" type="textarea" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Custom Error Message</label>                            
+                    <comment><![CDATA[
+                                To use the default Secure Submit error message use %s in the custom message text, ex.
+                                My message. %s -> will be displayed as: My message. Original Secure Submit message.]]>
+                    </comment>
+                </field>
+
+                <field id="use_http_proxy" translate="label" type="select" sortOrder="105" showInDefault="1" showInWebsite="1">
+                    <label>Use HTTP Proxy</label>
+                    <config_path>payment/hps_paypal/use_http_proxy</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <attribute type="shared">1</attribute>
+                </field>
+                <field id="http_proxy_host" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1">
+                    <label>HTTP Proxy Host</label>
+                    <depends>
+                        <field id="use_http_proxy">1</field>
+                    </depends>
+                    <attribute type="shared">1</attribute>
+                    <comment>Example: http://example.com</comment>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                <field id="http_proxy_port" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1">
+                    <label>HTTP Proxy Port</label>
+                    <depends>
+                        <field id="use_http_proxy">1</field>
+                    </depends>
+                    <attribute type="shared">1</attribute>
+                    <comment>Example: 8888</comment>
+                    <validate>required-entry validate-number</validate>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/hps_paypal/debug</config_path>
+                </field>
+            </group>            
         </section>
     </system>
 </config>

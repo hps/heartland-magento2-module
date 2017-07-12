@@ -10,23 +10,34 @@
 /*browser:true*/
 /*global define*/
 define(
-    [
-        'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list'
-    ],
-    function (
-        Component,
-        rendererList
-    ) {
-        'use strict';
-        rendererList.push(
-            {
-                type: 'hps_heartland',
-                component: 'HPS_Heartland/js/view/payment/method-renderer/heartland-method'
-            }
-        );
-        /** Add view logic here if needed */
-        return Component.extend({});
-        
-    }
+        [
+            'uiComponent',
+            'Magento_Checkout/js/model/payment/renderer-list'
+        ],
+        function (
+                Component,
+                rendererList
+                ) {
+            'use strict';
+
+            var config = window.checkoutConfig.payment,
+                    hpsPaymentMethod = 'hps_heartland',
+                    hpsPaypalMethod = 'hps_paypal';
+
+
+            rendererList.push(
+                    {
+                        type: 'hps_heartland',
+                        component: 'HPS_Heartland/js/view/payment/method-renderer/heartland-method'
+                    },
+                    {
+                        type: 'hps_paypal',
+                        component: 'HPS_Heartland/js/view/payment/method-renderer/hpspaypal-method'
+                    }
+            );
+
+            /** Add view logic here if needed */
+            return Component.extend({});
+
+        }
 );

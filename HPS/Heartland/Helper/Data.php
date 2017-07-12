@@ -48,6 +48,9 @@ class Data extends AbstractHelper
      *
      */
     const P_KEY_PATTERN = '/^pkapi\_(cert|)[\w]{5,245}$/';
+    
+    const AMOUNT_PRECISION = 2;
+
 
     /**
      * @param $config_path
@@ -117,5 +120,9 @@ class Data extends AbstractHelper
     public static function getCurrencyCode()
     {
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getCurrentCurrency()->getCode();
+    }
+    
+    public static function formatNumber2Precision($number){
+        return number_format($number, self::AMOUNT_PRECISION);
     }
 }
