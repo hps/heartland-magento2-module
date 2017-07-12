@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  Heartland payment method model
  *
@@ -22,7 +21,8 @@ use \Magento\Framework\UrlInterface;
  * @package HPS\Heartland\Controller\Paypal\CreateSession
  * \HPS\Heartland\Controller\Paypal\CreateSession
  */
-class CreateSession extends Action {
+class CreateSession extends Action
+{
 
     /**
      * @var \Magento\Framework\Controller\Result\Json
@@ -35,10 +35,10 @@ class CreateSession extends Action {
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-    \Magento\Framework\App\Action\Context $context, 
-    \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory, 
-    \HPS\Heartland\Model\Paypal\CreateSession $createSessionModel            
-    ) {        
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \HPS\Heartland\Model\Paypal\CreateSession $createSessionModel     
+    ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->createSessionModel = $createSessionModel;
         parent::__construct($context);
@@ -50,12 +50,12 @@ class CreateSession extends Action {
      * @throws \Exception
      * @return \Magento\Framework\Controller\Result\Json
      */
-    public function execute() {
+    public function execute()
+    {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
         //create the paypal session through model
         $response = $this->createSessionModel->createPaypalSession();
         return $resultJson->setData($response);
     }
-
 }
