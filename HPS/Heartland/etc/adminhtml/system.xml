@@ -211,17 +211,16 @@
                     </depends>
                     <attribute type="shared">1</attribute>
                     <comment>Example: http://example.com</comment>
-                    <validate>validate-url</validate>
+                    <validate>required-entry validate-url</validate>
                 </field>
                 <field id="http_proxy_port" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1">
                     <label>HTTP Proxy Port</label>
-                    <config_path>payment/payflow_advanced/proxy_port</config_path>
                     <depends>
                         <field id="use_http_proxy">1</field>
                     </depends>
                     <attribute type="shared">1</attribute>
                     <comment>Example: 8888</comment>
-                    <validate>validate-number</validate>
+                    <validate>required-entry validate-number</validate>
                 </field>
                 <field id="debug" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>

@@ -119,7 +119,6 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
                     $items[] = $item1;
                 }
 
-
                 // Create session
                 $config = new \HpsServicesConfig();
                 if ($this->isSandboxMode == 1) {
@@ -131,6 +130,14 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
                     $config->soapServiceUri = 'https://api-uat.heartlandportico.com/paymentserver.v1/PosGatewayService.asmx?wsdl';
                 } else {
                     $config->secretApiKey = HPS_DATA::getConfig('payment/hps_paypal/secretapikey');
+                }
+                // Use HTTP proxy
+                if (HPS_DATA::getConfig('payment/hps_paypal/use_http_proxy')) {
+                    $config->useProxy = true;
+                    $config->proxyOptions = array(
+                        'proxy_port' => HPS_DATA::getConfig('payment/hps_paypal/http_proxy_port'),
+                        'proxy_host' => HPS_DATA::getConfig('payment/hps_paypal/http_proxy_host'),
+                    );
                 }
                 //call portico service
                 $service = new \HpsPayPalService($config);
