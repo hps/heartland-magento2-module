@@ -34,6 +34,7 @@ class Paypal extends \Magento\Payment\Model\Method\Cc
     protected $_code = self::CODE;
     
     protected $_isGateway = true;
+    protected $_canUseInternal   = false;
     protected $_canCapture = true;
     protected $_canCapturePartial = true;
     protected $_canRefund = true;

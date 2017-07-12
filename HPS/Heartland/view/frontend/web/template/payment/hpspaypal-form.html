@@ -32,7 +32,11 @@
             <!--/ko-->
         </div>
         <input id="hps_paypal_sessionId" name="hps_paypal_sessionId" type="hidden">
-        <span data-bind="text: $t('Note: You will be redirected to Paypal site!')"></span>
+        <span data-bind="text: $t('Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.')"></span>
+        <a href="https://www.paypal.com/us/webapps/mpp/paypal-popup" 
+           class="about_paypal"
+           onclick="javascript:window.open('https://www.paypal.com/us/webapps/mpp/paypal-popup','HpsPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=650, height=600'); return false;" 
+           title="What is PayPal?">What is PayPal?</a>
         <div class="actions-toolbar">
             <div class="primary">                
                 <button class="action primary checkout"

@@ -14,7 +14,6 @@
         <arguments>
             <argument name="methodCodes" xsi:type="array">
                 <item name="hps_heartland" xsi:type="const">HPS\Heartland\Model\Payment::CODE</item>
-                <item name="hps_paypal" xsi:type="const">HPS\Heartland\Model\Paypal::CODE</item>
             </argument>
         </arguments>
     </virtualType>
