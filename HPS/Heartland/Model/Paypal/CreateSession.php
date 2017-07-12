@@ -135,6 +135,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
                 //call portico service
                 $service = new \HpsPayPalService($config);
                 $response = $service->createSession($amount, $currency, $buyer, $payment, $shipping, $items);
+            } else {
+                $errorMessage = 'Order details not found!';
             }
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
@@ -147,9 +149,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
      */
     private function sendResponse($porticoResponse, $message = '') {        
         $finalResponse = array();
-        if (!empty($porticoResponse)) {
-            if ($porticoResponse->responseCode == 0) {
-                $finalResponse = array(
+        if (!empty($porticoResponse) && $porticoResponse->responseCode == 0) {
+            $finalResponse = array(
                     'status' => 'success',
                     'message' => __('Paypal session created successfully!'),
                     'sessiondetails' => array(
@@ -158,17 +159,10 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel {
                         'transactionId' => $porticoResponse->transactionId
                     )
                 );
-            } else {
-                $finalResponse = array(
-                    'status' => 'error',
-                    'message' => __('Error in creating session ') . $message,
-                    'sessiondetails' => array()
-                );
-            }
         } else {
             $finalResponse = array(
                 'status' => 'error',
-                'message' => __('Order details not found! ') . $message,
+                'message' => __('Error in creating session! ') . $message,
                 'sessiondetails' => array()
             );
         }

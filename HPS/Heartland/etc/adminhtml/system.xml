@@ -174,6 +174,7 @@
                     <depends>
                         <field id="use_sandbox">0</field>
                     </depends>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="secretapikey" translate="label" type="obscure" showInDefault="1" sortOrder="70" showInWebsite="1" showInStore="0">
                     <label>Secret Api Key</label>
@@ -182,6 +183,7 @@
                     <depends>
                         <field id="use_sandbox">0</field>
                     </depends>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="cctypes" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Credit Card Types</label>
