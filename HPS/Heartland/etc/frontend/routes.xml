@@ -20,5 +20,8 @@
         <route id="hpspaypal" frontName="hpspaypal">
             <module name="HPS_Heartland" />
         </route>
+		 <route id="orderreview" frontName="hpsorder">
+            <module name="HPS_Heartland" />
+        </route>
     </router>
 </config>

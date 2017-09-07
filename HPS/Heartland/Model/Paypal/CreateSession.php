@@ -46,6 +46,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
      * @var QuoteItemRepository
      */
     private $quoteItemRepository;
+	
+	private $cartManagement;
 
     public function __construct(
         \HpsServicesConfig $hpsConfig,
@@ -56,8 +58,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
         \HpsPaymentData $paymentInfo,
         \HpsShippingInfo $shipping,
         \HpsServicesConfig $hpsServicesConfig,
-        \HpsAddress $address
-            
+        \HpsAddress $address,
+		\Magento\Quote\Api\CartManagementInterface $cartManagement	            
     ) {
         $this->heartlandApi = $hpsConfig;
         $this->checkoutSession = $checkoutSession;
@@ -69,7 +71,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
         $this->shipping = $shipping;
         $this->shipping->address = $address;
         $this->servicesConfig = $hpsServicesConfig;
-    }
+		$this->cartManagement = $cartManagement;
+	}
 
     /*
      * Create new paypal session using HPS portico service
@@ -84,6 +87,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
             //get the quote details
             $quote = $this->checkoutSession->getQuote();
             $quoteId = $quote->getId();
+			
             if (!empty($quoteId)) {
                 $quote = $this->quoteRepository->get($quoteId);
                 $shippingAdress = $quote->getShippingAddress();
@@ -97,8 +101,9 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                 $currency = $quote->getQuoteCurrencyCode();
 
                 // Create BuyerInfo                
-                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'checkout';
-                $this->buyer->cancelUrl = $this->buyer->returnUrl;
+                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'hpsorder/paypal/orderreview';
+              //$this->buyer->cancelUrl = $this->buyer->returnUrl;
+                $this->buyer->cancelUrl = HPS_DATA::getBaseUrl() . 'checkout/cart';
 
                 // Create PaymentInfo                
                 $this->paymentInfo->subtotal = HPS_DATA::formatNumber2Precision($quote->getSubtotal());
@@ -150,9 +155,14 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                         'proxy_host' => HPS_DATA::getConfig('payment/hps_paypal/http_proxy_host'),
                     ];
                 }
+				// Adding product to order
+				//$quote->getPayment()->setMethod('paypal');
+				//$this->cartManagement->placeOrder($quoteId);
+					
                 //call portico service
                 $service = new \HpsPayPalService($this->servicesConfig);
                 $response = $service->createSession($amount, $currency, $this->buyer, $this->paymentInfo, $this->shipping, $items);
+			
             } else {
                 $errorMessage = 'Order details not found!';
             }

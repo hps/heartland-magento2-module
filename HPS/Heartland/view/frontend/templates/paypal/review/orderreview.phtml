@@ -1,0 +1,50 @@
+<h1><?php // echo $this->getOrderTxt(); ?></h1>
+<?php
+//$lid = $this->getOrderId();
+ $lid = '14';
+echo  "Order ID:".$lid."<br/>";
+		 
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$order = $objectManager->create('Magento\Sales\Model\Order')->load($lid);
+//echo '<pre>'; print_r($order->debug()); echo '</pre>';
+// Grand Total
+$totall = $order->getGrandTotal();
+echo "Order Total:".$totall."<br/>";
+
+echo '<h1> Customer Details </h1>';
+
+// Shipping Details
+$shippingAddress = $order->getShippingAddress();
+$billingAddress = $order->getBillingAddress();
+
+echo '<h3> Billing Address </h3>';
+//echo '<pre>'; print_r($billingAddress->debug()); echo '</pre>';
+echo $billingAddress->getFirstname().' '.$billingAddress->getLastname();
+//echo $billingAddress->getStreet();
+echo $billingAddress->getCity().', '.$billingAddress->getRegion().' '.$billingAddress->getPostcode();
+echo $billingAddress->getTelephone();  
+
+echo '<h3> Shipping Address </h3>';
+//echo '<pre>'; print_r($shippingAddress->debug()); echo '</pre>';
+echo $shippingAddress->getFirstname().' '.$shippingAddress->getLastname();
+//echo $shippingAddress->getStreet();
+echo $shippingAddress->getCity().', '.$shippingAddress->getRegion().' '.$shippingAddress->getPostcode();
+echo $shippingAddress->getTelephone();  
+
+
+// Product Items
+$items = $order->getAllItems();
+foreach($items as $i):
+	$_product = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());	
+	// echo '<pre>'; print_r($_product->debug()); echo '</pre>';
+		$_productName = $_product->getName();
+		$_productSku = $_product->getSku();
+		$_productId = $_product->getId();
+		$_productPrice = $_product->getPrice();		
+
+		echo "product Name:".$_productName."<br/>";
+		echo "product sku:".$_productSku."<br/>";
+		echo "product ID:".$_productId."<br/>";
+		echo "product Price:".$_productPrice."<br/>";
+endforeach;  
+?>
