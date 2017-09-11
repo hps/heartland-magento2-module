@@ -23,5 +23,11 @@
 		 <route id="orderreview" frontName="hpsorder">
             <module name="HPS_Heartland" />
         </route>
+		<route id="cancelorder" frontName="hpsordercancel">
+            <module name="HPS_Heartland" />
+        </route>
+		<route id="completeorder" frontName="hpsordercomplete">
+            <module name="HPS_Heartland" />
+        </route>
     </router>
 </config>

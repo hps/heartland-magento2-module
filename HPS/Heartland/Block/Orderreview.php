@@ -12,9 +12,9 @@ namespace HPS\Heartland\Block;
  
 class Orderreview extends \Magento\Framework\View\Element\Template
 {
-    public function getOrderTxt()
-    {
-        return 'Hello world!';
+    public function getOrderId()
+    {       
+		return $_GET['oid'];
     }
 }
  

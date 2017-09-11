@@ -87,7 +87,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
             //get the quote details
             $quote = $this->checkoutSession->getQuote();
             $quoteId = $quote->getId();
-			
+						
             if (!empty($quoteId)) {
                 $quote = $this->quoteRepository->get($quoteId);
                 $shippingAdress = $quote->getShippingAddress();
@@ -101,9 +101,8 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                 $currency = $quote->getQuoteCurrencyCode();
 
                 // Create BuyerInfo                
-                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'hpsorder/paypal/orderreview';
-              //$this->buyer->cancelUrl = $this->buyer->returnUrl;
-                $this->buyer->cancelUrl = HPS_DATA::getBaseUrl() . 'checkout/cart';
+                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'hpsorder/paypal/orderreview?oid='.$quoteId;
+                $this->buyer->cancelUrl = HPS_DATA::getBaseUrl() . 'hpsordercancel/paypal/cancelorder?orderid='.$quoteId;
 
                 // Create PaymentInfo                
                 $this->paymentInfo->subtotal = HPS_DATA::formatNumber2Precision($quote->getSubtotal());
@@ -156,9 +155,9 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                     ];
                 }
 				// Adding product to order
-				//$quote->getPayment()->setMethod('paypal');
-				//$this->cartManagement->placeOrder($quoteId);
-					
+				$quote->getPayment()->setMethod('paypal');
+				$this->cartManagement->placeOrder($quoteId);
+			
                 //call portico service
                 $service = new \HpsPayPalService($this->servicesConfig);
                 $response = $service->createSession($amount, $currency, $this->buyer, $this->paymentInfo, $this->shipping, $items);
