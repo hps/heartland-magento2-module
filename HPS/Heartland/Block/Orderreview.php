@@ -16,6 +16,5 @@ class Orderreview extends \Magento\Framework\View\Element\Template
     {       
 		return $_GET['oid'];
     }
-}
- 
+} 
 ?> 

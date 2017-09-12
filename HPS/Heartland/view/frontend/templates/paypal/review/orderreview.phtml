@@ -108,7 +108,6 @@ $billingAddress = $order->getBillingAddress();
 	<form method="POST">		
 		<a href="<?php echo $this->getUrl('hpsordercancel/paypal/cancelorder').'?orderid='.$order->getEntityId(); ?>">Cancel Order</a>
 		<a href="<?php echo $this->getUrl('hpsordercomplete/paypal/completeorder').'?orderid='.$order->getEntityId(); ?>">Place Order</a>
-		<input type="submit" name="placeorder" value="Place Order" class="button checkout-button">
 		<input type="hidden" name="orederid" value="<?php echo $lid; ?>">		
 	</form>
     </div>

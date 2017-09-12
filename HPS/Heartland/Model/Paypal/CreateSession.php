@@ -129,7 +129,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                     $item1->name = filter_var($quoteItem->getName(), FILTER_SANITIZE_SPECIAL_CHARS);
                     $item1->description = $quoteItem->getDescription();
                     $item1->number = $itemNumber++;
-                    $item1->amount = HPS_DATA::formatNumber2Precision($quoteItem->getBaseRowTotal());
+                    $item1->amount = HPS_DATA::formatNumber2Precision($quoteItem->getBasePrice());
                     $item1->quantity = $quoteItem->getQty();
                     $item1->taxAmount = HPS_DATA::formatNumber2Precision($quoteItem->getTaxAmount());
                     $items[] = $item1;
