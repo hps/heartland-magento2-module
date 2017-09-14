@@ -1,7 +1,7 @@
 <?php
 $order = $this->getOrderId();
 $product = $this->getProductId();
-//echo '<pre>'; print_r($product->debug()); echo '</pre>';
+
 $shippingAddress = $order->getShippingAddress();
 $billingAddress = $order->getBillingAddress();
 ?>
@@ -71,8 +71,10 @@ $billingAddress = $order->getBillingAddress();
                     <td><?php echo $_productQty; ?></td>
                     <td><?php echo $_productPrice * $_productQty; ?></td>                
                 </tr>
-                <?php $j++;
-            endforeach; ?>
+                <?php
+                $j++;
+            endforeach;
+            ?>
         </tbody>
         <tfoot>
             <tr class="active">
@@ -86,7 +88,7 @@ $billingAddress = $order->getBillingAddress();
                 <td>
                     <?php echo $order->getSubtotal(); ?> <br>
                     <?php echo $order->getShippingAmount(); ?> <br>
-<?php echo $order->getTaxAmount(); ?> <br>
+                    <?php echo $order->getTaxAmount(); ?> <br>
                     <strong> <?php echo $order->getGrandTotal(); ?> </strong>
                 </td>
             </tr>

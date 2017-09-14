@@ -15,8 +15,6 @@ namespace HPS\Heartland\Block;
 use \Magento\Framework\App\Action\Context;
 use \Magento\Framework\App\ObjectManager as HPS_OM;
 
-//use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
-
 class Orderreview extends \Magento\Framework\View\Element\Template {
 
     /**
@@ -30,7 +28,6 @@ class Orderreview extends \Magento\Framework\View\Element\Template {
 
     public function getOrderId() {
         $lid = filter_input(INPUT_GET, 'oid');
-        //exit;
         $objectManager = HPS_OM::getInstance();
         $order = $objectManager->create('Magento\Sales\Model\Order')->load($lid);
         return $order;
