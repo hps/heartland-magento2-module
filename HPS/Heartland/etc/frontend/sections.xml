@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!--
-  ~  Heartland payment method model
-  ~
-  ~  @category    HPS
-  ~  @package     HPS_Heartland
-  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
-  ~  @copyright   Heartland (http://heartland.us)
-  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-  -->
+~  Heartland payment method model
+~
+~  @category    HPS
+~  @package     HPS_Heartland
+~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+~  @copyright   Heartland (http://heartland.us)
+~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+-->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">

@@ -33,7 +33,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     {
         $customerId = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');
         $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
-       //Retrieve customer id from customer mail id
+        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
             try {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();

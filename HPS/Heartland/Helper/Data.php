@@ -91,8 +91,7 @@ class Data extends AbstractHelper
      */
     public static function jsonData()
     {
-
-        $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);        
+        $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
 
         if (empty($inputs) === true && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $post = HPS_OM::getObjectManager()->get('Magento\Framework\App\RequestInterface')->getPostValue();
@@ -122,7 +121,8 @@ class Data extends AbstractHelper
         return (string) HPS_OM::getObjectManager()->get(self::CLASS_STOREMANAGERINTERFACE)->getStore()->getCurrentCurrency()->getCode();
     }
     
-    public static function formatNumber2Precision($number){
+    public static function formatNumber2Precision($number)
+    {
         return number_format($number, self::AMOUNT_PRECISION);
     }
 }

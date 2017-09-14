@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Heartland payment method model
  *
@@ -8,13 +9,43 @@
  * @copyright   Heartland (http://heartland.us)
  * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
+
 namespace HPS\Heartland\Block;
- 
-class Orderreview extends \Magento\Framework\View\Element\Template
-{
-    public function getOrderId()
-    {       
-		return $_GET['oid'];
+
+use \Magento\Framework\App\Action\Context;
+use \Magento\Framework\App\ObjectManager as HPS_OM;
+
+//use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
+
+class Orderreview extends \Magento\Framework\View\Element\Template {
+
+    /**
+     * Internal constructor, that is called from real constructor
+     *
+     * @return void
+     */
+    protected function _construct() {
+        parent::_construct();
     }
-} 
-?> 
+
+    public function getOrderId() {
+        $lid = filter_input(INPUT_GET, 'oid');
+        //exit;
+        $objectManager = HPS_OM::getInstance();
+        $order = $objectManager->create('Magento\Sales\Model\Order')->load($lid);
+        return $order;
+    }
+
+    public function getProductId() {
+        $order = $this->getOrderId();
+        $items = $order->getAllItems();
+        $objectManager = HPS_OM::getInstance();
+        $j = 0;
+        foreach ($items as $i):
+            $product[$j] = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());
+            $j++;
+        endforeach;
+        return $product;
+    }
+
+}

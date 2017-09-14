@@ -28,9 +28,8 @@ use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
  *
  * @package HPS\Heartland\Model
  */
-class Paypal extends \Magento\Payment\Model\Method\Cc 
+class Paypal extends \Magento\Payment\Model\Method\Cc
 {
-
     const CODE = 'hps_paypal';
 
     protected $_code = self::CODE;
@@ -85,7 +84,8 @@ class Paypal extends \Magento\Payment\Model\Method\Cc
      * @api
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         if (!$this->canAuthorize()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The authorize action is not available.'));
         }
@@ -102,7 +102,8 @@ class Paypal extends \Magento\Payment\Model\Method\Cc
      * @api
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
         }
@@ -119,7 +120,8 @@ class Paypal extends \Magento\Payment\Model\Method\Cc
      * @api
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The refund action is not available.'));
         }

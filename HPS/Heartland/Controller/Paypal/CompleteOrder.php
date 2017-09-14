@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Heartland payment method model
  *
@@ -10,7 +11,7 @@
  */
 
 namespace HPS\Heartland\Controller\Paypal;
- 
+
 use \Magento\Framework\Controller\ResultFactory;
 use \HPS\Heartland\Helper\Customer;
 use \HPS\Heartland\Helper\Admin;
@@ -19,29 +20,26 @@ use \HPS\Heartland\Helper\Data as HPS_DATA;
 use \Magento\Checkout\Model\Session;
 use \Magento\Sales\Model\Order;
 
-class CompleteOrder extends \Magento\Framework\App\Action\Action
-{
+class CompleteOrder extends \Magento\Framework\App\Action\Action {
+
     protected $resultPageFactory;
 
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        array $data = [])
-    {
+    \Magento\Framework\App\Action\Context $context, \Magento\Framework\View\Result\PageFactory $resultPageFactory, array $data = []) {
         $this->resultPageFactory = $resultPageFactory;
-        return parent::__construct($context,$data);
+        return parent::__construct($context, $data);
     }
 
-    public function execute()
-    {
+    public function execute() {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         $orderId = $this->getRequest()->getParam('orderid');
-		$order = $objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+        $order = $objectManager->create('Magento\Sales\Model\Order')->load($orderId);
         $orderState = Order::STATE_COMPLETE;
-		$order->setState($orderState)->setStatus(Order::STATE_COMPLETE);
-		$order->save();
+        $order->setState($orderState)->setStatus(Order::STATE_COMPLETE);
+        $order->save();
         $resultRedirect->setUrl(HPS_DATA::getBaseUrl() . 'checkout/onepage/success');
         return $resultRedirect;
     }
+
 }

@@ -20,7 +20,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
 
     public function canCapture()
     {
- //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
+        //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         try {
             if (preg_match(
                 "/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
@@ -97,8 +97,8 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             }
         } catch (\Exception $e) {
             $this->_transactionRecord = null;
-        }
-        finally{return $this->_transactionRecord;
+        } finally {
+            return $this->_transactionRecord;
         }
     }
 }

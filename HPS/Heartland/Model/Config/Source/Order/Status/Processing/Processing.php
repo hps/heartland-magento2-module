@@ -15,7 +15,6 @@ use \Magento\Sales\Model\Config\Source\Order\Status\Processing as OProcess;
 
 class Processing extends OProcess
 {
-
     public function toOptionArray()
     {
         $statuses = $this->_stateStatuses

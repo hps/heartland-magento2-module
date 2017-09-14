@@ -9,15 +9,12 @@
  *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
 namespace HPS\Heartland\Helper;
+
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
-
-
 
 class HPS_Responses
 {
-
-    public static
-    function getMessageManager()
+    public static function getMessageManager()
     {
         /**
          * @var \Magento\Framework\Message\ManagerInterface $messageManager
@@ -25,6 +22,4 @@ class HPS_Responses
         $messageManager = HPS_OM::getObjectManager()->get('\Magento\Framework\Message\ManagerInterface');
         return $messageManager;
     }
-
-
 }

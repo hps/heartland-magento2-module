@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Heartland payment method model
  *
@@ -10,22 +11,21 @@
  */
 
 namespace HPS\Heartland\Controller\Paypal;
- 
+
 use \Magento\Framework\App\Action\Context;
- 
-class OrderReview extends \Magento\Framework\App\Action\Action
-{
+
+class OrderReview extends \Magento\Framework\App\Action\Action {
+
     protected $_resultPageFactory;
- 
-    public function __construct(Context $context, \Magento\Framework\View\Result\PageFactory $resultPageFactory)
-    {
+
+    public function __construct(Context $context, \Magento\Framework\View\Result\PageFactory $resultPageFactory) {
         $this->_resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
- 
-    public function execute()
-    {
+
+    public function execute() {      
         $resultPage = $this->_resultPageFactory->create();
         return $resultPage;
     }
+
 }
