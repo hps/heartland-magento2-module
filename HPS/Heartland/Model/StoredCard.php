@@ -45,7 +45,7 @@ class StoredCard
                     )
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
-                $data = (array)$conn->fetchRow($select);                
+                $data = (array)$conn->fetchRow($select);
                 if (count($data) && key_exists('token_value', $data)) {
                     $MuToken = $data['token_value'];
                 }
@@ -62,7 +62,7 @@ class StoredCard
      */
     public static function deleteStoredCards($id)
     {
-            $conn = Db::db_connect();
+        $conn = Db::db_connect();
         if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
             $conn->delete(self::TABLE_NAME, [
             'heartland_storedcard_id = ?' => (int)$id,
@@ -154,7 +154,7 @@ class StoredCard
      * @throws \Exception
      */
     public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
-    {        
+    {
         $conn = Db::db_connect();
         if ($customerID) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
@@ -202,5 +202,5 @@ class StoredCard
             }
         }
         return true;
-    }    
+    }
 }

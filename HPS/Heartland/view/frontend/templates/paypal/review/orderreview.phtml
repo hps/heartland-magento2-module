@@ -1,0 +1,116 @@
+<?php
+$order = $this->getOrderId();
+$product = $this->getProductId();
+
+$shippingAddress = $order->getShippingAddress();
+$billingAddress = $order->getBillingAddress();
+?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-11">
+            <h1>Order details:</h1>
+        </div>
+    </div>
+
+    <hr>
+    <div class="row">
+        <div class="col-md-6 info" style="float:left;width:50%">
+            <strong>Billing Info:</strong><br>
+            <?php echo $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(); ?> </br>
+            <?php
+            echo $billingAddress->getStreetLine(1);
+            if ($billingAddress->getStreetLine(2)) {
+                echo ', ' . $billingAddress->getStreetLine(2);
+            }
+            ?> </br>
+            <?php echo $billingAddress->getCity() . ', ' . $billingAddress->getRegion(); ?> </br>
+            <?php echo $billingAddress->getCountry_id() . ' ' . $billingAddress->getPostcode(); ?> </br>
+            <?php echo 'T: ' . $billingAddress->getTelephone(); ?>          
+        </div>
+        <div class="col-md-6 info">
+            <strong>Shipping Info:</strong><br>
+            <?php echo $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(); ?> </br>
+            <?php
+            echo $shippingAddress->getStreetLine(1);
+            if ($shippingAddress->getStreetLine(2)) {
+                echo ' , ' . $shippingAddress->getStreetLine(2);
+            }
+            ?> </br>
+            <?php echo $shippingAddress->getCity() . ', ' . $shippingAddress->getRegion(); ?> </br>
+            <?php echo $shippingAddress->getCountry_id() . ' ' . $shippingAddress->getPostcode(); ?> </br>
+            <?php echo 'T: ' . $shippingAddress->getTelephone(); ?> </br></br>                   
+        </div>
+    </div>
+
+    <hr>
+    <table class="table">
+        <thead>
+            <tr class="active">
+                <th width="10%">Name</th>
+                <th width="60%">SKU</th>
+                <th width="10%">Amount</th>
+                <th width="10%">Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Product Items
+            $j = 0;
+            $items = $order->getAllItems();
+            foreach ($items as $i):
+                $_productName = $product[$j]->getName();
+                $_productSku = $product[$j]->getSku();
+                $_productPrice = $product[$j]->getPrice();
+                $_productQty = intval($i->getQtyOrdered());
+                ?>
+                <tr>
+                    <td><?php echo $_productName; ?></td>
+                    <td><?php echo $_productSku; ?></td>
+                    <td><?php echo $_productPrice; ?></td>
+                    <td><?php echo $_productQty; ?></td>
+                    <td><?php echo $_productPrice * $_productQty; ?></td>                
+                </tr>
+                <?php
+                $j++;
+            endforeach;
+            ?>
+        </tbody>
+        <tfoot>
+            <tr class="active">
+                <td colspan="3">&nbsp;</td>
+                <td>
+                    Subtotal:<br>
+                    Shipping:<br>
+                    Tax:<br>
+                    <strong>Total:</strong>
+                </td>
+                <td>
+                    <?php echo $order->getSubtotal(); ?> <br>
+                    <?php echo $order->getShippingAmount(); ?> <br>
+                    <?php echo $order->getTaxAmount(); ?> <br>
+                    <strong> <?php echo $order->getGrandTotal(); ?> </strong>
+                </td>
+            </tr>
+        </tfoot>
+    </table>     
+
+    <hr>
+    <div class="row" style="float:right;">
+        <div class="col-md-6">
+            <form method="POST">		
+                <a href="<?php echo $this->getUrl('hpsordercancel/paypal/cancelorder') . '?orderid=' . $order->getEntityId(); ?>">Cancel Order</a>
+                <a href="<?php echo $this->getUrl('hpsordercomplete/paypal/completeorder') . '?orderid=' . $order->getEntityId(); ?>">Place Order</a>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    require([
+        'Magento_Customer/js/customer-data'
+    ], function (customerData) {
+        var sections = ['cart'];
+        customerData.invalidate(sections);
+        customerData.reload(sections, true);
+    });
+</script>

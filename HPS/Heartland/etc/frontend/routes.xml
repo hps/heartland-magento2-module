@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!--
-  ~  Heartland payment method model
-  ~
-  ~  @category    HPS
-  ~  @package     HPS_Heartland
-  ~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
-  ~  @copyright   Heartland (http://heartland.us)
-  ~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
-  -->
+~  Heartland payment method model
+~
+~  @category    HPS
+~  @package     HPS_Heartland
+~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+~  @copyright   Heartland (http://heartland.us)
+~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+-->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/App/etc/routes.xsd">
     <router id="standard">
@@ -18,6 +18,15 @@
             <module name="HPS_Heartland"/>
         </route>
         <route id="hpspaypal" frontName="hpspaypal">
+            <module name="HPS_Heartland" />
+        </route>
+        <route id="orderreview" frontName="hpsorder">
+            <module name="HPS_Heartland" />
+        </route>
+        <route id="cancelorder" frontName="hpsordercancel">
+            <module name="HPS_Heartland" />
+        </route>
+        <route id="completeorder" frontName="hpsordercomplete">
             <module name="HPS_Heartland" />
         </route>
     </router>

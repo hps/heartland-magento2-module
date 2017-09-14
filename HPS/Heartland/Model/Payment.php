@@ -158,7 +158,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsServicesConfig $config,
         array $data = []
     ) {
-    
         parent::__construct(
             $context,
             $registry,
@@ -293,7 +292,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // \Magento\Payment\Model\Method\Cc::_validateExpDate
         if (!$this->_validateExpDate($info->getCcExpYear(), $info->getCcExpMonth())) {
             $errorMsg = __('Please enter a valid credit card expiration date. ');
-        }        
+        }
         */
         if ($errorMsg) {
             // \Magento\Framework\Exception\LocalizedException::__construct
@@ -313,7 +312,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function validateCcNum($ccNumber)
     {
- // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
+        // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
         return preg_match('/^[\d]{4}$/', $ccNumber) === 1;
     }
 
@@ -334,7 +333,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
-
         $cardHolder = new \HpsCardHolder();
         // \Magento\Sales\Model\Order\Address::getName
         //$splitName = explode(' ', $billing->getName());
@@ -746,8 +744,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         } catch (\Exception $e) {
             $errorMsg[]
                 = $e->getMessage();
-        }
-        finally {
+        } finally {
             // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
             if (count($errorMsg) || empty($response->transactionId)) {
@@ -809,13 +806,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /*
      * This method is a fix for the issue when customer id is not present in current order object
      * This issue faced in admin order / reorder page
-     * 
+     *
      */
     private function _getOrderCustomerId($orderObj)
     {
         $customerId = $orderObj->getCustomerId();
         $customerEmail = $orderObj->getCustomerEmail();
-       //Retrieve customer id from customer mail id
+        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
             try {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -855,7 +852,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private function getAdditionalData()
     {
-
         static $data = [];
         if (count($data) < 1) {
             $data = (array) $this->getPaymentMethod();

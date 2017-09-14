@@ -23,8 +23,7 @@ use Magento\Checkout\Model\Session;
  *
  * @package HPS\Heartland\Model
  */
-class CreateSession extends \Magento\Framework\Model\AbstractModel
-{
+class CreateSession extends \Magento\Framework\Model\AbstractModel {
 
     /**
      * @var bool|\HpsServicesConfig
@@ -46,18 +45,10 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
      * @var QuoteItemRepository
      */
     private $quoteItemRepository;
+    private $cartManagement;
 
     public function __construct(
-        \HpsServicesConfig $hpsConfig,
-        Session $checkoutSession,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository,
-        \HpsBuyerData $buyer,
-        \HpsPaymentData $paymentInfo,
-        \HpsShippingInfo $shipping,
-        \HpsServicesConfig $hpsServicesConfig,
-        \HpsAddress $address
-            
+    \HpsServicesConfig $hpsConfig, Session $checkoutSession, \Magento\Quote\Api\CartRepositoryInterface $quoteRepository, \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository, \HpsBuyerData $buyer, \HpsPaymentData $paymentInfo, \HpsShippingInfo $shipping, \HpsServicesConfig $hpsServicesConfig, \HpsAddress $address, \Magento\Quote\Api\CartManagementInterface $cartManagement
     ) {
         $this->heartlandApi = $hpsConfig;
         $this->checkoutSession = $checkoutSession;
@@ -69,21 +60,22 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
         $this->shipping = $shipping;
         $this->shipping->address = $address;
         $this->servicesConfig = $hpsServicesConfig;
+        $this->cartManagement = $cartManagement;
     }
 
     /*
      * Create new paypal session using HPS portico service
      */
 
-    public function createPaypalSession() 
-    {
+    public function createPaypalSession() {
         $response = [];
-        $errorMessage = '';        
+        $errorMessage = '';
         try {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             //get the quote details
             $quote = $this->checkoutSession->getQuote();
             $quoteId = $quote->getId();
+
             if (!empty($quoteId)) {
                 $quote = $this->quoteRepository->get($quoteId);
                 $shippingAdress = $quote->getShippingAddress();
@@ -96,11 +88,11 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                 // Currency
                 $currency = $quote->getQuoteCurrencyCode();
 
-                // Create BuyerInfo                
-                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'checkout';
-                $this->buyer->cancelUrl = $this->buyer->returnUrl;
+                // Create BuyerInfo
+                $this->buyer->returnUrl = HPS_DATA::getBaseUrl() . 'hpsorder/paypal/orderreview?oid=' . $quoteId;
+                $this->buyer->cancelUrl = HPS_DATA::getBaseUrl() . 'hpsordercancel/paypal/cancelorder?orderid=' . $quoteId;
 
-                // Create PaymentInfo                
+                // Create PaymentInfo
                 $this->paymentInfo->subtotal = HPS_DATA::formatNumber2Precision($quote->getSubtotal());
                 $this->paymentInfo->shippingAmount = HPS_DATA::formatNumber2Precision($quote->getShippingAddress()->getShippingAmount());
                 $this->paymentInfo->taxAmount = HPS_DATA::formatNumber2Precision($quote->getShippingAddress()->getTaxAmount());
@@ -125,7 +117,7 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                     $item1->name = filter_var($quoteItem->getName(), FILTER_SANITIZE_SPECIAL_CHARS);
                     $item1->description = $quoteItem->getDescription();
                     $item1->number = $itemNumber++;
-                    $item1->amount = HPS_DATA::formatNumber2Precision($quoteItem->getBaseRowTotal());
+                    $item1->amount = HPS_DATA::formatNumber2Precision($quoteItem->getBasePrice());
                     $item1->quantity = $quoteItem->getQty();
                     $item1->taxAmount = HPS_DATA::formatNumber2Precision($quoteItem->getTaxAmount());
                     $items[] = $item1;
@@ -150,6 +142,10 @@ class CreateSession extends \Magento\Framework\Model\AbstractModel
                         'proxy_host' => HPS_DATA::getConfig('payment/hps_paypal/http_proxy_host'),
                     ];
                 }
+                // Adding product to order
+                $quote->getPayment()->setMethod('paypal');
+                $this->cartManagement->placeOrder($quoteId);
+
                 //call portico service
                 $service = new \HpsPayPalService($this->servicesConfig);
                 $response = $service->createSession($amount, $currency, $this->buyer, $this->paymentInfo, $this->shipping, $items);
