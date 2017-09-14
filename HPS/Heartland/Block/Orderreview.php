@@ -33,15 +33,16 @@ class Orderreview extends \Magento\Framework\View\Element\Template {
         return $order;
     }
 
-    public function getProductId() {
+   public function getProductId() {
         $order = $this->getOrderId();
         $items = $order->getAllItems();
         $objectManager = HPS_OM::getInstance();
-        $j = 0;
-        foreach ($items as $i):
-            $product[$j] = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());
-            $j++;
-        endforeach;
+        $product = array();
+        if(!empty($items)){
+            foreach ($items as $i){
+                $product[] = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());
+            }
+        }
         return $product;
     }
 
