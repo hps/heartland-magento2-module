@@ -37,7 +37,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var bool
      */
-    public $_token_value = false;
+    public $token_value = false;
     /** Maps the HPS transaction type indicators to the Magento word strings
      * @array $transactionTypeMap
      */
@@ -51,45 +51,45 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $_code = self::CODE;
+    private $code = self::CODE;
     /**
      * @var bool
      */
-    private $_isGateway = true;
+    private $isGateway = true;
     /**
      * @var bool
      */
-    private $_canCapture = true;
+    private $canCapture = true;
     /**
      * @var bool
      */
-    private $_canOrder  = true;
-    private $_canCancel = true;
+    private $canOrder  = true;
+    private $canCancel = true;
 
     /**
      * @var bool
      */
-    private $_canCapturePartial = true;
+    private $canCapturePartial = true;
     /**
      * @var bool
      */
-    private $_canRefund = true;
+    private $canRefund = true;
     /**
      * @var bool
      */
-    private $_canRefundInvoicePartial = true;
+    private $canRefundInvoicePartial = true;
     /**
      * @var bool
      */
-    private $_canAuthorize = true;
+    private $canAuthorize = true;
     /**
      * @var int
      */
-    private $_save_token_value = 0;
+    private $save_token_value = 0;
     /**
      * @var bool|\HpsServicesConfig
      */
-    private $_heartlandApi = false;
+    private $heartlandApi = false;
     /**
      * @var null
      */
@@ -98,15 +98,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var \Magento\Directory\Model\CountryFactory
      */
-    private $_countryFactory;
+    private $countryFactory;
     /**
      * @var float
      */
-    private $_minAmount = 0.01;
+    private $minAmount = 0.01;
     /**
      * @var array
      */
-    private $_debugReplacePrivateDataKeys
+    private $debugReplacePrivateDataKeys
         = ['number',
            'exp_month',
            'exp_year',
@@ -114,11 +114,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var bool
      */
-    private $_context = false;
+    private $context = false;
     /**
      * @var array
      */
-    private $_heartlandConfigFields
+    private $heartlandConfigFields
         = ['developerId'   => '002914',
            'versionNumber' => '1573',];
 
@@ -126,7 +126,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @var \Magento\Framework\Message\ManagerInterface $messageManager
      */
     private $messageManager = null;
-    private $_objectManager = null;
+    private $objectManager = null;
 
     /**
      * Payment constructor.
@@ -174,20 +174,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $data
         );
         // \HPS\Heartland\Model\countryFactory
-        // \HPS\Heartland\Model\Payment::$_countryFactory
-        $this->_countryFactory = $countryFactory;
-        // \HPS\Heartland\Model\Payment::$_heartlandApi
+        // \HPS\Heartland\Model\Payment::$countryFactory
+        $this->countryFactory = $countryFactory;
+        // \HPS\Heartland\Model\Payment::$heartlandApi
         // \HpsServicesConfig
-        $this->_heartlandApi = $config;
+        $this->heartlandApi = $config;
         // \HpsServicesConfig::$secretApiKey
-        $this->_heartlandApi->secretApiKey = $this->getConfigData('private_key');
+        $this->heartlandApi->secretApiKey = $this->getConfigData('private_key');
         // \HpsServicesConfig::$developerId
-        $this->_heartlandApi->developerId = $this->_heartlandConfigFields['developerId'];
+        $this->heartlandApi->developerId = $this->heartlandConfigFields['developerId'];
         // \HpsServicesConfig::$versionNumber
-        $this->_heartlandApi->versionNumber = $this->_heartlandConfigFields['versionNumber'];
-        $this->_objectManager               = HPS_OM::getObjectManager();
+        $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
+        $this->objectManager               = HPS_OM::getObjectManager();
         $this->messageManager
-                                            = $this->_objectManager->get('\Magento\Framework\Message\ManagerInterface');
+                                            = $this->objectManager->get('\Magento\Framework\Message\ManagerInterface');
         ;
     }
     //public
@@ -322,9 +322,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private function getHpsCreditService()
     {
-        // \HPS\Heartland\Model\Payment::$_heartlandApi
+        // \HPS\Heartland\Model\Payment::$heartlandApi
         // \HpsCreditService::__construct
-        return new \HpsCreditService($this->_heartlandApi);
+        return new \HpsCreditService($this->heartlandApi);
     }
 
     /**
@@ -372,12 +372,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $address->state = $this->__sanitize($billing->getRegion());
         // \Magento\Sales\Model\Order\Address::getPostcode
         $address->zip = \HpsInputValidation::cleanZipCode($billing->getPostcode());
-        // \HPS\Heartland\Model\Payment::$_countryFactory
+        // \HPS\Heartland\Model\Payment::$countryFactory
         // \Magento\Directory\Model\CountryFactory::create
         // \Magento\Directory\Model\Country::loadByCode
         // \Magento\Sales\Model\Order\Address::getCountryId
         // \Magento\Directory\Model\Country::getName
-        $address->country = $this->_countryFactory->create()->loadByCode($billing->getCountryId())->getName();
+        $address->country = $this->countryFactory->create()->loadByCode($billing->getCountryId())->getName();
 
         return $address;
     }
@@ -840,13 +840,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function saveMuToken()
     {
         $data                    = $this->getAdditionalData();
-        $this->_save_token_value = 0;
-        if (array_key_exists('_save_token_value', $data)) {
-            $this->_save_token_value = (int) $data['_save_token_value'];
+        $this->save_token_value = 0;
+        if (array_key_exists('save_token_value', $data)) {
+            $this->save_token_value = (int) $data['save_token_value'];
         }
-        $this->log($this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
+        $this->log($this->save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
 
-        return $this->_save_token_value;
+        return $this->save_token_value;
     }
 
     /** returns additional_data element of paymentMethod
@@ -914,7 +914,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     /**
      * this method sets the instance  \HpsTokenData::$tokenValue
-     * If the \HPS\Heartland\Model\Payment::$_token_value that is sent is an integer only then we assume it is a
+     * If the \HPS\Heartland\Model\Payment::$token_value that is sent is an integer only then we assume it is a
      * primary key for hps_heartland_storedcard and perform a lookup
      *
      * @param \HpsTokenData $suToken
@@ -928,20 +928,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->getTokenValue();
         $this->log(HPS_STORED_CARDS::getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
-        if (!empty($this->_token_value) && is_numeric($this->_token_value) && !empty($custID) && HPS_STORED_CARDS::getCanStoreCards()) {
-            $this->log($this->_token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');
-            $this->_token_value = HPS_STORED_CARDS::getToken($this->_token_value, $custID);
+        if (!empty($this->token_value) && is_numeric($this->token_value) && !empty($custID) && HPS_STORED_CARDS::getCanStoreCards()) {
+            $this->log($this->token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');
+            $this->token_value = HPS_STORED_CARDS::getToken($this->token_value, $custID);
         }
        
-        // \HPS\Heartland\Model\Payment::$_token_value
-        $suToken->tokenValue = $this->_token_value;
+        // \HPS\Heartland\Model\Payment::$token_value
+        $suToken->tokenValue = $this->token_value;
         $this->log($suToken, '\HPS\Heartland\Model\Payment::getToken Method suToken:  ');
         
         return $suToken;
     }
 
     /**
-     * gets/assigns $this->_token_value from post data
+     * gets/assigns $this->token_value from post data
      */
     private function getTokenValue()
     {
@@ -953,7 +953,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         
         $r = (!empty($data['token_value'])) ? $data['token_value'] : '';
         // ensure that the string is clean and has not leading or trailing whitespace
-        $this->_token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
+        $this->token_value = (string) trim(filter_var($r, FILTER_SANITIZE_STRING));
     }
 
    

@@ -19,7 +19,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * @var \Magento\Config\Model\Config
      */
-    private $_backendConfig;
+    private $backendConfig;
 
     /**
      * @param \Magento\Backend\Block\Context $context
@@ -35,7 +35,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
         \Magento\Config\Model\Config $backendConfig,
         array $data = []
     ) {
-        $this->_backendConfig = $backendConfig;
+        $this->backendConfig = $backendConfig;
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
@@ -69,7 +69,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
         $isPaymentEnabled = false;
         foreach ($activityPaths as $activityPath) {
             $isPaymentEnabled = $isPaymentEnabled
-                || (bool)(string)$this->_backendConfig->getConfigDataValue($activityPath);
+                || (bool)(string)$this->backendConfig->getConfigDataValue($activityPath);
         }
 
         return $isPaymentEnabled;

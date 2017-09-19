@@ -23,7 +23,7 @@ use Magento\Payment\Model\MethodInterface;
 
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
-    private $_template = 'HPS_Heartland::form/cc.phtml';
+    private $template = 'HPS_Heartland::form/cc.phtml';
 
     /** in context gets stored cards from database for the selected customer
      * @return array

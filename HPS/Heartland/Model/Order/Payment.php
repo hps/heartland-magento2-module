@@ -13,7 +13,7 @@ namespace HPS\Heartland\Model\Order;
  */
 class Payment extends \Magento\Sales\Model\Order\Payment
 {
-    private $_transactionRecord = null;
+    private $transactionRecord = null;
     /** Can Capture
      * @return bool
      */
@@ -32,7 +32,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->settlementAmount > 0
+            return $this->transactionRecord->settlementAmount > 0
                 ? false
                 : true;
         } catch (\Exception $e) {
@@ -49,7 +49,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->transactionStatus === 'A'
+            return $this->transactionRecord->transactionStatus === 'A'
                 ? true
                 : false;
         } catch (\Exception $e) {
@@ -74,7 +74,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->settlementAmount > 0
+            return $this->transactionRecord->settlementAmount > 0
                 ? false
                 : true;
         } catch (\Exception $e) {
@@ -86,19 +86,19 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     {
         try {
             /** @var \HpsServicesConfig $hps */
-            if ($this->getCcTransId() && $this->_transactionRecord === null) {
+            if ($this->getCcTransId() && $this->transactionRecord === null) {
                 $hps                = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
                 $abs                = $this->getMethodInstance();
                 $hps->secretApiKey  = $abs->getConfigData('private_key');
                 $hps->developerId   = $abs->getConfigData('developerId');
                 $hps->versionNumber = $abs->getConfigData('versionNumber');
                 $creditService = new \HpsCreditService($hps);
-                $this->_transactionRecord = $creditService->get($this->getCcTransId());
+                $this->transactionRecord = $creditService->get($this->getCcTransId());
             }
         } catch (\Exception $e) {
-            $this->_transactionRecord = null;
+            $this->transactionRecord = null;
         }
-        finally{return $this->_transactionRecord;
+        finally{return $this->transactionRecord;
         }
     }
 }
