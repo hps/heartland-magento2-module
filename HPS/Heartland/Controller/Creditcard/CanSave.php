@@ -47,7 +47,7 @@ class CanSave extends \Magento\Framework\App\Action\Action
         /** @var \Magento\Framework\Controller\Result\Raw $resultRaw */
         $resultRaw = $this->resultRawFactory->create();
 
-        // \HPS\Heartland\Model\StoredCard::getCanStoreCards
+        // # \HPS\Heartland\Model\StoredCard::getCanStoreCards
         return $resultRaw->setContents((int) StoredCard::getCanStoreCards());
     }
 }

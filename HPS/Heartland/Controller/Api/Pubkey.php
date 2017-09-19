@@ -19,7 +19,7 @@ use \HPS\Heartland\Helper\Data as HPS_DATA;
  * @package HPS\Heartland\Controller\Hss
  *
  */
-// \HPS\Heartland\Controller\Api\Pubkey
+// # \HPS\Heartland\Controller\Api\Pubkey
 class Pubkey extends \Magento\Framework\App\Action\Action
 {
     /**

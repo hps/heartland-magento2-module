@@ -67,10 +67,10 @@ class Get extends Action
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
 
-        // \HPS\Heartland\Model\StoredCard::getCanStoreCards
+        // # \HPS\Heartland\Model\StoredCard::getCanStoreCards
         $response = [];
         if (HPS_STORED_CARDS::getCanStoreCards()) {
-            // \HPS\Heartland\Model\StoredCard::getStoredCards
+            // # \HPS\Heartland\Model\StoredCard::getStoredCards
             $data = HPS_STORED_CARDS::getStoredCards(); /**/
             if (!empty($data)) {
                 foreach ($data as $row) {

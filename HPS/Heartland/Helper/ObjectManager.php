@@ -12,7 +12,7 @@
 
 namespace HPS\Heartland\Helper;
 
-// HPS\Heartland\Helper\ObjectManager::getObjectManager()
+// # \HPS\Heartland\Helper\ObjectManager::getObjectManager()
 use \Magento\Framework\App\ObjectManager as MAGE_OM;
 
 /**
