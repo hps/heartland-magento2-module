@@ -37,7 +37,7 @@ class Group extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function _getHeaderCommentHtml($element)
+    private function _getHeaderCommentHtml($element)
     {
         $groupConfig = $element->getGroup();
 
@@ -63,7 +63,7 @@ class Group extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return bool
      */
-    protected function _isCollapseState($element)
+    private function _isCollapseState($element)
     {
         $extra = $this->_authSession->getUser()->getExtra();
         if (isset($extra['configState'][$element->getId()])) {

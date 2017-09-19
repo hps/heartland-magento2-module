@@ -41,7 +41,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /** Maps the HPS transaction type indicators to the Magento word strings
      * @array $transactionTypeMap
      */
-    protected $transactionTypeMap
+    private $transactionTypeMap
         = [\HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
            \HpsTransactionType::CAPTURE   => Transaction::TYPE_ORDER,
            \HpsTransactionType::CHARGE    => Transaction::TYPE_CAPTURE,
@@ -51,62 +51,62 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $_code = self::CODE;
+    private $_code = self::CODE;
     /**
      * @var bool
      */
-    protected $_isGateway = true;
+    private $_isGateway = true;
     /**
      * @var bool
      */
-    protected $_canCapture = true;
+    private $_canCapture = true;
     /**
      * @var bool
      */
-    protected $_canOrder  = true;
-    protected $_canCancel = true;
+    private $_canOrder  = true;
+    private $_canCancel = true;
 
     /**
      * @var bool
      */
-    protected $_canCapturePartial = true;
+    private $_canCapturePartial = true;
     /**
      * @var bool
      */
-    protected $_canRefund = true;
+    private $_canRefund = true;
     /**
      * @var bool
      */
-    protected $_canRefundInvoicePartial = true;
+    private $_canRefundInvoicePartial = true;
     /**
      * @var bool
      */
-    protected $_canAuthorize = true;
+    private $_canAuthorize = true;
     /**
      * @var int
      */
-    protected $_save_token_value = 0;
+    private $_save_token_value = 0;
     /**
      * @var bool|\HpsServicesConfig
      */
-    protected $_heartlandApi = false;
+    private $_heartlandApi = false;
     /**
      * @var null
      */
-    protected $storeId = null;
+    private $storeId = null;
 
     /**
      * @var \Magento\Directory\Model\CountryFactory
      */
-    protected $_countryFactory;
+    private $_countryFactory;
     /**
      * @var float
      */
-    protected $_minAmount = 0.01;
+    private $_minAmount = 0.01;
     /**
      * @var array
      */
-    protected $_debugReplacePrivateDataKeys
+    private $_debugReplacePrivateDataKeys
         = ['number',
            'exp_month',
            'exp_year',
@@ -114,11 +114,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var bool
      */
-    protected $_context = false;
+    private $_context = false;
     /**
      * @var array
      */
-    protected $_heartlandConfigFields
+    private $_heartlandConfigFields
         = ['developerId'   => '002914',
            'versionNumber' => '1573',];
 

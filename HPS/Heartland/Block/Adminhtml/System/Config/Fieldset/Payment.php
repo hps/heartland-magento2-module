@@ -19,7 +19,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * @var \Magento\Config\Model\Config
      */
-    protected $_backendConfig;
+    private $_backendConfig;
 
     /**
      * @param \Magento\Backend\Block\Context $context
@@ -45,7 +45,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function _getFrontendClass($element)
+    private function _getFrontendClass($element)
     {
         $enabledString = $this->_isPaymentEnabled($element) ? ' enabled' : '';
         return parent::_getFrontendClass($element) . ' with-button' . $enabledString;
@@ -57,7 +57,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return bool
      */
-    protected function _isPaymentEnabled($element)
+    private function _isPaymentEnabled($element)
     {
         $groupConfig = $element->getGroup();
         $activityPaths = isset($groupConfig['activity_path']) ? $groupConfig['activity_path'] : [];
@@ -82,7 +82,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return string
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function _getHeaderTitleHtml($element)
+    private function _getHeaderTitleHtml($element)
     {
         $html = '<div class="config-heading" ><div class="heading"><strong>' . $element->getLegend();
 
@@ -139,7 +139,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function _getHeaderCommentHtml($element)
+    private function _getHeaderCommentHtml($element)
     {
         return '';
     }
@@ -151,7 +151,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return false
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function _isCollapseState($element)
+    private function _isCollapseState($element)
     {
         return false;
     }

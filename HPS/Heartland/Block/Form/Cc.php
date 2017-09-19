@@ -23,7 +23,7 @@ use Magento\Payment\Model\MethodInterface;
 
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
-    protected $_template = 'HPS_Heartland::form/cc.phtml';
+    private $_template = 'HPS_Heartland::form/cc.phtml';
 
     /** in context gets stored cards from database for the selected customer
      * @return array
@@ -58,7 +58,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      *
      * @return void
      */
-    protected function _construct()
+    private function _construct()
     {
         parent::_construct();
     }
