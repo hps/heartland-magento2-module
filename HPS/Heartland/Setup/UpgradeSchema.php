@@ -27,7 +27,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     ) {
         $setup->startSetup();
         if (version_compare($context->getVersion(), "1.0.10", "<")) {
-            //Your upgrade script
+            return 'Version not supported'; //Your upgrade script
         }
         $setup->endSetup();
     }

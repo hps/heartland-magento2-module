@@ -405,8 +405,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $requestedAmount = 0.00,
         $paymentAction = \HpsTransactionType::CHARGE
     ) {
-
-
         // Sanitize
 
         /**
@@ -487,8 +485,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
                 //We know we dont have a valid transaction id so its time to throw an error
             }// all of these types of transactions require a transaction id from  previous transaction
-
-
             /*
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
              * objects
@@ -657,7 +653,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $response,
                 'HPS\Heartland\Model\Payment Capture Method Saving MUPT Results: $response->tokenData->tokenValue '
             );
-
 
             $this->log((array) $response, 'HPS\Heartland\Model\Payment _process Method Called: Done ');
 

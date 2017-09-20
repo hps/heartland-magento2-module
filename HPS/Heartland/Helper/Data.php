@@ -42,8 +42,6 @@ class Data extends AbstractHelper
      *
      */
     const CLASS_STOREMANAGERINTERFACE = 'Magento\Store\Model\StoreManagerInterface';
-
-
     /**
      *
      */
