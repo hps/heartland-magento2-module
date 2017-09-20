@@ -45,7 +45,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    private function _getFrontendClass($element)
+    protected function _getFrontendClass($element)
     {
         $enabledString = $this->_isPaymentEnabled($element) ? ' enabled' : '';
         return parent::_getFrontendClass($element) . ' with-button' . $enabledString;
@@ -82,7 +82,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return string
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function _getHeaderTitleHtml($element)
+    protected function _getHeaderTitleHtml($element)
     {
         $html = '<div class="config-heading" ><div class="heading"><strong>' . $element->getLegend();
 
@@ -139,7 +139,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    private function _getHeaderCommentHtml($element)
+    protected function _getHeaderCommentHtml($element)
     {
         return '';
     }
@@ -151,7 +151,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @return false
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    private function _isCollapseState($element)
+    protected function _isCollapseState($element)
     {
         return false;
     }
