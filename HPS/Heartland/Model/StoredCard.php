@@ -37,7 +37,7 @@ class StoredCard
             $custID = Customer::getCustID();
         }
         if (!empty($custID)) {
-            $conn = Db::db_connect();
+            $conn = Db::dbConnect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
@@ -46,7 +46,7 @@ class StoredCard
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
                 $data = (array)$conn->fetchRow($select);
-                if (count($data) && key_exists('token_value', $data)) {
+                if (!empty($data) && key_exists('token_value', $data)) {
                     $MuToken = $data['token_value'];
                 }
             }
@@ -62,7 +62,7 @@ class StoredCard
      */
     public static function deleteStoredCards($id)
     {
-            $conn = Db::db_connect();
+            $conn = Db::dbConnect();
         if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
             $conn->delete(self::TABLE_NAME, [
             'heartland_storedcard_id = ?' => (int)$id,
@@ -81,7 +81,7 @@ class StoredCard
     {
         $data = [];
         if (Customer::isLoggedIn()) {
-            $conn = Db::db_connect();
+            $conn = Db::dbConnect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
@@ -105,7 +105,7 @@ class StoredCard
     {
         $data = [];
         if ($custID !== null && $custID > 0 && self::getCanStoreCards()) {
-            $conn = Db::db_connect();
+            $conn = Db::dbConnect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
@@ -127,7 +127,7 @@ class StoredCard
     {
         $retVal = (int)0;
         if (Customer::isLoggedIn() || Admin::isLoggedIn()) {
-            $conn = Db::db_connect();
+            $conn = Db::dbConnect();
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
@@ -155,7 +155,7 @@ class StoredCard
      */
     public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
     {
-        $conn = Db::db_connect();
+        $conn = Db::dbConnect();
         if ($customerID) {
             if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
                 // try to prevent duplicat records in the table
@@ -175,7 +175,7 @@ class StoredCard
                     ]);
             }
         } else {
-            throw new \Exception(__('No valid User Logged On!! Cannot save card.'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('No valid User Logged On!! Cannot save card.'));
         }
     }
 
@@ -192,11 +192,11 @@ class StoredCard
             //simply dont want invalid arrays of data
             foreach ($data as $item) {
                 if (preg_match('/[\D]/', $item['heartland_storedcard_id']) === 1) {
-                    throw new \Exception(__('heartland_storedcard_id does not have a valid value.'));
+                    throw new \Magento\Framework\Exception\LocalizedException(__('heartland_storedcard_id does not have a valid value.'));
                 }
                 foreach ($item as $columnName => $columnValue) {
                     if ($columnValue === null || $columnValue === '' || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
-                        throw new \Exception(__($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id']));
+                        throw new \Magento\Framework\Exception\LocalizedException(__($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id']));
                     }
                 }
             }

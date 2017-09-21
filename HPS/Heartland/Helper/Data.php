@@ -46,6 +46,11 @@ class Data extends AbstractHelper
      *
      */
     const P_KEY_PATTERN = '/^pkapi\_(cert|)[\w]{5,245}$/';
+    
+    public function __construct(\Magento\Framework\App\RequestInterface $httpRequest)
+    {
+        $this->request = $httpRequest;
+    }
 
     /**
      * @param $config_path
@@ -88,8 +93,9 @@ class Data extends AbstractHelper
     {
 
         $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
-
-        if (empty($inputs) === true && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $methods =$this->request->getServer('REQUEST_METHOD');
+        
+        if (empty($inputs) === true && $methods === 'POST') {
             $post = HPS_OM::getObjectManager()->get('Magento\Framework\App\RequestInterface')->getPostValue();
                        
             if (array_key_exists('payment', $post)) {

@@ -482,9 +482,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 }
             } // end of verifying that we have something that looks like  transaction ID to use
             // these are the only 2 transaction types where Magento2 does not need a transaction ID to reference
-            elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
+            if ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
+                $paymentAction = 'do be done';
+                $this->log($paymentAction, 'We know we dont have a valid transaction id so its time to throw an error ');
                 //We know we dont have a valid transaction id so its time to throw an error
-            }// all of these types of transactions require a transaction id from  previous transaction
+            } // all of these types of transactions require a transaction id from  previous transaction
             /*
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
              * objects
@@ -739,11 +741,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         } finally {
             // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
-            if (count($errorMsg) || empty($response->transactionId)) {
+            if (empty($errorMsg) || empty($response->transactionId)) {
                 $errorMsg[] = 'Please contact this retailer to complete your transaction';
             }
 
-            if (count($errorMsg) && !empty($response->transactionId)) {
+            if (!empty($errorMsg) && !empty($response->transactionId)) {
                 if (($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) && ($response->transactionId > 0)
                 ) {
                     //Reverse any auth
@@ -764,7 +766,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
                 //completed!"));
             }
-            if (count($successMsg)) {
+            if (!empty($successMsg)) {
                 foreach ($successMsg as $msg) {
                     if (trim($msg)) {
                         $this->messageManager->addSuccessMessage($msg);
@@ -772,14 +774,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 }
             }
 
-            if (count($noticeMsg)) {
+            if (!empty($noticeMsg)) {
                 foreach ($noticeMsg as $msg) {
                     if (trim($msg)) {
                         $this->messageManager->addNoticeMessage($msg);
                     }
                 }
             }
-            if (count($errorMsg)) {
+            if (!empty($errorMsg)) {
                 foreach ($errorMsg as $msg) {
                     if (trim($msg)) {
                         $this->messageManager->addErrorMessage($msg);
@@ -908,7 +910,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      *
      * @return \HpsTokenData
      *
-     * @TODO: evaluate if something need to happen when no token is assigned. Probably safe to do nothing
+     * @evaluate if something need to happen when no token is assigned. Probably safe to do nothing
      */
     private function getToken(\HpsTokenData $suToken, $custID = null)
     {

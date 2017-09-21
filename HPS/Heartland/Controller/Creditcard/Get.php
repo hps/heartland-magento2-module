@@ -111,7 +111,7 @@ class Get extends Action
     private function getImageLink($cardType = null)
     {
         if ($cardType === null || $cardType === '' || preg_match('/[\W]/', $cardType) === 1) {
-            throw new \Exception(__('Card type not configured for saved token.'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Card type not configured for saved token.'));
         }
         return  $this->getStaticURL() . self::IMAGE_STATIC_PATH . 'ss-inputcard-' . strtolower($cardType) . '@2x.png';
     }

@@ -27,7 +27,7 @@ class Db
      * @throws \DomainException
      * @codeCoverageIgnore
      */
-    public static function db_connect()
+    public static function dbConnect()
     {
         return HPS_OM::getObjectManager()->get('\Magento\Framework\App\ResourceConnection')->getConnection();
     }

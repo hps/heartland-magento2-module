@@ -21,8 +21,7 @@ class InstallSchema implements InstallSchemaInterface
      * {@inheritdoc}
      */
     public function install(
-        SchemaSetupInterface $setup,
-        ModuleContextInterface $context
+        SchemaSetupInterface $setup
     ) {
         $installer = $setup;
         $installer->startSetup();

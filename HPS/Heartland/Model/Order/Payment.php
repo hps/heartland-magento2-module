@@ -20,7 +20,6 @@ class Payment extends \Magento\Sales\Model\Order\Payment
 
     public function canCapture()
     {
- //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         try {
             if (preg_match(
                 "/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
@@ -92,7 +91,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
                 $hps->secretApiKey  = $abs->getConfigData('private_key');
                 $hps->developerId   = $abs->getConfigData('developerId');
                 $hps->versionNumber = $abs->getConfigData('versionNumber');
-                $creditService = new \HpsCreditService($hps);
+                $creditService = new /HpsCreditService($hps);
                 $this->transactionRecord = $creditService->get($this->getCcTransId());
             }
         } catch (\Exception $e) {

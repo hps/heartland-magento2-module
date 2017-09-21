@@ -25,7 +25,7 @@ class Admin
      */
     public static function getSession()
     {
-        return HPS_OM::getObjectManager()->get('Magento\Backend\Model\Auth\Session');
+        return HPS_OM::getObjectManager()->get('\Magento\Backend\Model\Auth\Session');
     }
 
     /**
