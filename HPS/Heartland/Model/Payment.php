@@ -141,6 +141,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private $messageManager = null;
     private $objectManager = null;
+    private $customerRepository = null;
 
     /**
      * Payment constructor.
@@ -156,6 +157,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
      * @param \Magento\Directory\Model\CountryFactory              $countryFactory
      * @param \HpsServicesConfig                                   $config
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface    $customerRepository
      * @param array                                                $data
      */
     public function __construct(
@@ -170,6 +172,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \HpsServicesConfig $config,
+        \Magento\Framework\Message\ManagerInterface $managerInterface,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         array $data = []
     ) {
         parent::__construct(
@@ -199,7 +203,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // # \HpsServicesConfig::$versionNumber
         $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
         $this->objectManager = HPS_OM::getObjectManager();
-        $this->messageManager = $this->objectManager->get('\Magento\Framework\Message\ManagerInterface');
+        $this->messageManager = $managerInterface;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -806,10 +811,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $customerEmail = $orderObj->getCustomerEmail();
         //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
-            try {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
-                $customer = $customerFactory->get($customerEmail);
+            try {                
+                $customer = $this->customerRepository->get($customerEmail);
                 $customerId = $customer->getId();
             } catch (\Exception $e) {
                 $customerId = null;

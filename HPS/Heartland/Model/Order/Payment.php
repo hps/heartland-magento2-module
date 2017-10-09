@@ -91,7 +91,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
                 $hps->secretApiKey  = $abs->getConfigData('private_key');
                 $hps->developerId   = $abs->getConfigData('developerId');
                 $hps->versionNumber = $abs->getConfigData('versionNumber');
-                $creditService = new /HpsCreditService($hps);
+                $creditService = new \HpsCreditService($hps);
                 $this->transactionRecord = $creditService->get($this->getCcTransId());
             }
         } catch (\Exception $e) {

@@ -20,11 +20,22 @@ use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 class Customer
 {
     /**
+     * @var \Magento\Customer\Model\Session
+     */
+    private $authSession;
+    
+    public function __construct(
+        \Magento\Customer\Model\Session $authSession
+    ) {
+        $this->authSession = $authSession;
+    }
+    
+    /**
      * @return \Magento\Customer\Model\Session
      */
     public static function getSession()
     {
-        return HPS_OM::getObjectManager()->get('Magento\Customer\Model\Session');
+        return $this->authSession;
     }
 
     /**

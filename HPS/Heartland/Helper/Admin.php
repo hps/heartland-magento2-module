@@ -21,11 +21,22 @@ use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 class Admin
 {
     /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
+    private $authSession;
+    
+    public function __construct(
+        \Magento\Backend\Model\Auth\Session $authSession
+    ) {
+        $this->authSession = $authSession;
+    }
+    
+    /**
      * @return \Magento\Backend\Model\Auth\Session
      */
     public static function getSession()
     {
-        return HPS_OM::getObjectManager()->get('\Magento\Backend\Model\Auth\Session');
+        return $this->authSession;
     }
 
     /**

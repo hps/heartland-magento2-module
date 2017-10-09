@@ -21,6 +21,17 @@ use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 class Db
 {
     /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $resourceConnection;
+    
+    public function __construct(
+        \Magento\Framework\App\ResourceConnection $resourceConnection
+    ) {
+        $this->resourceConnection = $resourceConnection;
+    }
+    
+    /**
      * Retrieve connection to resource specified by $resourceName
      *
      * @return \Magento\Framework\DB\Adapter\AdapterInterface
@@ -29,6 +40,6 @@ class Db
      */
     public static function dbConnect()
     {
-        return HPS_OM::getObjectManager()->get('\Magento\Framework\App\ResourceConnection')->getConnection();
+        return $this->resourceConnection->getConnection();
     }
 }

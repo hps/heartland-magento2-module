@@ -24,6 +24,13 @@ use Magento\Payment\Model\MethodInterface;
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
     private $template = 'HPS_Heartland::form/cc.phtml';
+    private $customerRepository;
+    
+    public function __construct(
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+    ) {
+        $this->customerRepository = $customerRepository;
+    }
 
     /** in context gets stored cards from database for the selected customer
      * @return array
@@ -35,10 +42,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
-            try {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
-                $customer = $customerFactory->get($customerEmail);
+            try {                
+                $customer = $this->customerRepository->get($customerEmail);
                 $customerId = $customer->getId();
             } catch (\Exception $e) {
                 $customerId = null;

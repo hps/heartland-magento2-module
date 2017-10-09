@@ -43,6 +43,11 @@ class Get extends Action
      * @var \Magento\Framework\Controller\Result\Json
      */
     private $resultJsonFactory;
+    
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManagerInterface;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -50,10 +55,12 @@ class Get extends Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->storeManagerInterface = $storeManagerInterface;
     }
 
     /** \HPS\Heartland\Controller\Hss\StoredCard::execute
@@ -94,8 +101,7 @@ class Get extends Action
     private function getStaticURL()
     {
         if ($this->baseImageUri === false) {
-            $this->baseImageUri = HPS_OM::getObjectManager()
-                                        ->get(self::STORE_INTERFACE)
+            $this->baseImageUri = $this->storeManagerInterface
                                         ->getStore()
                                         ->getBaseUrl(UrlInterface::URL_TYPE_STATIC);
         }
