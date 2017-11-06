@@ -13,7 +13,6 @@
 namespace HPS\Heartland\Model;
 
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
-use \HPS\Heartland\Helper\Data as HPS_DATA;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
 use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
@@ -146,6 +145,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @var \HPS\Heartland\Model\StoredCard
      */
     private $hpsStoredCard;
+    
+    /**
+     * @var \HPS\Heartland\Helper\Data
+     */
+    private $hpsData;
 
     /**
      * Payment constructor.
@@ -179,6 +183,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Framework\Message\ManagerInterface $managerInterface,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
+        \HPS\Heartland\Helper\Data $hpsData,
         array $data = []
     ) {
         parent::__construct(
@@ -211,6 +216,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->messageManager = $managerInterface;
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
+        $this->hpsData = $hpsData;
     }
 
     /**
@@ -455,7 +461,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         try {
             $chargeService = $this->getHpsCreditService();
-            $currency = HPS_DATA::getCurrencyCode();
+            $currency = $this->hpsData->getCurrencyCode();
             /** $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case we are retrieving the
              * transaction
              * ID */
@@ -573,7 +579,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
                     $response = $chargeService->charge(
                         \HpsInputValidation::checkAmount($requestedAmount),
-                        HPS_DATA::getCurrencyCode(),
+                        $this->hpsData->getCurrencyCode(),
                         $suToken,
                         $validCardHolder,
                         $canSaveToken
@@ -874,7 +880,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
          */
         static $data = [];
         if (count($data) < 1) {
-            $data = (array) HPS_Data::jsonData();
+            $data = (array) $this->hpsData->jsonData();
         }
         $this->log($data, 'HPS\Heartland\Model\Payment getPaymentMethod Method Called:  ');
 

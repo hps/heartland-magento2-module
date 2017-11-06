@@ -17,6 +17,18 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     /** Can Capture
      * @return bool
      */
+     
+    
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsServicesConfig;
+    
+    public function __construct(
+        \HpsServicesConfig $hpsServicesConfig
+    ) {        
+        $this->hpsServicesConfig = $hpsServicesConfig;
+    }
 
     public function canCapture()
     {
@@ -86,7 +98,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
         try {
             /** @var \HpsServicesConfig $hps */
             if ($this->getCcTransId() && $this->transactionRecord === null) {
-                $hps                = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
+                $hps                = $this->hpsServicesConfig; 
                 $abs                = $this->getMethodInstance();
                 $hps->secretApiKey  = $abs->getConfigData('private_key');
                 $hps->developerId   = $abs->getConfigData('developerId');

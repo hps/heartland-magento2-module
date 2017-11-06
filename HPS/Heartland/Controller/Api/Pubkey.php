@@ -26,6 +26,11 @@ class Pubkey extends \Magento\Framework\App\Action\Action
      * @var \Magento\Framework\Controller\Result\Raw
      */
     private $resultRawFactory;
+    
+    /**
+     * @var \HPS\Heartland\Helper\Data
+     */
+    private $hpsData;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -33,10 +38,12 @@ class Pubkey extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
+        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory,
+        \HPS\Heartland\Helper\Data $hpsData
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
+        $this->hpsData = $hpsData;
     }
 
     /**
@@ -47,6 +54,6 @@ class Pubkey extends \Magento\Framework\App\Action\Action
         /** @var \Magento\Framework\Controller\Result\Raw $resultRaw */
         $resultRaw = $this->resultRawFactory->create();
 
-        return $resultRaw->setContents((string) HPS_DATA::getPublicKey());
+        return $resultRaw->setContents((string) $this->hpsData->getPublicKey());
     }
 }
