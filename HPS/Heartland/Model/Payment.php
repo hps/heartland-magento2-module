@@ -150,6 +150,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @var \HPS\Heartland\Helper\Data
      */
     private $hpsData;
+    
+    private $hpsTokenData;
+    private $hpsCreditService;
+    private $hpsCardHolder;
+    private $hpsAddress;
+    private $storeManagerInterface;
 
     /**
      * Payment constructor.
@@ -184,6 +190,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
         \HPS\Heartland\Helper\Data $hpsData,
+        \HpsTokenData $hpsTokenData,
+        \HpsCreditService $hpsCreditService,
+        \HpsCardHolder $hpsCardHolder,
+        \HpsAddress $hpsAddress,
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
         array $data = []
     ) {
         parent::__construct(
@@ -217,6 +228,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
         $this->hpsData = $hpsData;
+        $this->hpsTokenData = $hpsTokenData;
+        $this->hpsCreditService = $hpsCreditService;
+        $this->hpsCardHolder = $hpsCardHolder;
+        $this->hpsAddress = $hpsAddress;
+        $this->storeManagerInterface = $storeManagerInterface;
     }
 
     /**
@@ -312,7 +328,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $info->setCcNumber($ccNumber);
 
         // # \HPS\Heartland\Model\Payment::getToken
-        $suToken = $this->getToken(new \HpsTokenData);
+        $suToken = $this->getToken($this->hpsTokenData);
         if (empty($suToken->tokenValue)) {
             $errorMsg = __('Token error! Please try again.');
         }
@@ -347,7 +363,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     {
         // # \HPS\Heartland\Model\Payment::$heartlandApi
         // # \HpsCreditService::__construct
-        return new \HpsCreditService($this->heartlandApi);
+        return $this->hpsCreditService($this->heartlandApi);
     }
 
     /**
@@ -358,7 +374,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function getHpsCardHolder(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
 
-        $cardHolder = new \HpsCardHolder();
+        $cardHolder = $this->hpsCardHolder;
         // # \Magento\Sales\Model\Order\Address::getName
         // # $splitName = explode(' ', $billing->getName());
         // # \HpsConsumer::$firstName
@@ -383,7 +399,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private function getHpsAddress(\Magento\Sales\Api\Data\OrderAddressInterface $billing)
     {
-        $address = new \HpsAddress();
+        $address = $this->hpsAddress;
         // # \Magento\Sales\Model\Order\Address::getStreetLine
         /** @var \Magento\Sales\Model\Order\Address|\Magento\Sales\Api\Data\OrderAddressInterface|null $billing
          * @method  \Magento\Sales\Model\Order\Address getStreetLine($number) */
@@ -440,8 +456,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
          */
         $storeName = substr(
             trim(
-                filter_var(HPS_OM::getObjectManager()
-                                        ->get('\Magento\Store\Model\StoreManagerInterface')
+                filter_var($this->storeManagerInterface
                                         ->getStore()
                                         ->getName()),
                 FILTER_SANITIZE_SPECIAL_CHARS
@@ -519,7 +534,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
-                    $suToken = $this->getToken(new \HpsTokenData, $orderCustomerId);
+                    $suToken = $this->getToken($this->hpsTokenData, $orderCustomerId);
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
@@ -612,7 +627,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     );
                     break;
                 default:
-                    throw new LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
+                    throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
 
@@ -804,7 +819,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $this->messageManager->addErrorMessage($msg);
                     }
                 }
-                throw new LocalizedException(new Phrase("Your transaction could not be completed!"));
+                throw new \Magento\Framework\Exception\LocalizedException(new Phrase("Your transaction could not be completed!"));
             }
         }
 
