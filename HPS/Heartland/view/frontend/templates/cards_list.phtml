@@ -58,7 +58,7 @@
     <caption>Stored Payments for this customer(if any)</caption>
     <tbody>
 <?php
-$hpsTokens = \HPS\Heartland\Model\StoredCard::getStoredCards();
+$hpsTokens = $block->getStoredCards();
 if (count($hpsTokens)) {
     foreach ($hpsTokens as $token) {
         $token['token_value'] = $token['heartland_storedcard_id'];

@@ -13,7 +13,6 @@
 namespace HPS\Heartland\Model;
 
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
-use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 use \HPS\Heartland\Helper\Data as HPS_DATA;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
@@ -54,7 +53,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $code = self::CODE;
+    protected $_code = self::CODE;
 
     /**
      * @var bool
@@ -142,6 +141,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private $messageManager = null;
     private $objectManager = null;
     private $customerRepository = null;
+    
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
 
     /**
      * Payment constructor.
@@ -174,6 +178,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsServicesConfig $config,
         \Magento\Framework\Message\ManagerInterface $managerInterface,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard,
         array $data = []
     ) {
         parent::__construct(
@@ -205,6 +210,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->objectManager = HPS_OM::getObjectManager();
         $this->messageManager = $managerInterface;
         $this->customerRepository = $customerRepository;
+        $this->hpsStoredCard = $hpsStoredCard;
     }
 
     /**
@@ -633,7 +639,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $this->getAdditionalData()['cc_exp_year']
                     );
                     // # \HPS\Heartland\Model\StoredCard::setStoredCards
-                    HPS_STORED_CARDS::setStoredCards(
+                    $this->hpsStoredCard->setStoredCards(
                         $response->tokenData->tokenValue,
                         strtolower($info->getCcType()),
                         $CcL4,
@@ -918,11 +924,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function getToken(\HpsTokenData $suToken, $custID = null)
     {
         $this->getTokenValue();
-        $this->log(HPS_STORED_CARDS::getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
+        $this->log($this->hpsStoredCard->getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
-        if (!empty($this->token_value) && is_numeric($this->token_value) && !empty($custID) && HPS_STORED_CARDS::getCanStoreCards()) {
+        if (!empty($this->token_value) && is_numeric($this->token_value) && !empty($custID) && $this->hpsStoredCard->getCanStoreCards()) {
             $this->log($this->token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');
-            $this->token_value = HPS_STORED_CARDS::getToken($this->token_value, $custID);
+            $this->token_value = $this->hpsStoredCard->getToken($this->token_value, $custID);
         }
 
         // # \HPS\Heartland\Model\Payment::$token_value

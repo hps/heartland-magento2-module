@@ -12,7 +12,6 @@
 namespace HPS\Heartland\Controller\Creditcard;
 
 use \Magento\Framework\App\Action\Action;
-use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
 use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 use \Magento\Framework\UrlInterface;
 
@@ -48,6 +47,11 @@ class Get extends Action
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManagerInterface;
+    
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -56,11 +60,13 @@ class Get extends Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->hpsStoredCard = $hpsStoredCard;
     }
 
     /** \HPS\Heartland\Controller\Hss\StoredCard::execute
@@ -76,9 +82,9 @@ class Get extends Action
 
         // # \HPS\Heartland\Model\StoredCard::getCanStoreCards
         $response = [];
-        if (HPS_STORED_CARDS::getCanStoreCards()) {
+        if ($this->hpsStoredCard->getCanStoreCards()) {
             // # \HPS\Heartland\Model\StoredCard::getStoredCards
-            $data = HPS_STORED_CARDS::getStoredCards(); /**/
+            $data = $this->hpsStoredCard->getStoredCards(); /**/
             if (!empty($data)) {
                 foreach ($data as $row) {
                     $response[] = [

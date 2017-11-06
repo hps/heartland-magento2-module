@@ -25,11 +25,18 @@ class Cc extends \Magento\Payment\Block\Form\Cc
 {
     private $template = 'HPS_Heartland::form/cc.phtml';
     private $customerRepository;
+
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
     
     public function __construct(
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
         $this->customerRepository = $customerRepository;
+        $this->hpsStoredCard = $hpsStoredCard;
     }
 
     /** in context gets stored cards from database for the selected customer
@@ -50,11 +57,11 @@ class Cc extends \Magento\Payment\Block\Form\Cc
             }
         }
 
-        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customerId);
+        return $this->hpsStoredCard->getStoredCardsAdmin($customerId);
     }
     
     public function getCanSaveCards()
     {
-        return (int) \HPS\Heartland\Model\StoredCard::getCanStoreCards();
+        return (int) $this->hpsStoredCard->getCanStoreCards();
     }
 }

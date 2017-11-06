@@ -11,10 +11,6 @@
 
 namespace HPS\Heartland\Model;
 
-use \HPS\Heartland\Helper\Customer;
-use \HPS\Heartland\Helper\Admin;
-use \HPS\Heartland\Helper\Db;
-
 /**
  * Class StoredCard
  *
@@ -23,25 +19,54 @@ use \HPS\Heartland\Helper\Db;
 class StoredCard
 {
     const TABLE_NAME = 'hps_heartland_storedcard';
-
+    
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    private $authSession;
+    
+    /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
+    private $backendSession;
+    
+    /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $resourceConnection;
+    
+    /**
+     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Magento\Backend\Model\Auth\Session $backendSession
+     */
+    public function __construct(
+        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Backend\Model\Auth\Session $backendSession,
+        \Magento\Framework\App\ResourceConnection $resourceConnection
+    ) {
+        $this->authSession = $authSession;
+        $this->backendSession = $backendSession;
+        $this->resourceConnection = $resourceConnection;
+    }
+    
     /** performs a db lookup for the current customer within the db given a specific token ID
      * @param int $id
      *
      * @return bool|array
      * @throws \Exception
      */
-    public static function getToken($id, $custID = null)
+    public function getToken($id, $custID = null)
     {
         $MuToken = false;
-        if (empty($custID) && Customer::isLoggedIn()) {
-            $custID = Customer::getCustID();
+        if (empty($custID) && $this->authSession->isLoggedIn()) {
+            $custID = $this->authSession->getCustomerId();
         }
         if (!empty($custID)) {
-            $conn = Db::dbConnect();
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+            $conn = $this->resourceConnection->getConnection();
+            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME]
+                        ['o' => $this->TABLE_NAME]
                     )
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
@@ -60,11 +85,11 @@ class StoredCard
      *
      * @throws \Exception
      */
-    public static function deleteStoredCards($id)
+    public function deleteStoredCards($id)
     {
-            $conn = Db::dbConnect();
-        if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
-            $conn->delete(self::TABLE_NAME, [
+            $conn = $this->resourceConnection->getConnection();
+        if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            $conn->delete($this->TABLE_NAME, [
             'heartland_storedcard_id = ?' => (int)$id,
             ]);
         }
@@ -77,17 +102,17 @@ class StoredCard
      *
      * @throws \Exception
      */
-    public static function getStoredCards()
+    public function getStoredCards()
     {
         $data = [];
-        if (Customer::isLoggedIn()) {
-            $conn = Db::dbConnect();
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+        if ($this->authSession->isLoggedIn()) {
+            $conn = $this->resourceConnection->getConnection();
+            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => self::TABLE_NAME]
+                        ['o' => $this->TABLE_NAME]
                     )
-                    ->where('o.customer_id = ?', (int)Customer::getCustID());
+                    ->where('o.customer_id = ?', (int)$this->authSession->getCustomerId());
                 $data = (array)$conn->fetchAll($select);
             }
         }
@@ -101,15 +126,15 @@ class StoredCard
      *
      *
      */
-    public static function getStoredCardsAdmin($custID = null)
+    public function getStoredCardsAdmin($custID = null)
     {
         $data = [];
-        if ($custID !== null && $custID > 0 && self::getCanStoreCards()) {
-            $conn = Db::dbConnect();
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+        if ($custID !== null && $custID > 0 && $this->getCanStoreCards()) {
+            $conn = $this->resourceConnection->getConnection();
+            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
-                        ['o'=>self::TABLE_NAME]
+                        ['o'=>$this->TABLE_NAME]
                     )
                     ->where('o.customer_id = ?', (int)$custID);
                 $data = (array)$conn->fetchAll($select);
@@ -123,12 +148,12 @@ class StoredCard
      *
      * @return bool
      */
-    public static function getCanStoreCards()
+    public function getCanStoreCards()
     {
         $retVal = (int)0;
-        if (Customer::isLoggedIn() || Admin::isLoggedIn()) {
-            $conn = Db::dbConnect();
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+        if ($this->authSession->isLoggedIn() || $this->backendSession->isLoggedIn()) {
+            $conn = $this->resourceConnection->getConnection();
+            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
                 $select = $conn->select()
                     ->from(
                         ['o' => 'core_config_data']
@@ -153,17 +178,17 @@ class StoredCard
      *
      * @throws \Exception
      */
-    public static function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
+    public function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
     {
-        $conn = Db::dbConnect();
+        $conn = $this->resourceConnection->getConnection();
         if ($customerID) {
-            if ($conn->isTableExists($conn->getTableName(self::TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
                 // try to prevent duplicat records in the table
-                $conn->delete(self::TABLE_NAME, [
+                $conn->delete($this->TABLE_NAME, [
                     'customer_id = ?'   => (int)$customerID,
                     'token_value = ?' => $token,
                 ]);
-                $conn->insert(self::TABLE_NAME, [
+                $conn->insert($this->TABLE_NAME, [
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
                         'customer_id'   => $customerID,
@@ -185,7 +210,7 @@ class StoredCard
      * @return bool
      * @throws \Exception
      */
-    private static function validate($data)
+    private function validate($data)
     {
         if (!empty($data)) {
             // some very basic validation.

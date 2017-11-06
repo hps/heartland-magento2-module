@@ -24,6 +24,11 @@ class CanSave extends \Magento\Framework\App\Action\Action
      * @var \Magento\Framework\Controller\Result\Raw
      */
     private $resultRawFactory;
+    
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -31,10 +36,12 @@ class CanSave extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
+        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
+        $this->hpsStoredCard = $hpsStoredCard;
     }
 
     /** \HPS\Heartland\Controller\Hss\CanSave::execute
@@ -48,6 +55,6 @@ class CanSave extends \Magento\Framework\App\Action\Action
         $resultRaw = $this->resultRawFactory->create();
 
         // # \HPS\Heartland\Model\StoredCard::getCanStoreCards
-        return $resultRaw->setContents((int) StoredCard::getCanStoreCards());
+        return $resultRaw->setContents((int) $this->hpsStoredCard->getCanStoreCards());
     }
 }
