@@ -18,7 +18,7 @@ namespace HPS\Heartland\Model;
  */
 class StoredCard
 {
-    const TABLE_NAME = 'hps_heartland_storedcard';
+    private $hpsTableName = 'hps_heartland_storedcard';
     
     /**
      * @var \Magento\Customer\Model\Session
@@ -63,10 +63,10 @@ class StoredCard
         }
         if (!empty($custID)) {
             $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => $this->TABLE_NAME]
+                        ['o' => $this->hpsTableName]
                     )
                     ->where('o.customer_id   = ?', (int)$custID)
                     ->where('o.heartland_storedcard_id = ?', (int)$id);
@@ -88,8 +88,8 @@ class StoredCard
     public function deleteStoredCards($id)
     {
             $conn = $this->resourceConnection->getConnection();
-        if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
-            $conn->delete($this->TABLE_NAME, [
+        if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
+            $conn->delete($this->hpsTableName, [
             'heartland_storedcard_id = ?' => (int)$id,
             ]);
         }
@@ -107,10 +107,10 @@ class StoredCard
         $data = [];
         if ($this->authSession->isLoggedIn()) {
             $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
                 $select = $conn->select()
                     ->from(
-                        ['o' => $this->TABLE_NAME]
+                        ['o' => $this->hpsTableName]
                     )
                     ->where('o.customer_id = ?', (int)$this->authSession->getCustomerId());
                 $data = (array)$conn->fetchAll($select);
@@ -131,10 +131,10 @@ class StoredCard
         $data = [];
         if ($custID !== null && $custID > 0 && $this->getCanStoreCards()) {
             $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
                 $select = $conn->select()
                     ->from(
-                        ['o'=>$this->TABLE_NAME]
+                        ['o'=>$this->hpsTableName]
                     )
                     ->where('o.customer_id = ?', (int)$custID);
                 $data = (array)$conn->fetchAll($select);
@@ -153,7 +153,7 @@ class StoredCard
         $retVal = (int)0;
         if ($this->authSession->isLoggedIn() || $this->backendSession->isLoggedIn()) {
             $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
                 $select = $conn->select()
                     ->from(
                         ['o' => 'core_config_data']
@@ -182,13 +182,13 @@ class StoredCard
     {
         $conn = $this->resourceConnection->getConnection();
         if ($customerID) {
-            if ($conn->isTableExists($conn->getTableName($this->TABLE_NAME))) {
+            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
                 // try to prevent duplicat records in the table
-                $conn->delete($this->TABLE_NAME, [
+                $conn->delete($this->hpsTableName, [
                     'customer_id = ?'   => (int)$customerID,
                     'token_value = ?' => $token,
                 ]);
-                $conn->insert($this->TABLE_NAME, [
+                $conn->insert($this->hpsTableName, [
                         'heartland_storedcard_id' => '',
                         'dt'            => date("Y-m-d H:i:s"),
                         'customer_id'   => $customerID,
