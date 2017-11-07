@@ -12,7 +12,6 @@
 namespace HPS\Heartland\Controller\Creditcard;
 
 use \Magento\Framework\App\Action\Action;
-use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 use \Magento\Framework\UrlInterface;
 
 /**

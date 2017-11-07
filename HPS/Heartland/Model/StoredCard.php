@@ -11,6 +11,9 @@
 
 namespace HPS\Heartland\Model;
 
+use Magento\Customer\Model\Session as customerSession;
+use \Magento\Backend\Model\Auth\Session as adminSession;
+
 /**
  * Class StoredCard
  *
@@ -40,8 +43,8 @@ class StoredCard
      * @param \Magento\Backend\Model\Auth\Session $backendSession
      */
     public function __construct(
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Backend\Model\Auth\Session $backendSession,
+        customerSession $authSession,
+        adminSession $backendSession,
         \Magento\Framework\App\ResourceConnection $resourceConnection
     ) {
         $this->authSession = $authSession;

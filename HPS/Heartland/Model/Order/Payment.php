@@ -20,14 +20,17 @@ class Payment extends \Magento\Sales\Model\Order\Payment
      
     
     /**
-     * @var \HPS\Heartland\Model\StoredCard
+     * @var \HpsCreditService
      */
     private $hpsServicesConfig;
+    private $hpsCreditService;
     
     public function __construct(
+        //\HpsCreditService $hpsCreditService,
         \HpsServicesConfig $hpsServicesConfig
     ) {        
-        $this->hpsServicesConfig = $hpsServicesConfig;
+        $this->hpsServicesConfig = $hpsServicesConfig;        
+        //$this->hpsCreditService = $hpsCreditService($this->hpsServicesConfig);
     }
 
     public function canCapture()
@@ -94,7 +97,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     }
 
     private function getHPS()
-    {
+    { 
         try {
             /** @var \HpsServicesConfig $hps */
             if ($this->getCcTransId() && $this->transactionRecord === null) {

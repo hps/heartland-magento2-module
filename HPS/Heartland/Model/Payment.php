@@ -12,10 +12,10 @@
 
 namespace HPS\Heartland\Model;
 
-use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
 use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
+use \HpsTokenData as HpsTokenData;
 
 /**
  * Class Payment
@@ -138,7 +138,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @var \Magento\Framework\Message\ManagerInterface $messageManager
      */
     private $messageManager = null;
-    private $objectManager = null;
     private $customerRepository = null;
     
     /**
@@ -190,8 +189,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
         \HPS\Heartland\Helper\Data $hpsData,
-        \HpsTokenData $hpsTokenData,
-        \HpsCreditService $hpsCreditService,
+        //HpsTokenData $hpsTokenData,
+        //\HpsCreditService $hpsCreditService,
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
@@ -223,13 +222,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->heartlandApi->developerId = $this->heartlandConfigFields['developerId'];
         // # \HpsServicesConfig::$versionNumber
         $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
-        $this->objectManager = HPS_OM::getObjectManager();
         $this->messageManager = $managerInterface;
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
         $this->hpsData = $hpsData;
-        $this->hpsTokenData = $hpsTokenData;
-        $this->hpsCreditService = $hpsCreditService;
+        //$this->hpsTokenData = $hpsTokenData;
+        //$this->hpsCreditService = $hpsCreditService;
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
@@ -328,7 +326,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $info->setCcNumber($ccNumber);
 
         // # \HPS\Heartland\Model\Payment::getToken
-        $suToken = $this->getToken($this->hpsTokenData);
+        $suToken = $this->getToken(new HpsTokenData());
         if (empty($suToken->tokenValue)) {
             $errorMsg = __('Token error! Please try again.');
         }
@@ -363,7 +361,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     {
         // # \HPS\Heartland\Model\Payment::$heartlandApi
         // # \HpsCreditService::__construct
-        return $this->hpsCreditService($this->heartlandApi);
+        return new \HpsCreditService($this->heartlandApi);
     }
 
     /**
@@ -534,7 +532,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
-                    $suToken = $this->getToken($this->hpsTokenData, $orderCustomerId);
+                    $suToken = $this->getToken(new HpsTokenData(), $orderCustomerId);
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
@@ -951,7 +949,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $this->log($this->token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');
             $this->token_value = $this->hpsStoredCard->getToken($this->token_value, $custID);
         }
-
+        $this->log($suToken, '\HPS\Heartland\Model\Payment:: after getCanStoreCards:  ');
         // # \HPS\Heartland\Model\Payment::$token_value
         $suToken->tokenValue = $this->token_value;
         $this->log($suToken, '\HPS\Heartland\Model\Payment::getToken Method suToken:  ');

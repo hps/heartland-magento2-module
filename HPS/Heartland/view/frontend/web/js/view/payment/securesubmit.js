@@ -4,10 +4,11 @@ var getImageURL = (function () {
     //build a relative path based on the module location on the configured server
     var element = document.querySelector('script#HPS_SECURESUBMIT_IFRAME_CODE');
     if (element !== null) {
-        var myScript = element.src.split('/').slice(0,-4).join('/') + '/images/';
+        var myScript = element.src.split('/').slice(0, -4).join('/') + '/images/';
         //console.log(myScript);
         return function () {
- return myScript; };
+            return myScript;
+        };
     }
 })();
 
@@ -21,7 +22,8 @@ function _HPS_addClass(element, klass)
 function _HPS_removeClass(element, klass)
 {
     if (element !== null && element.className.indexOf(klass) === -1) {
-return; }
+        return;
+    }
     element.className = element.className.replace(klass, '');
 }
 
@@ -36,7 +38,7 @@ function setElementValue(selector, propertyToSet, valueToSet)
             case 'disabled':
                 element.disabled = valueToSet;
                 break;
-             case 'innerhtml':
+            case 'innerhtml':
                 element.innerHTML = valueToSet;
                 break;
         }
@@ -61,36 +63,41 @@ function _HPS_DisablePlaceOrder()
         setElementValue('#bPlaceOrderNow', 'disabled', true);
         setElementValue('#bPlaceOrderNow', 'disabled', 'disabled');
     } catch (e) {
-}
+    }
 }
 function _HPS_EnablePlaceOrder()
 {
     try {
-        var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';_HPS_removeClass(document.querySelector(element), 'disabled');
+        var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';
+        _HPS_removeClass(document.querySelector(element), 'disabled');
         setElementValue('#bPlaceOrderNow', 'disabled', false);
         setElementValue('#bPlaceOrderNow', 'disabled', '');
     } catch (e) {
-}
+    }
 }
 function HPS_SecureSubmit(document, Heartland, publicKey)
 {
     //if (arguments.callee.count > 0 )
     //    return;
     if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
-        && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
-        && publicKey) {
+            && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
+            && publicKey) {
         //var addHandler = Heartland.Events.addHandler;
         function enablePlaceOrder(disabled)
         {
             var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';
             try {
-_HPS_removeClass(document.querySelector(element), 'disabled');} catch (e) {
-}
-            if (!disabled ) {
+                _HPS_removeClass(document.querySelector(element), 'disabled');
+            } catch (e) {
+            }
+            if (!disabled) {
                 try {
-_HPS_addClass(document.querySelector(element), 'disabled');} } catch (e) {
-}
-        }enablePlaceOrder(false);
+                    _HPS_addClass(document.querySelector(element), 'disabled');
+                } catch (e) {
+                }
+            }
+        }
+        enablePlaceOrder(false);
 
 
         function toAll(elements, fun)
@@ -129,29 +136,34 @@ _HPS_addClass(document.querySelector(element), 'disabled');} } catch (e) {
             if (document.querySelector('#heartland-frame-cardNumber') != null) {
                 toAll(document.querySelectorAll('#iframesCardNumber > div, #heartland-frame-cardNumber, #heartland-frame-cardExpiration, #heartland-frame-cardCvv'), function (element) {
                     try {
-element.remove();} catch (e) {
-}
+                        element.remove();
+                    } catch (e) {
+                    }
                 });
                 document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
                 try {
-_HPS_addClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');} catch (e) {
-}
+                    _HPS_addClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
+                } catch (e) {
+                }
 
                 var errElement = document.querySelector('#iframesCardError');
                 try {
-errElement.innerText = '';} catch (e) {
-}
+                    errElement.innerText = '';
+                } catch (e) {
+                }
                 try {
-_HPS_removeClass(errElement, 'mage-error');} catch (e) {
-}
+                    _HPS_removeClass(errElement, 'mage-error');
+                } catch (e) {
+                }
                 if (response.error) {
                     _HPS_addClass(errElement, 'mage-error');
                     errElement.innerText = response.error.message;
                     // show the form again
                     HPS_SecureSubmit(document, Heartland, publicKey);
                     try {
-_HPS_removeClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');} catch (e) {
-}
+                        _HPS_removeClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
+                    } catch (e) {
+                    }
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
                     _HPS_setHssTransaction(response);
@@ -312,17 +324,18 @@ _HPS_removeClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe'
             e.preventDefault();
             // Tell the iframes to tokenize the data
             hps.Messages.post(
-                {
-                    accumulateData: true,
-                    action: 'tokenize',
-                    message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-                },
-                'cardNumber'
-            );
+                    {
+                        accumulateData: true,
+                        action: 'tokenize',
+                        message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
+                    },
+                    'cardNumber'
+                    );
 
         });
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
 
 
-};
+}
+;
