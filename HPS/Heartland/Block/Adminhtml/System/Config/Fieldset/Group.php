@@ -26,11 +26,11 @@ class Group extends \Magento\Config\Block\System\Config\Form\Fieldset
      */
     public function __construct(
         \Magento\Backend\Block\Context $context,
+        \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\View\Helper\Js $jsHelper,
         array $data = []
     ) {
-        parent::__construct($context, $jsHelper, $data);
-        $this->_authSession = AuthSession;
+        parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
     /**

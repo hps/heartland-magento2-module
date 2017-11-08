@@ -189,8 +189,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
         \HPS\Heartland\Helper\Data $hpsData,
-        //HpsTokenData $hpsTokenData,
-        //\HpsCreditService $hpsCreditService,
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
@@ -771,10 +769,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         } finally {
             // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
-            if (empty($errorMsg) || empty($response->transactionId)) {
+            if (!empty($errorMsg) || empty($response->transactionId)) {
                 $errorMsg[] = 'Please contact this retailer to complete your transaction';
             }
-
             if (!empty($errorMsg) && !empty($response->transactionId)) {
                 if (($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE) && ($response->transactionId > 0)
                 ) {

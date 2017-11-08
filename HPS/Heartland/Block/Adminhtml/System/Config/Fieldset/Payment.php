@@ -11,8 +11,6 @@
 
 namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;
 
-use \Magento\Backend\Model\Auth\Session as AuthSession;
-
 /**
  * Fieldset renderer for PayPal solution
  */
@@ -32,13 +30,13 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      */
     public function __construct(
         \Magento\Backend\Block\Context $context,
+        \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\View\Helper\Js $jsHelper,
         \Magento\Config\Model\Config $backendConfig,
         array $data = []
     ) {
         $this->backendConfig = $backendConfig;
-        $this->_authSession = AuthSession;
-        parent::__construct($context, $jsHelper, $data);
+        parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
     /**
