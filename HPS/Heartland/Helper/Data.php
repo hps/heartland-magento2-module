@@ -48,9 +48,11 @@ class Data extends AbstractHelper
      */
     private $storeManagerInterface;
     
+    private $request;
+    
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\RequestInterface $httpRequest,
+        \Magento\Framework\App\Request\Http $httpRequest,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
         )
@@ -99,7 +101,7 @@ class Data extends AbstractHelper
     {
 
         $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
-        $methods =$this->request->getServer('REQUEST_METHOD');
+        $methods = $this->request->getServer('REQUEST_METHOD');
         
         if (empty($inputs) === true && $methods === 'POST') {
             $post = $this->request->getPostValue();
