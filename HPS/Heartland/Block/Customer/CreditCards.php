@@ -18,7 +18,8 @@ class CreditCards extends \Magento\Vault\Block\Customer\CreditCards
         $this->hpsStoredCard = $hpsStoredCard;
     }
     
-    public function getStoredCards(){
+    public function getStoredCards()
+	{
         return $this->hpsStoredCard->getStoredCards();
     }
 }
