@@ -17,21 +17,7 @@ namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;
 use \Magento\Backend\Model\Auth\Session as AuthSession;
 
 class Group extends \Magento\Config\Block\System\Config\Form\Fieldset
-{
-    /**
-     * @param \Magento\Backend\Block\Context $context
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\View\Helper\Js $jsHelper
-     * @param array $data
-     */
-    public function __construct(
-        \Magento\Backend\Block\Context $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\View\Helper\Js $jsHelper,
-        array $data = []
-    ) {
-        parent::__construct($context, $authSession, $jsHelper, $data);
-    }
+{   
 
     /**
      * Return header comment part of html for fieldset

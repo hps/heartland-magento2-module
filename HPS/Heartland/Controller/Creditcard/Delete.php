@@ -29,8 +29,10 @@ class Delete extends Action
     private $hpsStoredCard;
     
     public function __construct(
+        \Magento\Framework\App\Action\Context $context,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
+        parent::__construct($context);
         $this->hpsStoredCard = $hpsStoredCard;
     }
     

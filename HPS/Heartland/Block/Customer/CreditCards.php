@@ -2,6 +2,9 @@
 
 namespace HPS\Heartland\Block\Customer;
 
+use \Magento\Framework\View\Element\Template;
+use \Magento\Vault\Model\CustomerTokenManagement;
+
 class CreditCards extends \Magento\Vault\Block\Customer\CreditCards
 {
 
@@ -13,9 +16,12 @@ class CreditCards extends \Magento\Vault\Block\Customer\CreditCards
     private $hpsStoredCard;
     
     public function __construct(
+        Template\Context $context,
+        \Magento\Vault\Model\CustomerTokenManagement $customerTokenManagement,        
         \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
-        $this->hpsStoredCard = $hpsStoredCard;
+        parent::__construct($context, $customerTokenManagement);
+        $this->hpsStoredCard = $hpsStoredCard;        
     }
     
     public function getStoredCards()
