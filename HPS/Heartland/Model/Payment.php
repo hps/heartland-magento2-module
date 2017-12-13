@@ -855,8 +855,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     {
         $data = $this->getAdditionalData();
         $this->save_token_value = 0;
-        if (array_key_exists('save_token_value', $data)) {
-            $this->save_token_value = (int) $data['save_token_value'];
+        if (array_key_exists('_save_token_value', $data)) {
+            $this->save_token_value = (int) $data['_save_token_value'];
         }
         $this->log($this->save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
 
