@@ -22,11 +22,13 @@ class InstallSchema implements InstallSchemaInterface
      */
     public function install(
         SchemaSetupInterface $setup,
-		ModuleContextInterface $context
+        ModuleContextInterface $context
     ) {
         $installer = $setup;
         $installer->startSetup();
-        $table_hps_heartland_storedcard = $setup->getConnection()->newTable($setup->getTable('hps_heartland_storedcard'));
+        $table_hps_heartland_storedcard = $setup->getConnection()->newTable(
+            $setup->getTable('hps_heartland_storedcard')
+        );
         $table_hps_heartland_storedcard->addColumn(
             'heartland_storedcard_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -83,6 +85,11 @@ class InstallSchema implements InstallSchemaInterface
             [],
             'dt'
         );
+        $table_hps_heartland_storedcard->addIndex(
+            $installer->getIdxName('hps_heartland', ['customer_id']),
+            ['customer_id']
+        );
+        
         $setup->getConnection()->createTable($table_hps_heartland_storedcard);
         $setup->endSetup();
     }
