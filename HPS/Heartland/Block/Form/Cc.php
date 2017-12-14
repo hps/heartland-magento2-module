@@ -12,6 +12,7 @@
 namespace HPS\Heartland\Block\Form;
 
 use Magento\Payment\Model\MethodInterface;
+use Magento\Payment\Model\Config;
 
 /**
  * Class Cc
@@ -37,10 +38,14 @@ class Cc extends \Magento\Payment\Block\Form\Cc
     private $hpsData;
     
     public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        Config $paymentConfig,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
-        \HPS\Heartland\Helper\Data $hpsData
+        \HPS\Heartland\Helper\Data $hpsData,
+        array $data = []
     ) {
+        parent::__construct($context, $paymentConfig, $data);
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
         $this->hpsData = $hpsData;
@@ -56,7 +61,7 @@ class Cc extends \Magento\Payment\Block\Form\Cc
         $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
-            try {                
+            try {
                 $customer = $this->customerRepository->get($customerEmail);
                 $customerId = $customer->getId();
             } catch (\Exception $e) {

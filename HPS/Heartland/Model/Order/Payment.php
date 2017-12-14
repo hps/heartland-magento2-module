@@ -23,14 +23,11 @@ class Payment extends \Magento\Sales\Model\Order\Payment
      * @var \HpsCreditService
      */
     private $hpsServicesConfig;
-    private $hpsCreditService;
     
     public function __construct(
-        //\HpsCreditService $hpsCreditService,
         \HpsServicesConfig $hpsServicesConfig
-    ) {        
-        $this->hpsServicesConfig = $hpsServicesConfig;        
-        //$this->hpsCreditService = $hpsCreditService($this->hpsServicesConfig);
+    ) {
+        $this->hpsServicesConfig = $hpsServicesConfig; 
     }
 
     public function canCapture()
@@ -97,11 +94,11 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     }
 
     private function getHPS()
-    { 
+    {
         try {
             /** @var \HpsServicesConfig $hps */
             if ($this->getCcTransId() && $this->transactionRecord === null) {
-                $hps                = new \HpsServicesConfig(); 
+                $hps                = new \HpsServicesConfig();
                 $abs                = $this->getMethodInstance();
                 $hps->secretApiKey  = $abs->getConfigData('private_key');
                 $hps->developerId   = $abs->getConfigData('developerId');

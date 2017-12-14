@@ -324,14 +324,13 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
             e.preventDefault();
             // Tell the iframes to tokenize the data
             hps.Messages.post(
-				{
-					accumulateData: true,
-					action: 'tokenize',
-					message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-				},
-				'cardNumber'
-				);
-
+                {
+                    accumulateData: true,
+                    action: 'tokenize',
+                    message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
+                },
+                'cardNumber'
+            );
         });
     }
 }

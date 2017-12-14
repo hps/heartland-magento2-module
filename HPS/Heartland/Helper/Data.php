@@ -55,8 +55,7 @@ class Data extends AbstractHelper
         \Magento\Framework\App\Request\Http $httpRequest,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
-        )
-    {
+    ) {
         $this->request = $httpRequest;
         $this->directoryList = $directoryList;
         $this->storeManagerInterface = $storeManagerInterface;
@@ -71,9 +70,9 @@ class Data extends AbstractHelper
     public function getConfig($config_path)
     {
         return $this->scopeConfig->getValue(
-                    (string) $config_path,
-                    (string) ScopeInterface::SCOPE_STORE
-                );
+            (string) $config_path,
+            (string) ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
@@ -84,7 +83,9 @@ class Data extends AbstractHelper
     {
         $pubKey = (string) $this->getConfig((string)$this->publicKey);
         if (preg_match($this->publicKeyPattern, (string) $pubKey) !== (int) 1) {
-            throw new \Magento\Framework\Validator\Exception(__((string)'Improperly configured public key found at core_config_data{ path = '.$this->publicKey.' }'));
+            throw new \Magento\Framework\Validator\Exception(
+                __((string)'Improperly configured public key found at core_config_data{ path = '.$this->publicKey.' }')
+            );
         }
         return (string) $pubKey;
     }

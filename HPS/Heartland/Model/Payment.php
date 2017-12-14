@@ -536,94 +536,103 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 }
             }
 
-            /*
-             * execute the portic messages related to the specified action
-             */
-            switch ($paymentAction) {
+            try{
                 /*
-                 * \HpsTransactionType::AUTHORIZE places a hold on the card and requests an approval from the Card
-                 * Issuer
-                 * This transaction will not be settled and the hold will fall off of the card holders account
-                 * usually after 7 days but this time frame is up to the issuer and may vary.
-                 * If the transaction is later captured it is then transfered from the card holders account to the
-                 * merchant.
-                 * Approval codes are typically only good for 30 days or so
-                 *
-                 * the typical use case for this transaction is if a product is ordered and not immediately shipped
+                 * execute the portic messages related to the specified action
                  */
-                case (\HpsTransactionType::AUTHORIZE):
-                    $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
-                    /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
-                    ;
-                    $response = $chargeService->authorize(
-                        \HpsInputValidation::checkAmount($requestedAmount),
-                        $currency,
-                        $suToken,
-                        $validCardHolder,
-                        $canSaveToken,
-                        null,
-                        $storeName
-                    );
-                    $this->log($response, 'HPS\Heartland\Model\Payment authorize Method response: ');
+                switch ($paymentAction) {
+                    /*
+                     * \HpsTransactionType::AUTHORIZE places a hold on the card and requests an approval from the Card
+                     * Issuer
+                     * This transaction will not be settled and the hold will fall off of the card holders account
+                     * usually after 7 days but this time frame is up to the issuer and may vary.
+                     * If the transaction is later captured it is then transfered from the card holders account to the
+                     * merchant.
+                     * Approval codes are typically only good for 30 days or so
+                     *
+                     * the typical use case for this transaction is if a product is ordered and not immediately shipped
+                     */
+                    case (\HpsTransactionType::AUTHORIZE):
+                        $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
+                        /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
+                        ;
+                        $response = $chargeService->authorize(
+                            \HpsInputValidation::checkAmount($requestedAmount),
+                            $currency,
+                            $suToken,
+                            $validCardHolder,
+                            $canSaveToken,
+                            null,
+                            $storeName
+                        );
+                        $this->log($response, 'HPS\Heartland\Model\Payment authorize Method response: ');
 
-                    if (isset($response->tokenData) && $response->tokenData->tokenValue) {
-                        $payment->setCcNumberEnc($response->tokenData->tokenValue);
-                    }
-                    break;
-                /*
-                 * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
-                 * It is the necesary follow up transaction initiated from the invoice function of magento
-                 * administrative pages.
-                 * NOTE::: Only one capture is supported  on an authorisation. by our gateway. a new authorization
-                 * will be necessary for follow up partial captures
-                 */
-                case (\HpsTransactionType::CAPTURE): // Portico CreditAddtoBatch \HpsTransactionType::CAPTURE
-                    $this->log($suToken, 'HPS\Heartland\Model\Payment capture Method Called: ');
-                    $response = $chargeService->capture($parentPaymentID, $requestedAmount);
-                    break;
-                /*
-                 * This transaction will request an approval code from the issuer and then add it to the daily
-                 * settlement. No further action is required in order for the merchant to aquire funds.
-                 * Digital media sales which are immediately delivered are an ideal use case for this transaction
-                 */
-                case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
-                    $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
-                    $response = $chargeService->charge(
-                        \HpsInputValidation::checkAmount($requestedAmount),
-                        $this->hpsData->getCurrencyCode(),
-                        $suToken,
-                        $validCardHolder,
-                        $canSaveToken
-                    );
+                        if (isset($response->tokenData) && $response->tokenData->tokenValue) {
+                            $payment->setCcNumberEnc($response->tokenData->tokenValue);
+                        }
+                        break;
+                    /*
+                     * This transaction is the compliment to \HpsTransactionType::AUTHORIZE.
+                     * It is the necesary follow up transaction initiated from the invoice function of magento
+                     * administrative pages.
+                     * NOTE::: Only one capture is supported  on an authorisation. by our gateway. a new authorization
+                     * will be necessary for follow up partial captures
+                     */
+                    case (\HpsTransactionType::CAPTURE): // Portico CreditAddtoBatch \HpsTransactionType::CAPTURE
+                        $this->log($suToken, 'HPS\Heartland\Model\Payment capture Method Called: ');
+                        $response = $chargeService->capture($parentPaymentID, $requestedAmount);
+                        break;
+                    /*
+                     * This transaction will request an approval code from the issuer and then add it to the daily
+                     * settlement. No further action is required in order for the merchant to aquire funds.
+                     * Digital media sales which are immediately delivered are an ideal use case for this transaction
+                     */
+                    case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
+                        $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
+                        $response = $chargeService->charge(
+                            \HpsInputValidation::checkAmount($requestedAmount),
+                            $this->hpsData->getCurrencyCode(),
+                            $suToken,
+                            $validCardHolder,
+                            $canSaveToken
+                        );
 
-                    $payment->setParentTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
-                    break;
-                /**
-                 * Reverses the full amount and removes any related capture from the batch */
-                case (\HpsTransactionType::VOID): // Portico CreditVoid \HpsTransactionType::VOID
-                    $response = $chargeService->void($parentPaymentID);
-                    break;
-                case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
-                    $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
-                    $response = $chargeService->reverse(
-                        $parentPaymentID,
-                        $reportTxnDetail->authorizedAmount,
-                        $currency,
-                        $details,
-                        $newAuthAmount
-                    );
-                    break;
-                case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
-                    $response = $chargeService->refund(
-                        $requestedAmount,
-                        $currency,
-                        $parentPaymentID,
-                        $validCardHolder,
-                        $details
-                    );
-                    break;
-                default:
-                    throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
+                        $payment->setParentTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
+                        break;
+                    /**
+                     * Reverses the full amount and removes any related capture from the batch */
+                    case (\HpsTransactionType::VOID): // Portico CreditVoid \HpsTransactionType::VOID
+                        $response = $chargeService->void($parentPaymentID);
+                        break;
+                    case (\HpsTransactionType::REVERSE):// Portico CreditReversal \HpsTransactionType::REVERSE
+                        $newAuthAmount = $reportTxnDetail->settlementAmount - $requestedAmount;
+                        $response = $chargeService->reverse(
+                            $parentPaymentID,
+                            $reportTxnDetail->authorizedAmount,
+                            $currency,
+                            $details,
+                            $newAuthAmount
+                        );
+                        break;
+                    case (\HpsTransactionType::REFUND):// Portico CreditReturn \HpsTransactionType::REFUND
+                        $response = $chargeService->refund(
+                            $requestedAmount,
+                            $currency,
+                            $parentPaymentID,
+                            $validCardHolder,
+                            $details
+                        );
+                        break;
+                    default:
+                        throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__($paymentAction . ' not implemented')));
+                }
+            } catch (\Exception $e) {
+                // # \Psr\Log\LoggerInterface::error
+                $this->_logger->error(__(
+                    'Gateway Error: - %1',
+                    $e->getMessage()
+                ));
+                $noticeMsg[] = __('Gateway Error:' . $e->getMessage());
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
 
@@ -833,7 +842,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $customerEmail = $orderObj->getCustomerEmail();
         //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
-            try {                
+            try {
                 $customer = $this->customerRepository->get($customerEmail);
                 $customerId = $customer->getId();
             } catch (\Exception $e) {
@@ -943,7 +952,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->log($this->hpsStoredCard->getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
         if (!empty($this->token_value) && is_numeric($this->token_value) && !empty($custID) && $this->hpsStoredCard->getCanStoreCards()) {
-            $this->log($this->token_value, '\HPS\Heartland\Model\Payment::getToken Method Retrive saved card value:  ');
             $this->token_value = $this->hpsStoredCard->getToken($this->token_value, $custID);
         }
         $this->log($suToken, '\HPS\Heartland\Model\Payment:: after getCanStoreCards:  ');

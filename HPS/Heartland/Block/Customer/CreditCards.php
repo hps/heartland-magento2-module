@@ -17,15 +17,15 @@ class CreditCards extends \Magento\Vault\Block\Customer\CreditCards
     
     public function __construct(
         Template\Context $context,
-        \Magento\Vault\Model\CustomerTokenManagement $customerTokenManagement,        
+        \Magento\Vault\Model\CustomerTokenManagement $customerTokenManagement,    
         \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
         parent::__construct($context, $customerTokenManagement);
-        $this->hpsStoredCard = $hpsStoredCard;        
+        $this->hpsStoredCard = $hpsStoredCard;
     }
     
     public function getStoredCards()
-	{
+    {
         return $this->hpsStoredCard->getStoredCards();
     }
 }
