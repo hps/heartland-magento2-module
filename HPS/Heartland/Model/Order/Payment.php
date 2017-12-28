@@ -7,6 +7,14 @@
 
 namespace HPS\Heartland\Model\Order;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order\Payment\Info;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface;
+
 /** Override these as Heartland wants to apply specific logic
  * Class Payment
  * @package HPS\Heartland\Model\Order
@@ -25,8 +33,41 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     private $hpsServicesConfig;
     
     public function __construct(
-        \HpsServicesConfig $hpsServicesConfig
-    ) {
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Magento\Payment\Helper\Data $paymentData,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
+        PriceCurrencyInterface $priceCurrency,
+        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
+        ManagerInterface $transactionManager,
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Order\Payment\Processor $paymentProcessor,
+        OrderRepositoryInterface $orderRepository,
+        \HpsServicesConfig $hpsServicesConfig,
+        array $data = []
+    ) {        
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $paymentData,
+            $encryptor,
+            $creditmemoFactory,
+            $priceCurrency,
+            $transactionRepository,
+            $transactionManager,
+            $transactionBuilder,
+            $paymentProcessor,
+            $orderRepository,
+            null,
+            null,
+            $data
+        );
+        
         $this->hpsServicesConfig = $hpsServicesConfig; 
     }
 
