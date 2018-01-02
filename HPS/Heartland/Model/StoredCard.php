@@ -203,7 +203,9 @@ class StoredCard
                     ]);
             }
         } else {
-            throw new \Magento\Framework\Exception\LocalizedException(__('No valid User Logged On!! Cannot save card.'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('No valid User Logged On!! Cannot save card.')
+            );
         }
     }
 
@@ -220,11 +222,16 @@ class StoredCard
             //simply dont want invalid arrays of data
             foreach ($data as $item) {
                 if (preg_match('/[\D]/', $item['heartland_storedcard_id']) === 1) {
-                    throw new \Magento\Framework\Exception\LocalizedException(__('heartland_storedcard_id does not have a valid value.'));
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __('heartland_storedcard_id does not have a valid value.')
+                    );
                 }
                 foreach ($item as $columnName => $columnValue) {
-                    if ($columnValue === null || $columnValue === '' || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
-                        throw new \Magento\Framework\Exception\LocalizedException(__($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id']));
+                    if ($columnValue === null || $columnValue === '' 
+                        || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
+                        throw new \Magento\Framework\Exception\LocalizedException(
+                            __($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id'])
+                        );
                     }
                 }
             }
