@@ -62,7 +62,7 @@ define([
         /**
          * Call HPS Tokenization
          */
-        initHpsToken: function () {
+        initHpsToken: function () { 
             var self = this;
             try {
                 $('body').trigger('processStart');
@@ -135,7 +135,7 @@ define([
         /**
          * Trigger order submit
          */
-        submitOrder: function (e) {
+        submitOrder: function (e) { 
             if ($('#securesubmit_token').val() !== '') {
                 this.placeOrder();
                 return true;
@@ -152,7 +152,7 @@ define([
         /**
          * Place order
          */
-        placeOrder: function () {
+        placeOrder: function () { 
             $('#' + this.selector).trigger('realOrder');
         }
     });
