@@ -227,10 +227,12 @@ class StoredCard
                     );
                 }
                 foreach ($item as $columnName => $columnValue) {
-                    if ($columnValue === null || $columnValue === '' 
-                        || preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
+                    if ($columnValue === null ||
+                        $columnValue === '' ||
+                        preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
                         throw new \Magento\Framework\Exception\LocalizedException(
-                            __($columnName . ' Column does not have a valid value for ' . $item['heartland_storedcard_id'])
+                            __($columnName . ' Column does not have a valid value for ' .
+                            $item['heartland_storedcard_id'])
                         );
                     }
                 }

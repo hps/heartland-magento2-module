@@ -25,7 +25,6 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     /** Can Capture
      * @return bool
      */
-     
     
     /**
      * @var \HpsCreditService
@@ -48,7 +47,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
         OrderRepositoryInterface $orderRepository,
         \HpsServicesConfig $hpsServicesConfig,
         array $data = []
-    ) {        
+    ) {
         parent::__construct(
             $context,
             $registry,
@@ -68,7 +67,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             $data
         );
         
-        $this->hpsServicesConfig = $hpsServicesConfig; 
+        $this->hpsServicesConfig = $hpsServicesConfig;
     }
 
     public function canCapture()

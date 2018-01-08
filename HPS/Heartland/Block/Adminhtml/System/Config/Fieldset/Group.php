@@ -16,7 +16,8 @@ namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;
 
 use \Magento\Backend\Model\Auth\Session as AuthSession;
 
-class Group extends \Magento\Config\Block\System\Config\Form\Fieldset{
+class Group extends \Magento\Config\Block\System\Config\Form\Fieldset
+{
     /**
      * Return header comment part of html for fieldset
      *

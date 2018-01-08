@@ -224,8 +224,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
         $this->hpsData = $hpsData;
-        //$this->hpsTokenData = $hpsTokenData;
-        //$this->hpsCreditService = $hpsCreditService;
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
@@ -460,7 +458,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             /**
              * $parentPaymentID While this could also be \HpsCreditCard|\HpsTokenData in this case
              * we are retrieving the transaction ID
-             */     
+             */
             $parentPaymentID = (int) $payment->getCcTransId();
             $canSaveToken = $this->saveMuToken() ? true : false;
 
@@ -490,7 +488,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     // set to do a capture
                     $paymentAction = \HpsTransactionType::CAPTURE;
                     $this->log($paymentAction, 'paymentAction in _payment method changed to capture: ');
-                } elseif ($paymentAction === \HpsTransactionType::REFUND 
+                } elseif ($paymentAction === \HpsTransactionType::REFUND
                           && $reportTxnDetail->transactionStatus == 'A') {
                     //perform the reversal when transactionStatus is Active
                     $paymentAction = \HpsTransactionType::REVERSE;
@@ -499,16 +497,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             // these are the only 2 transaction types where Magento2 does not need a transaction ID to reference
             if ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
                 $paymentAction = 'do be done';
-                $this->log($paymentAction, 
-                            'We know we dont have a valid transaction id so its time to throw an error '
-                            );
+                    $this->log(
+                        $paymentAction,
+                        'We know we dont have a valid transaction id so its time to throw an error '
+                    );
                 //We know we dont have a valid transaction id so its time to throw an error
             } // all of these types of transactions require a transaction id from  previous transaction
             /*
              * \HpsTransactionType::CAPTURE does not accept cardholder or token so there is no need to create these
              * objects
              */
-            if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CAPTURE 
+            if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CAPTURE
                 || $paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::REFUND
             ) {
                 $order = $payment->getOrder();
@@ -519,14 +518,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
-                if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE) {
+                if ($paymentAction === \HpsTransactionType::AUTHORIZE ||
+                    $paymentAction === \HpsTransactionType::CHARGE) {
                     $suToken = $this->getToken(new HpsTokenData(), $orderCustomerId);
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
             }
 
-            try{
+            try {
                 /*
                  * execute the portic messages related to the specified action
                  */
@@ -631,7 +631,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             // even if the MUPT save fails the transaction should still complete so we execute this step first
 
             /**
-             * @var \Magento\Payment\Model\InfoInterface|\Magento\Payment\Model\Method\AbstractMethod|\Magento\Framework\DataObject $info
+             * @var \Magento\Payment\Model\InfoInterface |
+             *      \Magento\Payment\Model\Method\AbstractMethod |
+             *      \Magento\Framework\DataObject $info
              * @method string $info::getCcNumber() Retrieves the value in the Credit card field in this instance
              * @method string getCcType() Retrieves the text type for the credit card in this instance
              */
@@ -743,10 +745,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     break;
 
                 case 'HpsReportTransactionDetails':
-                    /** @var \HpsReportTransactionDetails $response Properties found in the 
+                    /** @var \HpsReportTransactionDetails $response Properties found in the
                      * HpsReportTransactionDetails */
                     $payment->setAmountPaid($response->settlementAmount);
-                    $payment->setParentTransactionId($parentPaymentID . '-' . $this->transactionTypeMap[$paymentAction]);
+                    $payment->setParentTransactionId
+                    (
+                        $parentPaymentID . '-' . $this->transactionTypeMap[$paymentAction]
+                    );
                     $successMsg[] = __(
                         "The order Invoiced successfully for \$%1",
                         $response->settlementAmount
@@ -779,7 +784,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $errorMsg[] = 'Please contact this retailer to complete your transaction';
             }
             if (!empty($errorMsg) && !empty($response->transactionId)) {
-                if (($paymentAction === \HpsTransactionType::CHARGE 
+                if (($paymentAction === \HpsTransactionType::CHARGE
                     || $paymentAction === \HpsTransactionType::AUTHORIZE) && ($response->transactionId > 0)
                 ) {
                     //Reverse any auth
@@ -951,7 +956,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->getTokenValue();
         $this->log($this->hpsStoredCard->getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
-        if (!empty($this->token_value) && is_numeric($this->token_value) 
+        if (!empty($this->token_value) && is_numeric($this->token_value)
             && !empty($custID) && $this->hpsStoredCard->getCanStoreCards()) {
             $this->token_value = $this->hpsStoredCard->getToken($this->token_value, $custID);
         }
