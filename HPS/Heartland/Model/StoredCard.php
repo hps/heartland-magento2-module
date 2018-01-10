@@ -14,6 +14,8 @@ namespace HPS\Heartland\Model;
 use Magento\Customer\Model\Session as customerSession;
 use \Magento\Backend\Model\Auth\Session as adminSession;
 
+use HPS\Heartland\Model\TokenDataFactory;
+
 /**
  * Class StoredCard
  *
@@ -22,6 +24,11 @@ use \Magento\Backend\Model\Auth\Session as adminSession;
 class StoredCard
 {
     private $hpsTableName = 'hps_heartland_storedcard';
+    
+    /**
+     * @var HPS\Heartland\Model\TokenDataFactory		
+     */	 
+    protected $modelTokenDataFactory;
     
     /**
      * @var \Magento\Customer\Model\Session
@@ -42,14 +49,16 @@ class StoredCard
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Backend\Model\Auth\Session $backendSession
      */
-    public function __construct(
+    protected function __construct(
         customerSession $authSession,
         adminSession $backendSession,
-        \Magento\Framework\App\ResourceConnection $resourceConnection
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        TokenDataFactory $modelTokenDataFactory
     ) {
         $this->authSession = $authSession;
         $this->backendSession = $backendSession;
         $this->resourceConnection = $resourceConnection;
+        $this->modelTokenDataFactory = $modelTokenDataFactory;
     }
     
     /** performs a db lookup for the current customer within the db given a specific token ID
