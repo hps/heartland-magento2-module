@@ -8,13 +8,12 @@
  * @copyright   Heartland (http://heartland.us)
  * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
-
 namespace HPS\Heartland\Model;
 
 use Magento\Customer\Model\Session as customerSession;
 use \Magento\Backend\Model\Auth\Session as adminSession;
-
 use HPS\Heartland\Model\TokenDataFactory;
+use \Magento\Store\Model\ScopeInterface;
 
 /**
  * Class StoredCard
@@ -23,44 +22,39 @@ use HPS\Heartland\Model\TokenDataFactory;
  */
 class StoredCard
 {
-    private $hpsTableName = 'hps_heartland_storedcard';
-    
+
     /**
      * @var HPS\Heartland\Model\TokenDataFactory		
-     */	 
+     */
     protected $modelTokenDataFactory;
-    
+
     /**
      * @var \Magento\Customer\Model\Session
      */
     private $authSession;
-    
+
     /**
      * @var \Magento\Backend\Model\Auth\Session
      */
     private $backendSession;
-    
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
-    private $resourceConnection;
-    
+
     /**
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Backend\Model\Auth\Session $backendSession
      */
     public function __construct(
-        customerSession $authSession,
-        adminSession $backendSession,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
-        TokenDataFactory $modelTokenDataFactory
-    ) {
+            customerSession $authSession, 
+            adminSession $backendSession,
+            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+            TokenDataFactory $modelTokenDataFactory
+    )
+    {
         $this->authSession = $authSession;
         $this->backendSession = $backendSession;
-        $this->resourceConnection = $resourceConnection;
+        $this->scopeConfig = $scopeConfig;
         $this->modelTokenDataFactory = $modelTokenDataFactory;
     }
-    
+
     /** performs a db lookup for the current customer within the db given a specific token ID
      * @param int $id
      *
@@ -74,18 +68,14 @@ class StoredCard
             $custID = $this->authSession->getCustomerId();
         }
         if (!empty($custID)) {
-            $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-                $select = $conn->select()
-                    ->from(
-                        ['o' => $this->hpsTableName]
-                    )
-                    ->where('o.customer_id   = ?', (int)$custID)
-                    ->where('o.heartland_storedcard_id = ?', (int)$id);
-                $data = (array)$conn->fetchRow($select);
-                if (!empty($data) && key_exists('token_value', $data)) {
-                    $MuToken = $data['token_value'];
-                }
+            $token = $this->modelTokenDataFactory->create();
+            $collection = $token->getCollection()
+                ->addFieldToFilter('customer_id', array('eq' => (int) $custID))
+                ->addFieldToFilter('heartland_storedcard_id', array('eq' => (int) $id));
+            
+            if ($collection->getSize() > 0) {
+                $data = $collection->getFirstItem();
+                $MuToken = (!empty($data['token_value'])) ? $data['token_value'] : false;
             }
         }
         return $MuToken;
@@ -99,12 +89,15 @@ class StoredCard
      */
     public function deleteStoredCards($id)
     {
-            $conn = $this->resourceConnection->getConnection();
-        if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-            $conn->delete($this->hpsTableName, [
-            'heartland_storedcard_id = ?' => (int)$id,
-            ]);
-        }
+        try {
+            $model = $this->modelTokenDataFactory->create();
+            $model->load((int) $id);
+            $model->delete();
+        } catch (\Exception $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                $e->getMessage()
+            );
+        }        
     }
 
     /** looks up existing stored cards for the currently logged on user
@@ -118,15 +111,18 @@ class StoredCard
     {
         $data = [];
         if ($this->authSession->isLoggedIn()) {
-            $token = $this->modelTokenDataFactory->create();
+            $token = $this->modelTokenDataFactory->create(); 
             $collection = $token->getCollection()
-                            ->addFieldToFilter('customer_id', array('eq' => (int)$this->authSession->getCustomerId()));
-            $data = $collection->getData();            
+                ->addFieldToFilter('customer_id', array('eq' => (int) $this->authSession->getCustomerId()));
+            
+            if ($collection->getSize() > 0) {
+                $data = $collection->getData();
+            }
         }
 
-        return (array)$data;
+        return (array) $data;
     }
-    
+
     /** looks up existing stored cards for the currently logged on user
      *
      * @return array
@@ -139,11 +135,14 @@ class StoredCard
         if ($custID !== null && $custID > 0 && $this->getCanStoreCards()) {
             $token = $this->modelTokenDataFactory->create();
             $collection = $token->getCollection()
-                            ->addFieldToFilter('customer_id', array('eq' => (int)$custID));
-            $data = $collection->getData();               
+                ->addFieldToFilter('customer_id', array('eq' => (int) $custID));
+
+            if ($collection->getSize() > 0) {
+                $data = $collection->getData();
+            }
         }
 
-        return (array)$data;
+        return (array) $data;
     }
 
     /** returns true or false if stored cards are enabled
@@ -152,19 +151,12 @@ class StoredCard
      */
     public function getCanStoreCards()
     {
-        $retVal = (int)0;
+        $retVal = (int) 0;
         if ($this->authSession->isLoggedIn() || $this->backendSession->isLoggedIn()) {
-            $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-                $select = $conn->select()
-                    ->from(
-                        ['o' => 'core_config_data']
-                    )
-                    ->where('o.path = ?', (string)'payment/hps_heartland/save_cards');
-                $data = (array)$conn->fetchAll($select);
-
-                $retVal = (!empty($data[0])) ? (int)$data[0]['value'] : (int) 0;
-            }
+            return $this->scopeConfig->getValue(
+                    (string) 'payment/hps_heartland/save_cards',
+                    (string) ScopeInterface::SCOPE_STORE
+            );
         }
 
         return $retVal;
@@ -182,61 +174,25 @@ class StoredCard
      */
     public function setStoredCards($token, $cc_type, $last4, $cc_exp_month, $cc_exp_year, $customerID)
     {
-        $conn = $this->resourceConnection->getConnection();
         if ($customerID) {
-            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-                // try to prevent duplicat records in the table
-                $conn->delete($this->hpsTableName, [
-                    'customer_id = ?'   => (int)$customerID,
-                    'token_value = ?' => $token,
-                ]);
-                $conn->insert($this->hpsTableName, [
-                        'heartland_storedcard_id' => '',
-                        'dt'            => date("Y-m-d H:i:s"),
-                        'customer_id'   => $customerID,
-                        'token_value'   => (string)$token,
-                        'cc_type'       => (string)$cc_type,
-                        'cc_last4'      => (string)$last4,
-                        'cc_exp_month'  => (string)$cc_exp_month,
-                        'cc_exp_year'   => (string)$cc_exp_year,
-                    ]);
-            }
+            //delete existing data
+            $model = $this->modelTokenDataFactory->create();
+            $model->load($token, 'token_value');
+            $model->delete();
+
+            $newToken = $this->modelTokenDataFactory->create();
+            $newToken->setData('dt', date("Y-m-d H:i:s"))
+                ->setData('customer_id', $customerID)
+                ->setData('token_value', (string) $token)
+                ->setData('cc_type', (string) $cc_type)
+                ->setData('cc_last4', (string) $last4)
+                ->setData('cc_exp_month', (string) $cc_exp_month)
+                ->setData('cc_exp_year', (string) $cc_exp_year)
+                ->save();
         } else {
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('No valid User Logged On!! Cannot save card.')
+            __('No valid User Logged On!! Cannot save card.')
             );
         }
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    private function validate($data)
-    {
-        if (!empty($data)) {
-            // some very basic validation.
-            //simply dont want invalid arrays of data
-            foreach ($data as $item) {
-                if (preg_match('/[\D]/', $item['heartland_storedcard_id']) === 1) {
-                    throw new \Magento\Framework\Exception\LocalizedException(
-                        __('heartland_storedcard_id does not have a valid value.')
-                    );
-                }
-                foreach ($item as $columnName => $columnValue) {
-                    if ($columnValue === null ||
-                        $columnValue === '' ||
-                        preg_match('/[^\w\s\-\:]/', $columnValue) === 1) {
-                        throw new \Magento\Framework\Exception\LocalizedException(
-                            __($columnName . ' Column does not have a valid value for ' .
-                            $item['heartland_storedcard_id'])
-                        );
-                    }
-                }
-            }
-        }
-        return true;
     }
 }
