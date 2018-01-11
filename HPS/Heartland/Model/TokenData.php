@@ -11,9 +11,11 @@
 namespace HPS\Heartland\Model;
 
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\DataObject\IdentityInterface;
 
-class TokenData extends AbstractModel
+class TokenData extends AbstractModel implements TokenDataInterface, IdentityInterface
 {
+    const CACHE_TAG = 'hps_heartland_storedcard';
 
     /**
      * Define resource model
@@ -21,5 +23,10 @@ class TokenData extends AbstractModel
     protected function _construct()
     {
         $this->_init('HPS\Heartland\Model\ResourceModel\TokenData');
+    }
+    
+    public function getIdentities()
+    {
+        return [self::CACHE_TAG . '_' . $this->getId()];
     }
 }

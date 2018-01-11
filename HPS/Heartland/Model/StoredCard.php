@@ -49,7 +49,7 @@ class StoredCard
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Backend\Model\Auth\Session $backendSession
      */
-    protected function __construct(
+    public function __construct(
         customerSession $authSession,
         adminSession $backendSession,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -118,15 +118,10 @@ class StoredCard
     {
         $data = [];
         if ($this->authSession->isLoggedIn()) {
-            $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-                $select = $conn->select()
-                    ->from(
-                        ['o' => $this->hpsTableName]
-                    )
-                    ->where('o.customer_id = ?', (int)$this->authSession->getCustomerId());
-                $data = (array)$conn->fetchAll($select);
-            }
+            $token = $this->modelTokenDataFactory->create();
+            $collection = $token->getCollection()
+                            ->addFieldToFilter('customer_id', array('eq' => (int)$this->authSession->getCustomerId()));
+            $data = $collection->getData();            
         }
 
         return (array)$data;
@@ -142,15 +137,10 @@ class StoredCard
     {
         $data = [];
         if ($custID !== null && $custID > 0 && $this->getCanStoreCards()) {
-            $conn = $this->resourceConnection->getConnection();
-            if ($conn->isTableExists($conn->getTableName($this->hpsTableName))) {
-                $select = $conn->select()
-                    ->from(
-                        ['o'=>$this->hpsTableName]
-                    )
-                    ->where('o.customer_id = ?', (int)$custID);
-                $data = (array)$conn->fetchAll($select);
-            }
+            $token = $this->modelTokenDataFactory->create();
+            $collection = $token->getCollection()
+                            ->addFieldToFilter('customer_id', array('eq' => (int)$custID));
+            $data = $collection->getData();               
         }
 
         return (array)$data;

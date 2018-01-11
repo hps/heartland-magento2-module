@@ -100,7 +100,6 @@ class Data extends AbstractHelper
      */
     public function jsonData()
     {
-
         $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
         $methods = $this->request->getServer('REQUEST_METHOD');
         

@@ -8,19 +8,10 @@
  * @copyright   Heartland (http://heartland.us)
  * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
-namespace HPS\Heartland\Model\ResourceModel;
 
-use \Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+namespace HPS\Heartland\Model;
 
-class TokenData extends AbstractDb
+interface TokenDataInterface
 {
-
-    /** 	
-     * Define main table
-     * 
-    */
-    protected function _construct()
-    {
-        $this->_init('hps_heartland_storedcard', 'heartland_storedcard_id');
-    }
+    
 }
