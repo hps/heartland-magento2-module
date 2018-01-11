@@ -748,8 +748,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     /** @var \HpsReportTransactionDetails $response Properties found in the
                      * HpsReportTransactionDetails */
                     $payment->setAmountPaid($response->settlementAmount);
-                    $payment->setParentTransactionId
-                    (
+                    $payment->setParentTransactionId(
                         $parentPaymentID . '-' . $this->transactionTypeMap[$paymentAction]
                     );
                     $successMsg[] = __(

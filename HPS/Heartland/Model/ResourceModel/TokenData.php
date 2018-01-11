@@ -15,10 +15,10 @@ use \Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 class TokenData extends AbstractDb
 {
 
-    /** 	
+    /**
      * Define main table
-     * 
-    */
+     *
+     */
     protected function _construct()
     {
         $this->_init('hps_heartland_storedcard', 'heartland_storedcard_id');

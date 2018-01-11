@@ -24,7 +24,7 @@ class StoredCard
 {
 
     /**
-     * @var HPS\Heartland\Model\TokenDataFactory		
+     * @var HPS\Heartland\Model\TokenDataFactory
      */
     protected $modelTokenDataFactory;
 
@@ -43,12 +43,12 @@ class StoredCard
      * @param \Magento\Backend\Model\Auth\Session $backendSession
      */
     public function __construct(
-            customerSession $authSession, 
-            adminSession $backendSession,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-            TokenDataFactory $modelTokenDataFactory
-    )
-    {
+        customerSession $authSession,
+        adminSession $backendSession,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        TokenDataFactory $modelTokenDataFactory
+    ) {
+    
         $this->authSession = $authSession;
         $this->backendSession = $backendSession;
         $this->scopeConfig = $scopeConfig;
@@ -70,8 +70,8 @@ class StoredCard
         if (!empty($custID)) {
             $token = $this->modelTokenDataFactory->create();
             $collection = $token->getCollection()
-                ->addFieldToFilter('customer_id', array('eq' => (int) $custID))
-                ->addFieldToFilter('heartland_storedcard_id', array('eq' => (int) $id));
+                ->addFieldToFilter('customer_id', ['eq' => (int) $custID])
+                ->addFieldToFilter('heartland_storedcard_id', ['eq' => (int) $id]);
             
             if ($collection->getSize() > 0) {
                 $data = $collection->getFirstItem();
@@ -97,7 +97,7 @@ class StoredCard
             throw new \Magento\Framework\Exception\LocalizedException(
                 $e->getMessage()
             );
-        }        
+        }
     }
 
     /** looks up existing stored cards for the currently logged on user
@@ -111,9 +111,9 @@ class StoredCard
     {
         $data = [];
         if ($this->authSession->isLoggedIn()) {
-            $token = $this->modelTokenDataFactory->create(); 
+            $token = $this->modelTokenDataFactory->create();
             $collection = $token->getCollection()
-                ->addFieldToFilter('customer_id', array('eq' => (int) $this->authSession->getCustomerId()));
+                ->addFieldToFilter('customer_id', ['eq' => (int) $this->authSession->getCustomerId()]);
             
             if ($collection->getSize() > 0) {
                 $data = $collection->getData();
@@ -135,7 +135,7 @@ class StoredCard
         if ($custID !== null && $custID > 0 && $this->getCanStoreCards()) {
             $token = $this->modelTokenDataFactory->create();
             $collection = $token->getCollection()
-                ->addFieldToFilter('customer_id', array('eq' => (int) $custID));
+                ->addFieldToFilter('customer_id', ['eq' => (int) $custID]);
 
             if ($collection->getSize() > 0) {
                 $data = $collection->getData();
@@ -154,8 +154,8 @@ class StoredCard
         $retVal = (int) 0;
         if ($this->authSession->isLoggedIn() || $this->backendSession->isLoggedIn()) {
             return $this->scopeConfig->getValue(
-                    (string) 'payment/hps_heartland/save_cards',
-                    (string) ScopeInterface::SCOPE_STORE
+                (string) 'payment/hps_heartland/save_cards',
+                (string) ScopeInterface::SCOPE_STORE
             );
         }
 
@@ -191,7 +191,7 @@ class StoredCard
                 ->save();
         } else {
             throw new \Magento\Framework\Exception\LocalizedException(
-            __('No valid User Logged On!! Cannot save card.')
+                __('No valid User Logged On!! Cannot save card.')
             );
         }
     }
