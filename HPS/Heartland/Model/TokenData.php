@@ -20,7 +20,7 @@ class TokenData extends AbstractModel implements TokenDataInterface, IdentityInt
     /**
      * Define resource model
      */
-    protected function _construct()
+    public function _construct()
     {
         $this->_init('HPS\Heartland\Model\ResourceModel\TokenData');
     }

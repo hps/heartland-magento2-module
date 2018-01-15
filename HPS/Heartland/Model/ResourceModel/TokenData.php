@@ -19,7 +19,7 @@ class TokenData extends AbstractDb
      * Define main table
      *
      */
-    protected function _construct()
+    public function _construct()
     {
         $this->_init('hps_heartland_storedcard', 'heartland_storedcard_id');
     }

@@ -26,7 +26,7 @@ class StoredCard
     /**
      * @var HPS\Heartland\Model\TokenDataFactory
      */
-    protected $modelTokenDataFactory;
+    private $modelTokenDataFactory;
 
     /**
      * @var \Magento\Customer\Model\Session

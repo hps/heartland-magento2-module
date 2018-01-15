@@ -15,7 +15,7 @@ use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 class Collection extends AbstractCollection
 {
   
-    protected function _construct()
+    public function _construct()
     {
         $this->_init(
             'HPS\Heartland\Model\TokenData',
