@@ -463,6 +463,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $canSaveToken = $this->saveMuToken() ? true : false;
 
             $this->log(func_num_args(), 'HPS\Heartland\Model\Payment Capture Method Called: ');
+            $this->log($parentPaymentID, 'parentPaymentID: ');
 
             /*
              * The below logic serves to determine if we need to authorise and capture or just add 
@@ -493,9 +494,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     //perform the reversal when transactionStatus is Active
                     $paymentAction = \HpsTransactionType::REVERSE;
                 }
-            } // end of verifying that we have something that looks like  transaction ID to use
-            // these are the only 2 transaction types where Magento2 does not need a transaction ID to reference
-            if ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE) {
+                // end of verifying that we have something that looks like  transaction ID to use
+            } elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE
+                      && $paymentAction !== \HpsTransactionType::CHARGE) 
+            {
+                // these are the only 2 transaction types where Magento2 does not need a
+                // transaction ID to reference
                 $paymentAction = 'do be done';
                     $this->log(
                         $paymentAction,

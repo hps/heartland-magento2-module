@@ -138,12 +138,12 @@ class Payment extends \Magento\Sales\Model\Order\Payment
         try {
             /** @var \HpsServicesConfig $hps */
             if ($this->getCcTransId() && $this->transactionRecord === null) {
-                $hps                = new \HpsServicesConfig();
+                //$hps                = new \HpsServicesConfig();
                 $abs                = $this->getMethodInstance();
-                $hps->secretApiKey  = $abs->getConfigData('private_key');
-                $hps->developerId   = $abs->getConfigData('developerId');
-                $hps->versionNumber = $abs->getConfigData('versionNumber');
-                $creditService = new \HpsCreditService($hps);
+                $this->hpsServicesConfig->secretApiKey  = $abs->getConfigData('private_key');
+                $this->hpsServicesConfig->developerId   = $abs->getConfigData('developerId');
+                $this->hpsServicesConfig->versionNumber = $abs->getConfigData('versionNumber');
+                $creditService = new \HpsCreditService($this->hpsServicesConfig);
                 $this->transactionRecord = $creditService->get($this->getCcTransId());
             }
         } catch (\Exception $e) {
