@@ -47,16 +47,12 @@ class Data extends AbstractHelper
      * @var Magento\Store\Model\StoreManagerInterface
      */
     private $storeManagerInterface;
-    
-    private $request;
-    
+  
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Request\Http $httpRequest,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
     ) {
-        $this->request = $httpRequest;
         $this->directoryList = $directoryList;
         $this->storeManagerInterface = $storeManagerInterface;
         parent::__construct($context);
@@ -101,10 +97,10 @@ class Data extends AbstractHelper
     public function jsonData()
     {
         $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
-        $methods = $this->request->getServer('REQUEST_METHOD');
+        $methods = $this->_request->getServer('REQUEST_METHOD');
         
         if (empty($inputs) === true && $methods === 'POST') {
-            $post = $this->request->getPostValue();
+            $post = $this->_request->getPostValue();
                        
             if (array_key_exists('payment', $post)) {
                 $inputs['paymentMethod']['additional_data'] = $post['payment'];
