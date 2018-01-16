@@ -15,7 +15,8 @@ namespace HPS\Heartland\Model;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
 use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
-use \HpsTokenData as HpsTokenData;
+//use HPS\Heartland\Model\Factory\HpsCreditServiceFactory as HpsCreditServiceFactory;
+//use HPS\Heartland\Model\Factory\HpsTokenDataFactory as HpsTokenDataFactory;
 
 /**
  * Class Payment
@@ -150,8 +151,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private $hpsData;
     
-    private $hpsTokenData;
-    private $hpsCreditService;
+    private $hpsTokenDataFactory;
+    private $hpsCreditServiceFactory;
     private $hpsCardHolder;
     private $hpsAddress;
     private $storeManagerInterface;
@@ -191,6 +192,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HPS\Heartland\Helper\Data $hpsData,
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
+        \HpsCreditServiceFactory $hpsCreditServiceFactory,
+        //HpsTokenDataFactory $hpsTokenDataFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
         array $data = []
     ) {
@@ -214,12 +217,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // # \HPS\Heartland\Model\Payment::$heartlandApi
         // # \HpsServicesConfig
         $this->heartlandApi = $config;
-        // # \HpsServicesConfig::$secretApiKey
-        $this->heartlandApi->secretApiKey = $this->getConfigData('private_key');
-        // # \HpsServicesConfig::$developerId
-        $this->heartlandApi->developerId = $this->heartlandConfigFields['developerId'];
-        // # \HpsServicesConfig::$versionNumber
-        $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
         $this->messageManager = $managerInterface;
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
@@ -227,6 +224,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->hpsCreditServiceFactory = $hpsCreditServiceFactory;
+        //$this->hpsTokenDataFactory = $hpsTokenDataFactory;
     }
 
     /**
@@ -322,7 +321,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $info->setCcNumber($ccNumber);
 
         // # \HPS\Heartland\Model\Payment::getToken
-        $suToken = $this->getToken(new HpsTokenData());
+        $suToken = $this->getToken(new \HpsTokenData());
         if (empty($suToken->tokenValue)) {
             $errorMsg = __('Token error! Please try again.');
         }
@@ -355,9 +354,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private function getHpsCreditService()
     {
-        // # \HPS\Heartland\Model\Payment::$heartlandApi
-        // # \HpsCreditService::__construct
-        return new \HpsCreditService($this->heartlandApi);
+        $this->heartlandApi->secretApiKey = $this->getConfigData('private_key');
+        $this->heartlandApi->developerId = $this->heartlandConfigFields['developerId'];
+        $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
+        //create a new service with config values
+        return $this->hpsCreditServiceFactory->create(['config' => $this->heartlandApi]);
     }
 
     /**
@@ -496,15 +497,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 }
                 // end of verifying that we have something that looks like  transaction ID to use
             } elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE
-                      && $paymentAction !== \HpsTransactionType::CHARGE) 
-            {
+                      && $paymentAction !== \HpsTransactionType::CHARGE) {
                 // these are the only 2 transaction types where Magento2 does not need a
                 // transaction ID to reference
                 $paymentAction = 'do be done';
-                    $this->log(
-                        $paymentAction,
-                        'We know we dont have a valid transaction id so its time to throw an error '
-                    );
+                $this->log(
+                    $paymentAction,
+                    'We know we dont have a valid transaction id so its time to throw an error '
+                );
                 //We know we dont have a valid transaction id so its time to throw an error
             } // all of these types of transactions require a transaction id from  previous transaction
             /*
@@ -524,7 +524,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE ||
                     $paymentAction === \HpsTransactionType::CHARGE) {
-                    $suToken = $this->getToken(new HpsTokenData(), $orderCustomerId);
+                    $suToken = $this->getToken(new \HpsTokenData(), $orderCustomerId);
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
