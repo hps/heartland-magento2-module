@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  Heartland payment method model
  *

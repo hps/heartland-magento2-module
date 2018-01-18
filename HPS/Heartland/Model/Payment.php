@@ -15,8 +15,6 @@ namespace HPS\Heartland\Model;
 use \Magento\Framework\Exception\LocalizedException;
 use \Magento\Framework\Phrase;
 use \Magento\Sales\Api\Data\TransactionInterface as Transaction;
-//use HPS\Heartland\Model\Factory\HpsCreditServiceFactory as HpsCreditServiceFactory;
-//use HPS\Heartland\Model\Factory\HpsTokenDataFactory as HpsTokenDataFactory;
 
 /**
  * Class Payment
@@ -151,8 +149,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     private $hpsData;
     
-    private $hpsTokenDataFactory;
-    private $hpsCreditServiceFactory;
     private $hpsCardHolder;
     private $hpsAddress;
     private $storeManagerInterface;
@@ -192,8 +188,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HPS\Heartland\Helper\Data $hpsData,
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
-        \HpsCreditServiceFactory $hpsCreditServiceFactory,
-        //HpsTokenDataFactory $hpsTokenDataFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
         array $data = []
     ) {
@@ -224,8 +218,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
-        $this->hpsCreditServiceFactory = $hpsCreditServiceFactory;
-        //$this->hpsTokenDataFactory = $hpsTokenDataFactory;
     }
 
     /**
@@ -345,7 +337,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     public function validateCcNum($ccNumber)
     {
-        // luhn was used before but our implimentation will only validate 4 digits exist since portico will do the real validation
+        // luhn was used before but our implimentation will only validate 4 digits
+        // exist since portico will do the real validation
         return preg_match('/^[\d]{4}$/', $ccNumber) === 1;
     }
 
@@ -358,7 +351,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->heartlandApi->developerId = $this->heartlandConfigFields['developerId'];
         $this->heartlandApi->versionNumber = $this->heartlandConfigFields['versionNumber'];
         //create a new service with config values
-        return $this->hpsCreditServiceFactory->create(['config' => $this->heartlandApi]);
+        return new \HpsCreditService($this->heartlandApi);
     }
 
     /**

@@ -24,7 +24,6 @@
                 <item name="hps_heartland_config_provider" xsi:type="object">HPS\Heartland\Model\ConfigProvider</item>
             </argument>
         </arguments>
-    </type>
-
+    </type>    
 
 </config>
