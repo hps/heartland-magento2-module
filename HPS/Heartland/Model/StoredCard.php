@@ -10,8 +10,8 @@
  */
 namespace HPS\Heartland\Model;
 
-use Magento\Customer\Model\Session as customerSession;
-use \Magento\Backend\Model\Auth\Session as adminSession;
+use Magento\Customer\Model\Session\Proxy as customerSession;
+use \Magento\Backend\Model\Auth\Session\Proxy as adminSession;
 use HPS\Heartland\Model\TokenDataFactory;
 use \Magento\Store\Model\ScopeInterface;
 
@@ -74,7 +74,7 @@ class StoredCard
                 ->addFieldToFilter('heartland_storedcard_id', ['eq' => (int) $id]);
             
             if ($collection->getSize() > 0) {
-                $data = $collection->getFirstItem();
+                $data = $collection->setPageSize(1, 1)->getLastItem();
                 $MuToken = (!empty($data['token_value'])) ? $data['token_value'] : false;
             }
         }
