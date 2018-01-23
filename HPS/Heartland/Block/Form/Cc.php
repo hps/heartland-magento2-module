@@ -24,7 +24,7 @@ use Magento\Payment\Model\Config;
 
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
-    private $template = 'HPS_Heartland::form/cc.phtml';
+    protected $_template = 'HPS_Heartland::form/cc.phtml';
     private $customerRepository;
 
     /**
