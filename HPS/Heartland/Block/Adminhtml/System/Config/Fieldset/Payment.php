@@ -29,10 +29,14 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param array $data
      */
     public function __construct(
-        \Magento\Config\Model\Config $backendConfig
+        \Magento\Backend\Block\Context $context,
+        \Magento\Backend\Model\Auth\Session\Proxy $authSession,
+        \Magento\Framework\View\Helper\Js $jsHelper,
+        \Magento\Config\Model\Config $backendConfig,
+        array $data = []
     ) {
         $this->backendConfig = $backendConfig;
-        parent::__construct();
+        parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
     /**

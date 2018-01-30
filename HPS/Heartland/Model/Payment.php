@@ -542,7 +542,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     case (\HpsTransactionType::AUTHORIZE):
                         $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
                         /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
-                        ;
                         $response = $chargeService->authorize(
                             \HpsInputValidation::checkAmount($requestedAmount),
                             $currency,
@@ -992,10 +991,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function log($param, $txt = '')
     {
         try {
-            getenv('MAGE_MODE') == 'developer' ? $this->_logger->log(100, $txt . print_r($param, true)) : '';
+            getenv('MAGE_MODE') == 'developer' ? $this->_logger->log(100, $txt . var_export($param, true)) : '';
         } catch (\Exception $e) {
-            $this->_logger->log(100, $txt . print_r($param, true));
+            $this->_logger->log(100, $txt . var_export($param, true));
         }
-        $this->_logger->log(100, $txt . print_r($param, true));
+        $this->_logger->log(100, $txt . var_export($param, true));
     }
 }
