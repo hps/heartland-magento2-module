@@ -151,13 +151,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     
     private $hpsCardHolder;
     private $hpsAddress;
-    private $storeManagerInterface;
-    
-    /**
-     * @var Magento\Framework\App\State
-     */
-    private $appState;
-    
+    private $storeManagerInterface;    
 
     /**
      * Payment constructor.
@@ -195,7 +189,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
-        \Magento\Framework\App\State $appState,
         array $data = []
     ) {
         parent::__construct(
@@ -225,7 +218,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
-        $this->appState = $appState;
     }
 
     /**
@@ -1001,7 +993,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function log($param, $txt = '')
     {
         try {
-            if ($this->appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER) {
+            if ($this->_appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER) {
                 $this->_logger->log(100, $txt . var_export($param, true));
             }
         } catch (\Exception $e) {

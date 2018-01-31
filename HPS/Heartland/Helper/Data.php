@@ -20,6 +20,7 @@ namespace HPS\Heartland\Helper;
 
 use \Magento\Framework\App\Helper\AbstractHelper;
 use \Magento\Store\Model\ScopeInterface;
+use \Magento\Framework\Filesystem\Driver\File;
 
 /**
  * Class Data
@@ -48,14 +49,21 @@ class Data extends AbstractHelper
      * @var Magento\Store\Model\StoreManagerInterface
      */
     private $storeManagerInterface;
+    
+    /**
+     * @var \Magento\Framework\Filesystem\Driver\File
+     */
+    private $fileSystem;
   
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
-        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \Magento\Framework\Filesystem\Driver\File $fileSystem
     ) {
         $this->directoryList = $directoryList;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->fileSystem = $fileSystem;
         parent::__construct($context);
     }
 
@@ -97,7 +105,7 @@ class Data extends AbstractHelper
      */
     public function jsonData()
     {
-        $inputs = json_decode((string) file_get_contents((string)'php://input'), (bool) true);
+        $inputs = json_decode((string) $this->fileSystem->fileGetContents((string)'php://input'), (bool) true);
         $methods = $this->_request->getServer('REQUEST_METHOD');
         
         if (empty($inputs) === true && $methods === 'POST') {
