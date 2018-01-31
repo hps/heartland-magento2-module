@@ -152,6 +152,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private $hpsCardHolder;
     private $hpsAddress;
     private $storeManagerInterface;
+    
+    /**
+     * @var Magento\Framework\App\State
+     */
+    private $appState;
+    
 
     /**
      * Payment constructor.
@@ -189,6 +195,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \Magento\Framework\App\State $appState,
         array $data = []
     ) {
         parent::__construct(
@@ -218,6 +225,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->appState = $appState;
     }
 
     /**
@@ -651,6 +659,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             try {
                 if (((bool) $canSaveToken) && isset($response->tokenData) && !empty($response->tokenData->tokenValue)) {
                     /* This call will automatically make sure the expire date is updated on a save */
+                    $this->log($response->tokenData->tokenValue, 'in update cards: ');
+                                        
                     $chargeService->updateTokenExpiration(
                         $response->tokenData->tokenValue,
                         $this->getAdditionalData()['cc_exp_month'],
@@ -991,7 +1001,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function log($param, $txt = '')
     {
         try {
-            getenv('MAGE_MODE') == 'developer' ? $this->_logger->log(100, $txt . var_export($param, true)) : '';
+            if ($this->appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER) {
+                $this->_logger->log(100, $txt . var_export($param, true));
+            }
         } catch (\Exception $e) {
             $this->_logger->log(100, $txt . var_export($param, true));
         }
