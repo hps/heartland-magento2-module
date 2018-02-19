@@ -151,7 +151,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     
     private $hpsCardHolder;
     private $hpsAddress;
-    private $storeManagerInterface;    
+    private $storeManagerInterface;
 
     /**
      * Payment constructor.
