@@ -999,6 +999,5 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         } catch (\Exception $e) {
             $this->_logger->log(100, $txt . var_export($param, true));
         }
-        $this->_logger->log(100, $txt . var_export($param, true));
     }
 }
