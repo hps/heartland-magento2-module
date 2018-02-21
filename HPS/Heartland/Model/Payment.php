@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  Heartland payment method model
  *
@@ -41,7 +40,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /** Maps the HPS transaction type indicators to the Magento word strings
      * @array $transactionTypeMap
      */
-    private $transactionTypeMap = [\HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
+    protected $transactionTypeMap = [\HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
         \HpsTransactionType::CAPTURE => Transaction::TYPE_ORDER,
         \HpsTransactionType::CHARGE => Transaction::TYPE_CAPTURE,
         \HpsTransactionType::REFUND => Transaction::TYPE_REFUND,
@@ -56,43 +55,40 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var bool
      */
-    private $isGateway = true;
+    protected $_isGateway = true;
+    
+    /**
+     * @var bool
+     */
+    protected $_canCapture = true;
+    
+    /**
+     * @var bool
+     */
+    protected $_canOrder  = true;
+    protected $_canCancel = true;
 
     /**
      * @var bool
      */
-    private $canCapture = true;
-
+    protected $_canCapturePartial = true;
     /**
      * @var bool
      */
-    private $canOrder = true;
-    private $canCancel = true;
-
+    protected $_canRefund = true;
     /**
      * @var bool
      */
-    private $canCapturePartial = true;
-
+    protected $_canRefundInvoicePartial = true;
     /**
      * @var bool
      */
-    private $canRefund = true;
-
-    /**
-     * @var bool
-     */
-    private $canRefundInvoicePartial = true;
-
-    /**
-     * @var bool
-     */
-    private $canAuthorize = true;
+    protected $_canAuthorize = true;
 
     /**
      * @var int
      */
-    private $save_token_value = 0;
+    protected $_save_token_value = 0;
 
     /**
      * @var bool|\HpsServicesConfig
@@ -102,22 +98,22 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var null
      */
-    private $storeId = null;
+    protected $storeId = null;
 
     /**
      * @var \Magento\Directory\Model\CountryFactory
      */
-    private $countryFactory;
+    protected $countryFactory;
 
     /**
      * @var float
      */
-    private $minAmount = 0.01;
+    protected $_minAmount = 0.01;
 
     /**
      * @var array
      */
-    private $debugReplacePrivateDataKeys = ['number',
+    protected $_debugReplacePrivateDataKeys = ['number',
         'exp_month',
         'exp_year',
         'cvc'];
@@ -125,7 +121,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /**
      * @var bool
      */
-    private $context = false;
+    protected $_context = false;
 
     /**
      * @var array
@@ -865,13 +861,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function saveMuToken()
     {
         $data = $this->getAdditionalData();
-        $this->save_token_value = 0;
+        $this->_save_token_value = 0;
         if (array_key_exists('_save_token_value', $data)) {
-            $this->save_token_value = (int) $data['_save_token_value'];
+            $this->_save_token_value = (int) $data['_save_token_value'];
         }
-        $this->log($this->save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
+        $this->log($this->_save_token_value, '\HPS\Heartland\Model\Payment::saveMuToken ');
 
-        return $this->save_token_value;
+        return $this->_save_token_value;
     }
 
     /** returns additional_data element of paymentMethod
