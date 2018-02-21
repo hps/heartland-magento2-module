@@ -164,7 +164,7 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
                         _HPS_removeClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
                     } catch (e) {
                     }
-                    document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
+                    document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
                 } else {
                     _HPS_setHssTransaction(response);
                     document.querySelector("#bPlaceOrderNow").click();
