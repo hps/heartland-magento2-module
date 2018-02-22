@@ -12,6 +12,7 @@
 namespace HPS\Heartland\Block\Form;
 
 use Magento\Payment\Model\MethodInterface;
+use Magento\Payment\Model\Config;
 
 /**
  * Class Cc
@@ -24,6 +25,31 @@ use Magento\Payment\Model\MethodInterface;
 class Cc extends \Magento\Payment\Block\Form\Cc
 {
     protected $_template = 'HPS_Heartland::form/cc.phtml';
+    private $customerRepository;
+
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
+    
+    /**
+     * @var \HPS\Heartland\Helper\Data
+     */
+    private $hpsData;
+    
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        Config $paymentConfig,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard,
+        \HPS\Heartland\Helper\Data $hpsData,
+        array $data = []
+    ) {
+        parent::__construct($context, $paymentConfig, $data);
+        $this->customerRepository = $customerRepository;
+        $this->hpsStoredCard = $hpsStoredCard;
+        $this->hpsData = $hpsData;
+    }
 
     /** in context gets stored cards from database for the selected customer
      * @return array
@@ -36,30 +62,23 @@ class Cc extends \Magento\Payment\Block\Form\Cc
        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
             try {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $customerFactory = $objectManager->get('\Magento\Customer\Api\CustomerRepositoryInterface');
-                $customer = $customerFactory->get($customerEmail);
+                $customer = $this->customerRepository->get($customerEmail);
                 $customerId = $customer->getId();
             } catch (\Exception $e) {
                 $customerId = null;
             }
         }
 
-        return \HPS\Heartland\Model\StoredCard::getStoredCardsAdmin($customerId);
+        return $this->hpsStoredCard->getStoredCardsAdmin($customerId);
     }
     
     public function getCanSaveCards()
     {
-        return (int) \HPS\Heartland\Model\StoredCard::getCanStoreCards();
+        return (int) $this->hpsStoredCard->getCanStoreCards();
     }
     
-    /**
-     * Internal constructor, that is called from real constructor
-     *
-     * @return void
-     */
-    protected function _construct()
+    public function getPublicKey()
     {
-        parent::_construct();
+        return $this->hpsData->getPublicKey();
     }
 }

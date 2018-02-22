@@ -12,8 +12,6 @@
 namespace HPS\Heartland\Controller\Creditcard;
 
 use \Magento\Framework\App\Action\Action;
-use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
-use \HPS\Heartland\Helper\ObjectManager as HPS_OM;
 use \Magento\Framework\UrlInterface;
 
 /**
@@ -43,6 +41,16 @@ class Get extends Action
      * @var \Magento\Framework\Controller\Result\Json
      */
     private $resultJsonFactory;
+    
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManagerInterface;
+    
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
@@ -50,10 +58,14 @@ class Get extends Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->storeManagerInterface = $storeManagerInterface;
+        $this->hpsStoredCard = $hpsStoredCard;
     }
 
     /** \HPS\Heartland\Controller\Hss\StoredCard::execute
@@ -67,11 +79,11 @@ class Get extends Action
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
 
-        // \HPS\Heartland\Model\StoredCard::getCanStoreCards
+        // # \HPS\Heartland\Model\StoredCard::getCanStoreCards
         $response = [];
-        if (HPS_STORED_CARDS::getCanStoreCards()) {
-            // \HPS\Heartland\Model\StoredCard::getStoredCards
-            $data = HPS_STORED_CARDS::getStoredCards(); /**/
+        if ($this->hpsStoredCard->getCanStoreCards()) {
+            // # \HPS\Heartland\Model\StoredCard::getStoredCards
+            $data = $this->hpsStoredCard->getStoredCards(); /**/
             if (!empty($data)) {
                 foreach ($data as $row) {
                     $response[] = [
@@ -94,8 +106,7 @@ class Get extends Action
     private function getStaticURL()
     {
         if ($this->baseImageUri === false) {
-            $this->baseImageUri = HPS_OM::getObjectManager()
-                                        ->get(self::STORE_INTERFACE)
+            $this->baseImageUri = $this->storeManagerInterface
                                         ->getStore()
                                         ->getBaseUrl(UrlInterface::URL_TYPE_STATIC);
         }
@@ -111,7 +122,7 @@ class Get extends Action
     private function getImageLink($cardType = null)
     {
         if ($cardType === null || $cardType === '' || preg_match('/[\W]/', $cardType) === 1) {
-            throw new \Exception(__('Card type not configured for saved token.'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Card type not configured for saved token.'));
         }
         return  $this->getStaticURL() . self::IMAGE_STATIC_PATH . 'ss-inputcard-' . strtolower($cardType) . '@2x.png';
     }

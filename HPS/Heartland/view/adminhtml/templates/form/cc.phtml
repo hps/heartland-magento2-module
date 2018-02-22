@@ -15,7 +15,7 @@
  */
 
 $hpsTokens = $block->getCcTokens();
-$pubApiKey = \HPS\Heartland\Helper\Data::getPublicKey();
+$pubApiKey = $block->getPublicKey();
 $code = $block->escapeHtml($block->getMethodCode());
 $ccType = $block->getInfoData('cc_type');
 $ccExpMonth = $block->getInfoData('cc_exp_month');

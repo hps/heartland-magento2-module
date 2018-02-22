@@ -29,8 +29,6 @@ define(
         'Magento_Checkout/js/action/redirect-on-success'
     ],
     function (
-
-
         ko,
         $,
         Component,
@@ -58,13 +56,13 @@ define(
                 template: 'HPS_Heartland/payment/heartland-form'
 
             },
-            hpsSavedCards: function(){
+            hpsSavedCards: function () {
                 var self = this;
                 $("#SavedCardsTable").fadeIn();
 
                 if ($("#SavedCardsTable tr").length < 2) {
                     self.hpsBusy();
-                    if (!customer.isLoggedIn()){
+                    if (!customer.isLoggedIn()) {
                         $("#SavedCardsTable").append($("<tr />"));
                         self.hpsNewCard();
                         return;
@@ -87,7 +85,6 @@ define(
                                 self.hpsNotBusy();
 
                                 $("#iframes").fadeOut();
-
                             } else {
                                 $("#SavedCardsTable").append($("<tr />"));
                                 self.hpsNewCard();
@@ -97,14 +94,14 @@ define(
                     });
                 }
             },
-            drawTable: function(data) {
+            drawTable: function (data) {
                 var self = this;
                 for (var i = 0; i < data.length; i++) {
                     self.drawRow(data[i]);
                 }
             },
 
-            drawRow: function(rowData) {
+            drawRow: function (rowData) {
 
                 var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
                 var row = $("<tr " + rOnClick + " />");
@@ -118,32 +115,32 @@ define(
 
 
 
-            hpsNewCard: function(){
+            hpsNewCard: function () {
                 var self = this;
                 $('#securesubmit_token').removeAttr('value');;
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
-                if ($("#SavedCardsTable tr").length > 1){
+                if ($("#SavedCardsTable tr").length > 1) {
                     $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
-                        .success( function(publicKey) {
+                        .success(function (publicKey) {
                             self.hpsShowCcForm(publicKey);
                             self.hpsNotBusy();
-                        }).fail(function(){
+                        }).fail(function () {
                         $('#hps_heartland').parent().parent().querySelector('span').innerHTML = ' <font color=red>Please contact site owner</font>';
                         self.hpsNotBusy();
                     });
                 }
                 return true;
             },
-            hpsBusy: function(){
+            hpsBusy: function () {
                 $("#checkout-loader-iframeEdition").fadeIn();
             },
-            hpsNotBusy: function(){
+            hpsNotBusy: function () {
                 $("#checkout-loader-iframeEdition").fadeOut();
                 _HPS_EnablePlaceOrder();
             },
-            hpsShowCcForm: function(publicKey){
-                if ( publicKey ){
+            hpsShowCcForm: function (publicKey) {
+                if (publicKey ) {
                     var self = this;
                     $("#iframes").fadeIn();
                     HPS_SecureSubmit(document, Heartland, publicKey);
@@ -152,13 +149,13 @@ define(
 
             }
             ,
-            hideNewCardForm: function(){
+            hideNewCardForm: function () {
                 $("#iframes").fadeOut();
             },
-            hpsGetCanSave: function(){
+            hpsGetCanSave: function () {
                 var data;
                 $("#saveCardCheck").parent().fadeOut();
-                if(customer.isLoggedIn()) {
+                if (customer.isLoggedIn()) {
                     $.get("../heartland/creditcard/cansave/").success(function (data) {
                         if (data === '1') {
                             $("#saveCardCheck").parent().fadeIn();
@@ -190,9 +187,9 @@ define(
                     $("#onestepcheckout-button-place-order").unbind("click");
                 }
                 self.hpsBusy();
-                if ($("#securesubmit_token").val() == ''){
+                if ($("#securesubmit_token").val() == '') {
                     $("#bValidateButton").click();
-                }else{
+                } else {
                     self.placeOrder();
                 }
                 self.hpsNotBusy();
@@ -200,10 +197,10 @@ define(
             /**
              * Place order.
              */
-            isOSC: function(){
+            isOSC: function () {
                 var self = this;
-                if ($("#onestepcheckout-button-place-order")){
-                    $("#onestepcheckout-button-place-order").bind("click", self, function(){
+                if ($("#onestepcheckout-button-place-order")) {
+                    $("#onestepcheckout-button-place-order").bind("click", self, function () {
                         self.getToken();
                     });
                     return false;
@@ -220,7 +217,7 @@ define(
                 if (event) {
                     event.preventDefault();
                 }
-                if ($("#securesubmit_token").val() !== ''){
+                if ($("#securesubmit_token").val() !== '') {
                     if (this.validate() && additionalValidators.validate()) {
                         this.isPlaceOrderActionAllowed(false);
 
@@ -236,12 +233,12 @@ define(
                         placeOrder = placeOrderAction(pData, false);
 
                         $.when(placeOrder)
-                            .fail(function() {
+                            .fail(function () {
                                 self.isPlaceOrderActionAllowed(true);
                                 self.hpsNotBusy();
                                 $('#hps_heartland_NewCard').click();
                             })
-                            .done(function() {
+                            .done(function () {
                                 redirectOnSuccessAction.execute()
                             });
 
@@ -251,8 +248,7 @@ define(
                     $("#iframesCardError").text("Invalid payment data.");
                     self.hpsNotBusy();
                     $('#hps_heartland_NewCard').click();
-
-                }else{
+                } else {
                     $("#iframesCardError").text("Token lookup failed. Please try again.");
                     self.hpsNotBusy();
                 }

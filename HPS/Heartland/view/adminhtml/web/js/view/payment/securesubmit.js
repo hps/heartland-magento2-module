@@ -14,25 +14,32 @@ var getImageURL = (function () {
     //build a relative path based on the module location on the configured server
     var myScript = document.querySelector('script#HPS_SECURESUBMIT_IFRAME_CODE').src.split('/').slice(0,-4).join('/') + '/images/';
     //console.log(myScript);
-    return function() { return myScript; };
+    return function () {
+        return myScript;
+    };
 })();
 
-function _HPS_addClass(element, klass) {
+function _HPS_addClass(element, klass)
+{
     if (element.className.indexOf(klass) === -1) {
         element.className = element.className + ' ' + klass;
     }
 }
 
-function _HPS_removeClass(element, klass) {
-    if (element.className.indexOf(klass) === -1) return;
+function _HPS_removeClass(element, klass)
+{
+    if (element.className.indexOf(klass) === -1) {
+        return;
+    }
     element.className = element.className.replace(klass, '');
 }
 
-function setElementValue(selector, propertyToSet, valueToSet){
+function setElementValue(selector, propertyToSet, valueToSet)
+{
     var element = document.querySelector(selector);
     
-    if(element !== null){
-        switch(propertyToSet.toLowerCase()){
+    if (element !== null) {
+        switch (propertyToSet.toLowerCase()) {
             case 'value':
                 element.value = valueToSet;
                 break;
@@ -41,53 +48,66 @@ function setElementValue(selector, propertyToSet, valueToSet){
                 break;
              case 'innerhtml':
                 element.innerHTML = valueToSet;
-                break;   
+                break;
         }
     }
 }
 
-function _HPS_setHssTransaction(response){
+function _HPS_setHssTransaction(response)
+{
     setElementValue('#securesubmit_token', 'value', response.token_value.trim());
     setElementValue('#hps_heartland_cc_number', 'value', response.last_four.trim());
     setElementValue('#hps_heartland_cc_type', 'value', response.card_type.trim());
     setElementValue('#hps_heartland_expiration', 'value', response.exp_month.trim());
-    setElementValue('#hps_heartland_expiration_yr', 'value', response.exp_year.trim());    
+    setElementValue('#hps_heartland_expiration_yr', 'value', response.exp_year.trim());
     //document.querySelector('#bPlaceOrderNow').click();
 }
 
-function _HPS_DisablePlaceOrder(){
-    try{
+function _HPS_DisablePlaceOrder()
+{
+    try {
         var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';
         _HPS_addClass(document.querySelector(element), 'disabled');
         setElementValue('#bPlaceOrderNow', 'disabled', true);
         setElementValue('#bPlaceOrderNow', 'disabled', 'disabled');
-    }catch(e){}
+    } catch (e) {
+    }
 }
-function _HPS_EnablePlaceOrder(){
-    try{
+function _HPS_EnablePlaceOrder()
+{
+    try {
         var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';_HPS_removeClass(document.querySelector(element), 'disabled');
         setElementValue('#bPlaceOrderNow', 'disabled', false);
         setElementValue('#bPlaceOrderNow', 'disabled', '');
-    }catch(e){}
+    } catch (e) {
+    }
 }
-function HPS_SecureSubmit($,document, Heartland, publicKey) { 
+function HPS_SecureSubmit($,document, Heartland, publicKey)
+{
     //if (arguments.callee.count > 0 )
     //    return;
     if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
         && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
         && publicKey) {
-
         //var addHandler = Heartland.Events.addHandler;
         function enablePlaceOrder(disabled)
         {
             var element = '#checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div.actions-toolbar > div > button';
-            try{_HPS_removeClass(document.querySelector(element), 'disabled');}catch(e){}
-            if ( !disabled )
-                try{_HPS_addClass(document.querySelector(element), 'disabled');}catch(e){}
+            try {
+                _HPS_removeClass(document.querySelector(element), 'disabled');
+            } catch (e) {
+            }
+            if (!disabled) {
+                try {
+                   _HPS_addClass(document.querySelector(element), 'disabled');
+                } catch (e) {
+                }
+            }
         }enablePlaceOrder(false);
 
 
-        function toAll(elements, fun) {
+        function toAll(elements, fun)
+        {
             var i = 0;
             var length = elements.length;
             for (i; i < length; i++) {
@@ -95,7 +115,8 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
             }
         }
 
-        function filter(elements, fun) {
+        function filter(elements, fun)
+        {
             var i = 0;
             var length = elements.length;
             var result = [];
@@ -107,7 +128,8 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
             return result;
         }
 
-        function clearFields() {
+        function clearFields()
+        {
             toAll(document.querySelectorAll('.magento2_error, .magento2-error, .magento2-message, .magento2_message'), function (element) {
                 element.remove();
             });
@@ -115,20 +137,23 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
 
 
         // Handles tokenization response
-        function responseHandler(response) {
+        function responseHandler(response)
+        {
                 if (response.error) {
                     _HPS_addClass(errElement, 'mage-error');
                     errElement.innerText = response.error.message;
                     // show the form again
                     HPS_SecureSubmit(document, Heartland, publicKey);
-                    try{_HPS_removeClass( document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');}catch(e){}
+                    try {
+                        _HPS_removeClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
+                    } catch (e) {
+                    }
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'block';
                 } else {
-                    _HPS_setHssTransaction(response);   
+                    _HPS_setHssTransaction(response);
                     //trigger the main form submission
                     $('#edit_form').trigger('realOrder');
-                }       
-                
+                }
         }
 
         // Load function to attach event handlers when WC refreshes payment fields
@@ -276,11 +301,7 @@ function HPS_SecureSubmit($,document, Heartland, publicKey) {
              console.log('There was an error: ' + resp.error.message);
              }*/
         });
-        
-        
     }
     // #checkout-payment-method-load > div > div.payment-method._active > div.payment-method-content > div > fieldset > div.actions-toolbar > div > button.action.action-update > span
-    // Attach a handler to interrupt the form submission    
-    
-    
+    // Attach a handler to interrupt the form submission
 };

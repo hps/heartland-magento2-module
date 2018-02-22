@@ -8,7 +8,6 @@
  * @copyright   Heartland (http://heartland.us)
  * @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
  */
-
 namespace HPS\Heartland\Setup;
 
 use Magento\Framework\Setup\UpgradeSchemaInterface;
@@ -20,15 +19,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function upgrade(
         SchemaSetupInterface $setup,
         ModuleContextInterface $context
     ) {
+        $installer = $setup;
         $setup->startSetup();
-        if (version_compare($context->getVersion(), "1.0.10", "<")) {
-            //Your upgrade script
+
+        $version = $context->getVersion();
+        $connection = $setup->getConnection();
+        $tablename = "hps_heartland_storedcard";
+        if (version_compare($version, '1.0.10')) {
+            $connection->addIndex(
+                $setup->getTable($tablename),
+                $setup->getIdxName($setup->getTable($tablename), ['customer_id']),
+                ['customer_id']
+            );
         }
+
         $setup->endSetup();
     }
 }

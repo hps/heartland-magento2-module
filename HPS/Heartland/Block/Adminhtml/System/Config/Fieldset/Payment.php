@@ -11,6 +11,8 @@
 
 namespace HPS\Heartland\Block\Adminhtml\System\Config\Fieldset;
 
+use \Magento\Backend\Model\Auth\Session as AuthSession;
+
 /**
  * Fieldset renderer for PayPal solution
  */
@@ -19,23 +21,21 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
     /**
      * @var \Magento\Config\Model\Config
      */
-    protected $_backendConfig;
+    private $backendConfig;
 
     /**
      * @param \Magento\Backend\Block\Context $context
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\View\Helper\Js $jsHelper
      * @param \Magento\Config\Model\Config $backendConfig
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Context $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Backend\Model\Auth\Session\Proxy $authSession,
         \Magento\Framework\View\Helper\Js $jsHelper,
         \Magento\Config\Model\Config $backendConfig,
         array $data = []
     ) {
-        $this->_backendConfig = $backendConfig;
+        $this->backendConfig = $backendConfig;
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
@@ -57,7 +57,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return bool
      */
-    protected function _isPaymentEnabled($element)
+    private function _isPaymentEnabled($element)
     {
         $groupConfig = $element->getGroup();
         $activityPaths = isset($groupConfig['activity_path']) ? $groupConfig['activity_path'] : [];
@@ -69,7 +69,7 @@ class Payment extends \Magento\Config\Block\System\Config\Form\Fieldset
         $isPaymentEnabled = false;
         foreach ($activityPaths as $activityPath) {
             $isPaymentEnabled = $isPaymentEnabled
-                || (bool)(string)$this->_backendConfig->getConfigDataValue($activityPath);
+                || (bool)(string)$this->backendConfig->getConfigDataValue($activityPath);
         }
 
         return $isPaymentEnabled;

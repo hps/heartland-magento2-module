@@ -7,20 +7,71 @@
 
 namespace HPS\Heartland\Model\Order;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order\Payment\Info;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface;
+
 /** Override these as Heartland wants to apply specific logic
  * Class Payment
  * @package HPS\Heartland\Model\Order
  */
 class Payment extends \Magento\Sales\Model\Order\Payment
 {
-    private $_transactionRecord = null;
+    private $transactionRecord = null;
     /** Can Capture
      * @return bool
      */
+    
+    /**
+     * @var \HpsCreditService
+     */
+    private $hpsServicesConfig;
+    
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Magento\Payment\Helper\Data $paymentData,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
+        PriceCurrencyInterface $priceCurrency,
+        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
+        ManagerInterface $transactionManager,
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Order\Payment\Processor $paymentProcessor,
+        OrderRepositoryInterface $orderRepository,
+        \HpsServicesConfig $hpsServicesConfig,
+        array $data = []
+    ) {
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $paymentData,
+            $encryptor,
+            $creditmemoFactory,
+            $priceCurrency,
+            $transactionRepository,
+            $transactionManager,
+            $transactionBuilder,
+            $paymentProcessor,
+            $orderRepository,
+            null,
+            null,
+            $data
+        );
+        
+        $this->hpsServicesConfig = $hpsServicesConfig;
+    }
 
     public function canCapture()
     {
- //TODO: ensure that this is an authorization but the gateway will throw an error if this fails for now
         try {
             if (preg_match(
                 "/(".\Magento\Sales\Api\Data\TransactionInterface::TYPE_AUTH."|"
@@ -32,7 +83,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->settlementAmount > 0
+            return $this->transactionRecord->settlementAmount > 0
                 ? false
                 : true;
         } catch (\Exception $e) {
@@ -49,7 +100,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->transactionStatus === 'A'
+            return $this->transactionRecord->transactionStatus === 'A'
                 ? true
                 : false;
         } catch (\Exception $e) {
@@ -74,7 +125,7 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             if ($this->getHPS() === null) {
                 return false;
             }
-            return $this->_transactionRecord->settlementAmount > 0
+            return $this->transactionRecord->settlementAmount > 0
                 ? false
                 : true;
         } catch (\Exception $e) {
@@ -86,19 +137,18 @@ class Payment extends \Magento\Sales\Model\Order\Payment
     {
         try {
             /** @var \HpsServicesConfig $hps */
-            if ($this->getCcTransId() && $this->_transactionRecord === null) {
-                $hps                = \HPS\Heartland\Helper\ObjectManager::getObjectManager()->get('\HpsServicesConfig');
+            if ($this->getCcTransId() && $this->transactionRecord === null) {
                 $abs                = $this->getMethodInstance();
-                $hps->secretApiKey  = $abs->getConfigData('private_key');
-                $hps->developerId   = $abs->getConfigData('developerId');
-                $hps->versionNumber = $abs->getConfigData('versionNumber');
-                $creditService = new \HpsCreditService($hps);
-                $this->_transactionRecord = $creditService->get($this->getCcTransId());
+                $this->hpsServicesConfig->secretApiKey  = $abs->getConfigData('private_key');
+                $this->hpsServicesConfig->developerId   = $abs->getConfigData('developerId');
+                $this->hpsServicesConfig->versionNumber = $abs->getConfigData('versionNumber');
+                $creditService = new \HpsCreditService($this->hpsServicesConfig);
+                $this->transactionRecord = $creditService->get($this->getCcTransId());
             }
         } catch (\Exception $e) {
-            $this->_transactionRecord = null;
+            $this->transactionRecord = null;
         }
-        finally{return $this->_transactionRecord;
+        finally{return $this->transactionRecord;
         }
     }
 }

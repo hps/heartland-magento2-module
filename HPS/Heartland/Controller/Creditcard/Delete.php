@@ -23,11 +23,24 @@ use \HPS\Heartland\Model\StoredCard as HPS_STORED_CARDS;
  */
 class Delete extends Action
 {
+    /**
+     * @var \HPS\Heartland\Model\StoredCard
+     */
+    private $hpsStoredCard;
+    
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \HPS\Heartland\Model\StoredCard $hpsStoredCard
+    ) {
+        parent::__construct($context);
+        $this->hpsStoredCard = $hpsStoredCard;
+    }
+    
     /** Provides and ajax callable way to delete a saved token by id
      * @throws \Exception
      */
     public function execute()
     {
-        HPS_STORED_CARDS::deleteStoredCards((int) $this->getRequest()->getParam('t'));
+        $this->hpsStoredCard->deleteStoredCards((int) $this->getRequest()->getParam('t'));
     }
 }
