@@ -37,18 +37,25 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      */
     private $hpsData;
     
+    /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    private $sessionQuote;
+    
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         Config $paymentConfig,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \HPS\Heartland\Model\StoredCard $hpsStoredCard,
         \HPS\Heartland\Helper\Data $hpsData,
+        \Magento\Backend\Model\Session\Quote $sessionQuote,
         array $data = []
     ) {
         parent::__construct($context, $paymentConfig, $data);
         $this->customerRepository = $customerRepository;
         $this->hpsStoredCard = $hpsStoredCard;
         $this->hpsData = $hpsData;
+        $this->sessionQuote = $sessionQuote;
     }
 
     /** in context gets stored cards from database for the selected customer
@@ -57,8 +64,8 @@ class Cc extends \Magento\Payment\Block\Form\Cc
      */
     public function getCcTokens()
     {
-        $customerId = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_id');
-        $customerEmail = $this->getData('method')->getData('info_instance')->getQuote()->getOrigData('customer_email');
+        $customerId = $this->sessionQuote->getQuote()->getCustomerId();
+        $customerEmail = $this->sessionQuote->getQuote()->getCustomerEmail();
        //Retrieve customer id from customer mail id
         if ($customerId === null && !empty($customerEmail)) {
             try {

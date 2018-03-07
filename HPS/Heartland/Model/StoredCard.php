@@ -177,7 +177,7 @@ class StoredCard
         if ($customerID) {
             //delete existing data
             $model = $this->modelTokenDataFactory->create();
-            $model->load($token, 'token_value');
+            $model->load((int) $customerID, 'customer_id');
             $model->delete();
 
             $newToken = $this->modelTokenDataFactory->create();
