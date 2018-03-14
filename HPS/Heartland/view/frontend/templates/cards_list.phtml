@@ -1,6 +1,5 @@
-
 <script>
-    var <?php 
+    var <?php
         $code = \HPS\Heartland\Model\Payment::CODE;
         /* @noEscape */ echo $code;
         ?>;
@@ -33,7 +32,7 @@
                                                 deleteCard: function (id, e) {
                                                     if (confirm('Are you sure you want to delete the stored card?')) {
                                                         $.ajax({
-                                                            url: "<?php echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=" + id,
+                                                            url: "<?php /* @noEscape */ echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=" + id,
                                                             showLoader: true,
                                                             context: $('#SavedCardsTable'),
                                                             success: function (data) {
@@ -43,38 +42,31 @@
                                                             }
                                                         });
                                                     }
-
                                                 }
                                             }
                                         });
-
-
                                     }
                             );
-
-
 </script>
 <table id="SavedCardsTable">
     <caption>Stored Payments for this customer(if any)</caption>
     <tbody>
-<?php
-$hpsTokens = $block->getStoredCards();
-if (count($hpsTokens)) {
-    foreach ($hpsTokens as $token) {
-        $token['token_value'] = $token['heartland_storedcard_id'];
-        unset($token['heartland_storedcard_id'], $token['dt'], $token['customer_id']);
-        $tokenJson = addslashes(json_encode($token));
-        //{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}
-        $ccTypeHPS = strtoupper($token['cc_type']);
-        ?>
+        <?php
+        $hpsTokens = $block->getStoredCards();
+        if (!empty($hpsTokens)) {
+            foreach ($hpsTokens as $token) {
+                $token['token_value'] = $token['heartland_storedcard_id'];
+                unset($token['heartland_storedcard_id'], $token['dt'], $token['customer_id']);
+                $ccTypeHPS = strtoupper($token['cc_type']);
+                ?>
                 <tr>
                     <td width="width:100px" > </td>
-                    <th align="left" id="image_holder_<?php echo $token['token_value'] ?>"><?php echo $ccTypeHPS . ' ending in ' . $token['cc_last4']; ?><br />Expiring on <?php echo $token['cc_exp_month'] . '/' . $token['cc_exp_year']; ?><span class="card-type-<?php echo $token['cc_type'] ?>" /></th>
+                    <th align="left" id="image_holder_<?php /* @noEscape */ echo $token['token_value'] ?>"><?php /* @noEscape */ echo $ccTypeHPS . ' ending in ' . $token['cc_last4']; ?><br />Expiring on <?php /* @noEscape */ echo $token['cc_exp_month'] . '/' . $token['cc_exp_year']; ?><span class="card-type-<?php /* @noEscape */ echo $token['cc_type'] ?>" /></th>
                     <td width="width:50px" >
-                        <input onclick="return <?php echo $code; ?>.deleteCard(<?php echo $token['token_value'] ?>, this.parentNode.parentNode)"
-                                                   style="color:red;font-size:
-                                                   2em;background-color: transparent;border: none" type="button"
-                                                   value="X">
+                        <input onclick="return <?php /* @noEscape */ echo $code; ?>.deleteCard(<?php /* @noEscape */ echo $token['token_value'] ?>, this.parentNode.parentNode)"
+                               style="color:red;font-size:
+                               2em;background-color: transparent;border: none" type="button"
+                               value="X">
                     </td>
                 </tr>
 
@@ -84,9 +76,7 @@ if (count($hpsTokens)) {
             ?>
             <tr>
                 <td width="width:100px">You have no saved cards</td></tr><?php
-    }
+        }
         ?>
-
-
     </tbody>
 </table>
