@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~  Heartland payment method model
+~
+~  @category    HPS
+~  @package     HPS_Heartland
+~  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+~  @copyright   Heartland (http://heartland.us)
+~  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <head>
+        <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
+
+        <!-- Cert
+        <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
+        -->
+        <!-- PROD
+        <script src="https://api2.heartlandportico.com/SecureSubmit.v1/token/2.1/securesubmit.js" src_type="url" />
+        -->
+        <link src="HPS_Heartland/js/view/payment/securesubmit.js" id="HPS_SECURESUBMIT_IFRAME_CODE"/>
+        <css  src="HPS_Heartland/creditForm.css" />
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="HPS\Heartland\Block\Customer\CreditCards" name="vault.cards.list" cacheable="false" template="HPS_Heartland::cards_list.phtml" />           
+        </referenceContainer>
+    </body>
+</page>
