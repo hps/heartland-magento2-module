@@ -19,7 +19,7 @@
         <!-- PROD
         <script src="https://api2.heartlandportico.com/SecureSubmit.v1/token/2.1/securesubmit.js" src_type="url" />
         -->
-        <link src="HPS_Heartland/js/view/payment/securesubmit.js" id="HPS_SECURESUBMIT_IFRAME_CODE"/>
+        <link src="HPS_Heartland/js/view/payment/securesubmit.js" />
         <css  src="HPS_Heartland/creditForm.css" />
     </head>
     <body>
