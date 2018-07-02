@@ -2,7 +2,8 @@
 
 var getImageURL = (function () {
     //build a relative path based on the module location on the configured server
-    var element = document.querySelector('script#HPS_SECURESUBMIT_IFRAME_CODE');
+    var scripts = document.getElementsByTagName('script');
+    var element = scripts[scripts.length-1];
     if (element !== null) {
         var myScript = element.src.split('/').slice(0, -4).join('/') + '/images/';
         //console.log(myScript);
