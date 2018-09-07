@@ -32,6 +32,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     const CODE = 'hps_heartland';
 
+    const TYPE_VERIFY = 'verify';
+
     /**
      * @var bool
      */
@@ -45,7 +47,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsTransactionType::CHARGE => Transaction::TYPE_CAPTURE,
         \HpsTransactionType::REFUND => Transaction::TYPE_REFUND,
         \HpsTransactionType::REVERSE => Transaction::TYPE_REFUND,
-        \HpsTransactionType::VOID => Transaction::TYPE_VOID,];
+        \HpsTransactionType::VOID => Transaction::TYPE_VOID,
+        \HpsTransactionType::VERIFY => self::TYPE_VERIFY,];
 
     /**
      * @var \Magento\Framework\App\RequestInterface
@@ -253,7 +256,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        return $this->_payment($payment, $amount, \HpsTransactionType::$CAPTURE);
+        return $this->_payment($payment, $amount, \HpsTransactionType::VERIFY);
     }
 
     public function void(\Magento\Payment\Model\InfoInterface $payment)
@@ -485,8 +488,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     $paymentAction = \HpsTransactionType::REVERSE;
                 }
                 // end of verifying that we have something that looks like  transaction ID to use
-            } elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE
-                      && $paymentAction !== \HpsTransactionType::CHARGE) {
+            } elseif ($paymentAction !== \HpsTransactionType::AUTHORIZE && $paymentAction !== \HpsTransactionType::CHARGE
+                      && $paymentAction !== \HpsTransactionType::VERIFY) {
                 // these are the only 2 transaction types where Magento2 does not need a
                 // transaction ID to reference
                 $paymentAction = 'do be done';
@@ -502,6 +505,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
              */
             if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CAPTURE
                 || $paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::REFUND
+                || $paymentAction === \HpsTransactionType::VERIFY
             ) {
                 $order = $payment->getOrder();
                 //get current customer id
@@ -511,8 +515,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $validCardHolder = $this->getHpsCardHolder($order->getBillingAddress());
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
-                if ($paymentAction === \HpsTransactionType::AUTHORIZE ||
-                    $paymentAction === \HpsTransactionType::CHARGE) {
+                if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE ||
+                    $paymentAction === \HpsTransactionType::VERIFY) {
                     $suToken = $this->getToken(new \HpsTokenData(), $orderCustomerId);
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
@@ -582,6 +586,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $payment->setParentTransactionId(
                             $response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]
                         );
+                        break;
+                    case (\HpsTransactionType::VERIFY): // Portico CreditSale \HpsTransactionType::VERIFY
+                        $this->log($suToken, 'HPS\Heartland\Model\Payment Verify Method Called: ');
+                        $response = $chargeService->verify(
+                            $suToken,
+                            $validCardHolder,
+                            $canSaveToken
+                        );
+                        $this->log($response, 'HPS\Heartland\Model\Payment Verify Method response: ');
                         break;
                     /**
                      * Reverses the full amount and removes any related capture from the batch */
@@ -733,6 +746,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $detail = $chargeService->get($response->transactionId);
                         $payment->setAmountPaid($detail->settlementAmount);
                     }
+                    if ($paymentAction === \HpsTransactionType::VERIFY) {
+                        $actionVerb = 'Verified';
+                    }
                     //Build a message to show the user what is happening
                     $successMsg[] = __("Your order placed successfully.");
 
@@ -777,8 +793,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $errorMsg[] = 'Please contact this retailer to complete your transaction';
             }
             if (!empty($errorMsg) && !empty($response->transactionId)) {
-                if (($paymentAction === \HpsTransactionType::CHARGE
-                    || $paymentAction === \HpsTransactionType::AUTHORIZE) && ($response->transactionId > 0)
+                if (($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE
+                    || $paymentAction === \HpsTransactionType::VERIFY) && ($response->transactionId > 0)
                 ) {
                     //Reverse any auth
                     try {
