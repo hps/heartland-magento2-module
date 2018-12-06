@@ -56,6 +56,7 @@ define(
                 template: 'HPS_Heartland/payment/heartland-form'
 
             },
+            messages: new Messages(),
             hpsSavedCards: function () {
                 var self = this;
                 $("#SavedCardsTable").fadeIn();

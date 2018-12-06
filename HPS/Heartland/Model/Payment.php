@@ -631,7 +631,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     'Gateway Error: - %1',
                     $e->getMessage()
                 ));
-                $noticeMsg[] = __('Gateway Error:' . $e->getMessage());
+                throw $e;
             }
             // even if the MUPT save fails the transaction should still complete so we execute this step first
 
@@ -646,13 +646,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $CcL4 = $info->getCcNumber();
 
             $this->log($response, 'setStatus ');
-            // set items always found in the response header
-            /** @var \HpsTransaction $response Properties found in the header */
-            // # $payment->setStatus($response->responseText);
-            $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
-            $payment->setAdditionalInformation(serialize($response));
-            if ($payment->isCaptureFinal($requestedAmount)) {
-                $payment->setShouldCloseParentTransaction(true);
+            if ($response !== null) {
+                // set items always found in the response header
+                /** @var \HpsTransaction $response Properties found in the header */
+                // # $payment->setStatus($response->responseText);
+                $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
+                $payment->setAdditionalInformation(serialize($response));
+                if ($payment->isCaptureFinal($requestedAmount)) {
+                    $payment->setShouldCloseParentTransaction(true);
+                }
             }
 
             // token saving should just work but just in case we dont want to stop the transaction if it didnt
@@ -676,7 +678,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $this->getAdditionalData()['cc_exp_year'],
                         $orderCustomerId
                     );
-                    $successMsg[] = __("Payment token saved for future purchases");
+                    // $successMsg[] = __("Payment token saved for future purchases");
                 }/**/
             } catch (\Exception $e) {
                 // # \Psr\Log\LoggerInterface::error
@@ -686,7 +688,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     Heartland - %1',
                     $e->getMessage()
                 ));
-                $noticeMsg[] = __('We could not save your payment information for later use.');
+                // $noticeMsg[] = __('We could not save your payment information for later use.');
             }
             // # \Psr\Log\LoggerInterface::error
             // an error any where here will it seems not get picked up by Magento2 error handlers.
@@ -701,7 +703,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             switch (get_class($response)) {
                 case 'HpsReversal':
                     /** @var \HpsReversal $response Properties found in the HpsReversal */
-                    $successMsg[] = __(
+                    $successMsg = __(
                         "The amount authorised for Transaction ID: %1 for
                         \$%2 was refunded by \$%3 successfully",
                         $payment->getCcTransId(),
@@ -712,7 +714,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                 case 'HpsRefund':
                     /** @var \HpsRefund $response Properties found in the HpsRefund */
-                    $successMsg[] = __(
+                    $successMsg = __(
                         "The Transaction ID: %1 was refunded for \$%2
                         successfully",
                         $payment->getCcTransId(),
@@ -724,7 +726,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                 case 'HpsVoid':
                     /** @var \HpsVoid $response Properties found in the HpsVoid */
-                    $successMsg[] = __("The Transaction ID: %1 was voided successfully", $payment->getCcTransId());
+                    $successMsg = __("The Transaction ID: %1 was voided successfully", $payment->getCcTransId());
                     break;
 
                 case 'HpsAuthorization':
@@ -750,7 +752,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $actionVerb = 'Verified';
                     }
                     //Build a message to show the user what is happening
-                    $successMsg[] = __("Your order placed successfully.");
+                    $successMsg = __("Your order placed successfully.");
 
                     break;
 
@@ -761,8 +763,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     $payment->setParentTransactionId(
                         $parentPaymentID . '-' . $this->transactionTypeMap[$paymentAction]
                     );
-                    $successMsg[] = __(
-                        "The order Invoiced successfully for \$%1",
+                    $successMsg = __(
+                        "The order invoiced successfully for \$%1",
                         $response->settlementAmount
                     );
 
@@ -771,27 +773,18 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 default:
                     break;
             }
-        } catch (\HpsInvalidRequestException $e) {
-            $errorMsg[] = 'Incorrect parameters on line: ' . $e->getLine() . '. Please get your 
-                log files and contact Heartland: ' . $e->getMessage();
-        } catch (\HpsAuthenticationException $e) {
-            $errorMsg[] = 'Authentication on line: ' . $e->getLine() . '. Failure: Credentials Rejected by 
-                Gateway please contact Heartland: ' . $e->getMessage();
-        } catch (\HpsGatewayException $e) {
-            $errorMsg[] = 'Gateway Error: ' . $e->getMessage();
         } catch (\HpsCreditException $e) {
-            $errorMsg[] = 'Cannot process Payment: ' . $e->getMessage();
-        } catch (\HpsException $e) {
-            $errorMsg[] = 'General Error on line: ' . $e->getLine() . '. The problem will require '
-                           . 'troubleshooting: ' . $e->getMessage();
+            $errorMsg = 'Cannot process payment: ' . $e->getMessage();
+        } catch (\HpsGatewayException $e) {
+            $errorMsg = 'Gateway Error: ' . $e->getMessage();
         } catch (\Exception $e) {
-            $errorMsg[] = $e->getMessage();
+            $errorMsg = $e->getMessage();
         } finally {
             // trying to prevent Magento2 from incorrectly finishing a transaction that has an error
             // send any error messages from processing to the browser
-            if (!empty($errorMsg) || empty($response->transactionId)) {
-                $errorMsg[] = 'Please contact this retailer to complete your transaction';
-            }
+            // if (!empty($errorMsg) || empty($response->transactionId)) {
+            //     $errorMsg[] = 'Please contact this retailer to complete your transaction';
+            // }
             if (!empty($errorMsg) && !empty($response->transactionId)) {
                 if (($paymentAction === \HpsTransactionType::CHARGE || $paymentAction === \HpsTransactionType::AUTHORIZE
                     || $paymentAction === \HpsTransactionType::VERIFY) && ($response->transactionId > 0)
@@ -805,38 +798,39 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                             $currency
                         );
                         unset($successMsg);
-                        $successMsg[] = 'Your transaction was reversed and will not be charged.';
+                        // $successMsg[] = 'Your transaction was reversed and will not be charged.';
                     } catch (\Exception $e) {
-                        $errorMsg[] = $e->getMessage();
-                        $errorMsg[] = 'Please contact this retailer to complete your transaction';
+                        // $errorMsg[] = $e->getMessage();
+                        // $errorMsg[] = 'Please contact this retailer to complete your transaction';
                     }
+                    $errorMsg = __('There was an issue during payment.');
                 }
                 //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
                 //completed!"));
             }
-            if (!empty($successMsg)) {
-                foreach ($successMsg as $msg) {
-                    if (trim($msg)) {
-                        $this->messageManager->addSuccessMessage($msg);
-                    }
-                }
-            }
+            // if (!empty($successMsg)) {
+            //     foreach ($successMsg as $msg) {
+            //         if (trim($msg)) {
+            //             $this->messageManager->addSuccessMessage($msg);
+            //         }
+            //     }
+            // }
 
-            if (!empty($noticeMsg)) {
-                foreach ($noticeMsg as $msg) {
-                    if (trim($msg)) {
-                        $this->messageManager->addNoticeMessage($msg);
-                    }
-                }
-            }
+            // if (!empty($noticeMsg)) {
+            //     foreach ($noticeMsg as $msg) {
+            //         if (trim($msg)) {
+            //             $this->messageManager->addNoticeMessage($msg);
+            //         }
+            //     }
+            // }
             if (!empty($errorMsg)) {
-                foreach ($errorMsg as $msg) {
-                    if (trim($msg)) {
-                        $this->messageManager->addErrorMessage($msg);
-                    }
-                }
+                // foreach ($errorMsg as $msg) {
+                //     if (trim($msg)) {
+                //         $this->messageManager->addErrorMessage($msg);
+                //     }
+                // }
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    new Phrase("Your transaction could not be completed!")
+                    new Phrase($errorMsg)
                 );
             }
         }
