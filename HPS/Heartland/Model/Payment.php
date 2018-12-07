@@ -608,7 +608,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $response = $chargeService->verify(
                             $suToken,
                             $validCardHolder,
-                            true // verify only requires a token
+                            true && !$suToken->isMultiUse // verify only requires a token
                         );
                         $this->log($response, 'HPS\Heartland\Model\Payment Verify Method response: ');
                         break;
@@ -667,6 +667,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 /** @var \HpsTransaction $response Properties found in the header */
                 // # $payment->setStatus($response->responseText);
                 $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
+
+                if ($suToken->isMultiUse) {
+                    $response->tokenData = $suToken;
+                }
+
                 $payment->setAdditionalInformation('response_data', serialize($response));
                 if ($payment->isCaptureFinal($requestedAmount)) {
                     $payment->setShouldCloseParentTransaction(true);
@@ -986,11 +991,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private function getToken(\HpsTokenData $suToken, $custID = null)
     {
         $this->getTokenValue();
+        $suToken->isMultiUse = false;
         $this->log($this->hpsStoredCard->getCanStoreCards(), '\HPS\Heartland\Model\Payment::getCanStoreCards:  ');
         //if token value is an number it's may be a stored card need to check with heartland_storedcard_id value
         if (!empty($this->token_value) && is_numeric($this->token_value)
             && !empty($custID) && $this->hpsStoredCard->getCanStoreCards()) {
             $this->token_value = $this->hpsStoredCard->getToken($this->token_value, $custID);
+            $suToken->isMultiUse = true;
         }
         $this->log($suToken, '\HPS\Heartland\Model\Payment:: after getCanStoreCards:  ');
         // # \HPS\Heartland\Model\Payment::$token_value
