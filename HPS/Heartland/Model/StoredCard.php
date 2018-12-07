@@ -177,8 +177,14 @@ class StoredCard
         if ($customerID) {
             //delete existing data
             $model = $this->modelTokenDataFactory->create();
-            $model->load($token, 'token_value');
-            $model->delete();
+            $collection = $model->getCollection()
+                ->addFieldToFilter('customer_id', ['eq' => (int) $customerID])
+                ->addFieldToFilter('token_value', ['eq' => (string) $token]);
+
+            if ($collection->getSize() > 0) {
+                $data = $collection->setPageSize(1, 1)->getLastItem();
+                $data->delete();
+            }
 
             $newToken = $this->modelTokenDataFactory->create();
             $newToken->setData('dt', date("Y-m-d H:i:s"))
