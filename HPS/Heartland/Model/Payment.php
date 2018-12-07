@@ -668,7 +668,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 // # $payment->setStatus($response->responseText);
                 $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
 
-                if ($suToken->isMultiUse) {
+                if (isset($suToken->isMultiUse) && !empty($suToken->isMultiUse) && $suToken->isMultiUse) {
                     $response->tokenData = $suToken;
                 }
 
