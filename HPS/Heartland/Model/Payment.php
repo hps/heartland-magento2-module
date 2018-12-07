@@ -42,13 +42,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /** Maps the HPS transaction type indicators to the Magento word strings
      * @array $transactionTypeMap
      */
-    protected $transactionTypeMap = [\HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
+    protected $transactionTypeMap = [
+        \HpsTransactionType::AUTHORIZE => Transaction::TYPE_AUTH,
         \HpsTransactionType::CAPTURE => Transaction::TYPE_ORDER,
         \HpsTransactionType::CHARGE => Transaction::TYPE_CAPTURE,
         \HpsTransactionType::REFUND => Transaction::TYPE_REFUND,
         \HpsTransactionType::REVERSE => Transaction::TYPE_REFUND,
         \HpsTransactionType::VOID => Transaction::TYPE_VOID,
-        \HpsTransactionType::VERIFY => self::TYPE_VERIFY,];
+        \HpsTransactionType::VERIFY => self::TYPE_VERIFY,
+    ];
 
     /**
      * @var \Magento\Framework\App\RequestInterface
@@ -465,7 +467,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
             if ($parentPaymentID && is_integer($parentPaymentID)) {
                 $reportTxnDetail = $chargeService->get($parentPaymentID);
-                if ($paymentAction === \HpsTransactionType::CHARGE) {
+                if ($paymentAction === \HpsTransactionType::CHARGE
+                    && $reportTxnDetail->transactionType !== \HpsTransactionType::VERIFY
+                ) {
                     if ($reportTxnDetail->transactionStatus != 'A'
                         || $requestedAmount > $reportTxnDetail->authorizedAmount
                         || $reportTxnDetail->transactionType !== \HpsTransactionType::AUTHORIZE
@@ -508,6 +512,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 || $paymentAction === \HpsTransactionType::VERIFY
             ) {
                 $order = $payment->getOrder();
+
                 //get current customer id
                 $orderCustomerId = $this->_getOrderCustomerId($order);
                 $this->log($orderCustomerId, 'order details getCustomerId:');
@@ -516,8 +521,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                 $this->log($paymentAction, 'HPS\Heartland\Model\Payment $paymentAction: ');
                 if ($paymentAction === \HpsTransactionType::AUTHORIZE || $paymentAction === \HpsTransactionType::CHARGE ||
-                    $paymentAction === \HpsTransactionType::VERIFY) {
+                    $paymentAction === \HpsTransactionType::VERIFY
+                ) {
+                    $responseData = $payment->getAdditionalInformation('response_data');
                     $suToken = $this->getToken(new \HpsTokenData(), $orderCustomerId);
+
+                    if (empty($suToken->tokenValue) && $responseData !== null) {
+                        $originalResponse = unserialize($responseData);
+
+                        if (!empty($originalResponse->tokenData) && !empty($originalResponse->tokenData->tokenValue)) {
+                            $suToken = $originalResponse->tokenData;
+                        }
+                    }
+
                     // token value
                     $this->log($suToken, 'HPS\Heartland\Model\Payment after getToken Method Called: ');
                 }
@@ -592,7 +608,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         $response = $chargeService->verify(
                             $suToken,
                             $validCardHolder,
-                            $canSaveToken
+                            true // verify only requires a token
                         );
                         $this->log($response, 'HPS\Heartland\Model\Payment Verify Method response: ');
                         break;
@@ -651,7 +667,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 /** @var \HpsTransaction $response Properties found in the header */
                 // # $payment->setStatus($response->responseText);
                 $payment->setTransactionId($response->transactionId . '-' . $this->transactionTypeMap[$paymentAction]);
-                $payment->setAdditionalInformation(serialize($response));
+                $payment->setAdditionalInformation('response_data', serialize($response));
                 if ($payment->isCaptureFinal($requestedAmount)) {
                     $payment->setShouldCloseParentTransaction(true);
                 }
@@ -735,10 +751,23 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     $payment->setCcApproval($response->authorizationCode);
                     $payment->setCcAvsStatus($response->avsResultCode . ': ' . $response->avsResultText);
                     $payment->setCcCidStatus($response->cvvResultCode . ': ' . $response->cvvResultText);
-                    $payment->setCcLast4($this->getAdditionalData()['cc_number']);
-                    $payment->setCcExpMonth($this->getAdditionalData()['cc_exp_month']);
-                    $payment->setCcExpYear($this->getAdditionalData()['cc_exp_year']);
-                    $payment->setCcType($this->getAdditionalData()['cc_type']);
+
+                    $data = $this->getAdditionalData();
+                    if ($data !== null) {
+                        if (!empty($data['cc_number'])) {
+                            $payment->setCcLast4($data['cc_number']);
+                        }
+                        if (!empty($data['cc_exp_month'])) {
+                            $payment->setCcExpMonth($data['cc_exp_month']);
+                        }
+                        if (!empty($data['cc_exp_year'])) {
+                            $payment->setCcExpYear($data['cc_exp_year']);
+                        }
+                        if (!empty($data['cc_typegit'])) {
+                            $payment->setCcType($data['cc_type']);
+                        }
+                    }
+
                     $payment->setCcOwner($validCardHolder->lastName . ', ' . $validCardHolder->firstName);
                     $actionVerb = 'Authorised for';
                     if ($paymentAction === \HpsTransactionType::CHARGE) {
@@ -803,7 +832,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         // $errorMsg[] = $e->getMessage();
                         // $errorMsg[] = 'Please contact this retailer to complete your transaction';
                     }
-                    $errorMsg = __('There was an issue during payment.');
+                    // $errorMsg = __(c'There was an issue during payment.');
                 }
                 //throw new LocalizedException(new Phrase(print_r($errorMsg,true) . " Your transaction could not be
                 //completed!"));
