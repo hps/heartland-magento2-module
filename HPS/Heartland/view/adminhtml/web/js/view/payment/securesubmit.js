@@ -7,7 +7,7 @@
  *  @package     HPS_Heartland
  *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
  *  @copyright   Heartland (http://heartland.us)
- *  @license     https://github.com/hps/heartland-magento2-extension/blob/master/LICENSE.md
+ *  @license     https://github.com/hps/heartland-magento2-module/blob/master/LICENSE.md
  */
 
 var getImageURL = (function () {
