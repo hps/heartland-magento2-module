@@ -11,7 +11,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
-        <link src="HPS_Heartland/js/view/payment/securesubmit.js" id="HPS_SECURESUBMIT_IFRAME_CODE"/>
+        <link src="HPS_Heartland/js/view/payment/securesubmit.js" />
         <css  src="HPS_Heartland/creditForm.css" />
     </head>
     <body>    

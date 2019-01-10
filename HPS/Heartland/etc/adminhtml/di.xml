@@ -25,7 +25,6 @@
             </argument>
         </arguments>
     </type>
-    <preference for="Magento\Sales\Model\Order\Payment" type="\HPS\Heartland\Model\Order\Payment" />
     <preference for="\Magento\Payment\Block\Form\Cc" type="\HPS\Heartland\Block\Form\Cc" />
 
 </config>

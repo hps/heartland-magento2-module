@@ -24,6 +24,7 @@
                 <item name="hps_heartland_config_provider" xsi:type="object">HPS\Heartland\Model\ConfigProvider</item>
             </argument>
         </arguments>
-    </type>    
+    </type>
+    <preference for="Magento\Sales\Model\Order\Payment" type="\HPS\Heartland\Model\Order\Payment" />
 
 </config>
