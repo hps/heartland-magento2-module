@@ -80,6 +80,9 @@ class Payment extends \Magento\Sales\Model\Order\Payment
             ) === 1) {
                 return true;
             }
+            if ($this->canMultiCapture()) {
+                return true;
+            }
             if ($this->getHPS() === null) {
                 return false;
             }
@@ -150,5 +153,17 @@ class Payment extends \Magento\Sales\Model\Order\Payment
         }
         finally{return $this->transactionRecord;
         }
+    }
+
+    private function canMultiCapture() {
+        if ($this->getAdditionalInformation('cc_is_multi') !== 'Y') {
+            return false;
+        }
+
+        $responseData = unserialize($this->getAdditionalInformation('response_data'));
+
+        return !empty($responseData)
+            && !empty($responseData->tokenData)
+            && !empty($responseData->tokenData->tokenValue);
     }
 }

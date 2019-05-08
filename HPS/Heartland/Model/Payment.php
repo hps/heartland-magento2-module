@@ -446,6 +446,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $details = null;
         $newAuthAmount = null;
         $suToken = null;
+        $isMultiCapture = $paymentAction === \HpsTransactionType::VERIFY || $payment->getAdditionalInformation('cc_is_multi') === 'Y';
 
         try {
             $chargeService = $this->getHpsCreditService();
@@ -469,6 +470,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $reportTxnDetail = $chargeService->get($parentPaymentID);
                 if ($paymentAction === \HpsTransactionType::CHARGE
                     && $reportTxnDetail->transactionType !== \HpsTransactionType::VERIFY
+                    && !$isMultiCapture
                 ) {
                     if ($reportTxnDetail->transactionStatus != 'A'
                         || $requestedAmount > $reportTxnDetail->authorizedAmount
@@ -531,6 +533,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
                         if (!empty($originalResponse->tokenData) && !empty($originalResponse->tokenData->tokenValue)) {
                             $suToken = $originalResponse->tokenData;
+                            $suToken->isMultiUse = true;
                         }
                     }
 
@@ -672,6 +675,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                     $response->tokenData = $suToken;
                 }
 
+                $payment->setAdditionalInformation('cc_is_multi', $isMultiCapture ? 'Y' : 'N');
                 $payment->setAdditionalInformation('response_data', serialize($response));
                 if ($payment->isCaptureFinal($requestedAmount)) {
                     $payment->setShouldCloseParentTransaction(true);
