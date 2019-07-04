@@ -34,7 +34,7 @@ class Data extends AbstractHelper
      */
     private $publicKey = 'payment/hps_heartland/public_key';
     private $saveCards = 'payment/hps_heartland/save_cards';
-
+    private $requireExpCvv = 'payment/hps_heartland/require_exp_cvv';
     /**
      *
      */
@@ -97,6 +97,10 @@ class Data extends AbstractHelper
     public function getCanSave()
     {
         return (int) $this->getConfig($this->saveCards);
+    }
+    public function getReqExpCvv()
+    {
+        return (string) $this->getConfig($this->requireExpCvv);
     }
 
     /** Customer facing will generate JSON input while admin side will send post this function returns the relevent
