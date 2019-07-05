@@ -84,3 +84,4 @@ class Checkbox extends \Magento\Config\Block\System\Config\Form\Field
         return $this->_values;
     }
 }
+
