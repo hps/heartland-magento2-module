@@ -187,6 +187,12 @@ define(
                 if ($("#onestepcheckout-button-place-order")) {
                     $("#onestepcheckout-button-place-order").unbind("click");
                 }
+                /**
+                * For amasty comaptablity issue
+                */
+                if($('div.am-checkout').length) {
+                    additionalValidators.validate();
+                }
                 self.hpsBusy();
                 if ($("#securesubmit_token").val() == '') {
                     $("#bValidateButton").click();
