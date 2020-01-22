@@ -163,5 +163,5 @@ div.mage-error[generated]
 #heartland-frame-cardNumber,
 #heartland-frame-cardExpiration,
 #heartland-frame-cardCvv {
-    height: 51px;
+    min-height: 51px;
 }
