@@ -159,3 +159,9 @@ div.mage-error[generated]
 #SavedCardsTable .card-type-discover {background-image: url("images/ss-inputcard-discover@2x.png")}
 #SavedCardsTable .card-type-amex {background-image: url("images/ss-inputcard-amex@2x.png")}
 #SavedCardsTable .card-type-mastercard {background-image: url("images/ss-inputcard-mastercard@2x.png")}
+
+#heartland-frame-cardNumber,
+#heartland-frame-cardExpiration,
+#heartland-frame-cardCvv {
+    height: 51px;
+}
