@@ -260,6 +260,12 @@ define(
                     self.hpsNotBusy();
                 }
                 return false;
+            },
+            Requirecvvexp: function () {
+                 var valueElement = document.querySelector('#requirecvvexp');
+                $.get("../heartland/creditcard/requirecvvexpconfig/").success(function (data) {
+                   $("#requirecvvexp").val(data);
+                });
             }
         });
     }

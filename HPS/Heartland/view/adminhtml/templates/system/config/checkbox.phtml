@@ -1,0 +1,26 @@
+<?php
+/**
+ *  Heartland Checkbox
+ *
+ * @category    HPS
+ * @package     HPS_Heartland
+ * @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+ * @copyright   Heartland (http://heartland.us)
+ * @license     https://github.com/hps/heartland-magento2-module/blob/master/LICENSE.md
+ */
+?>
+<input type="hidden" name="<?php echo $this->getNamePrefix() ?>" value="" /><!-- this is send if nothing is checked -->
+<ul class="checkboxes">
+    <?php foreach ($this->getValues() as $name => $label): ?>
+        <li>
+            <input type="checkbox" value="<?php echo $name?>"
+                   name="<?php echo $this->getNamePrefix() ?>[]"
+                   id="<?php echo $this->getHtmlId() . '_' . $name ?>"
+                <?php echo ($this->getIsChecked($name) ? ' checked="checked"' : '') ?>
+            />
+            <label for="<?php echo $this->getHtmlId() . '_' . $name ?>">
+                <?php echo $label ?>
+            </label>
+        </li>
+    <?php endforeach;?>
+</ul>

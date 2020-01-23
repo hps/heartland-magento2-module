@@ -134,6 +134,8 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
         // Handles tokenization response
         function responseHandler(response)
         {
+            var getrequireval = document.querySelector('#requirecvvexp');
+            var requirecvvexpval = getrequireval.value;
             if (document.querySelector('#heartland-frame-cardNumber') != null) {
                 toAll(document.querySelectorAll('#iframesCardNumber > div, #heartland-frame-cardNumber, #heartland-frame-cardExpiration, #heartland-frame-cardCvv'), function (element) {
                     try {
@@ -208,6 +210,11 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
             }
         };
         window.securesubmitLoadEvents();
+        var state = {
+            cardNumberValid: false,
+            cardCvvValid: false,
+            cardExpirationValid: false
+          };
         // Create a new `HPS` object with the necessary configuration
         var hps = new Heartland.HPS({
             // Change the publicKey below to match your account's credential.
@@ -308,7 +315,11 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
             },
 
             onTokenSuccess: responseHandler,
-            onTokenError: responseHandler /*
+            onTokenError: responseHandler,
+            onEvent: function (event) {
+                state[event.source + 'Valid'] = event.classes.indexOf('valid') !== -1;
+            }
+            /*
              // Callback when a token is received from the service
              onTokenSuccess: function (resp) {
              console.log('Here is a single-use token: ' + resp.token_value);
@@ -320,18 +331,40 @@ function HPS_SecureSubmit(document, Heartland, publicKey)
         });
         // Attach a handler to interrupt the form submission
         Heartland.Events.addHandler(document.getElementById('iframes'), 'submit', function (e) {
+           
             // Prevent the form from continuing to the `action` address
-
             e.preventDefault();
-            // Tell the iframes to tokenize the data
-            hps.Messages.post(
-                {
-                    accumulateData: true,
-                    action: 'tokenize',
-                    message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
-                },
-                'cardNumber'
-            );
+            var getrequireval = document.querySelector('#requirecvvexp');
+            var requirecvvexpval = getrequireval.value; 
+            var errElement = document.querySelector('#iframesCardError');
+            
+            if (state.cardNumberValid == false) {
+                _HPS_addClass(errElement, 'mage-error');
+                errElement.innerText = 'Card number is undefined';
+                document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
+            }
+            if (requirecvvexpval == 'yes' && state.cardExpirationValid == false) {
+                _HPS_addClass(errElement, 'mage-error');
+                errElement.innerText = 'Invalid Expiration Date.';
+                document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
+            }
+            else if (requirecvvexpval == 'yes' && state.cardCvvValid == false) {
+                _HPS_addClass(errElement, 'mage-error');
+                errElement.innerText = 'Invalid CVV.';
+                document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
+            }
+            else{ 
+                // Tell the iframes to tokenize the data
+                hps.Messages.post(
+                        {
+                            accumulateData: true,
+                            action: 'tokenize',
+                            message: publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
+                        },
+                        'cardNumber'
+                        );
+            }
+           
         });
     }
 }
