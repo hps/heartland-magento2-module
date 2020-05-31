@@ -74,9 +74,11 @@ class Data extends AbstractHelper
      */
     public function getConfig($config_path)
     {
+        $store_id = isset($_POST['store_id']) ? $_POST['store_id'] : null;
         return $this->scopeConfig->getValue(
             (string) $config_path,
-            (string) ScopeInterface::SCOPE_STORE
+            (string) ScopeInterface::SCOPE_STORE,
+            $store_id
         );
     }
 
