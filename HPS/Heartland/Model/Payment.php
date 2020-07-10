@@ -409,7 +409,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         // # \HPS\Heartland\Model\Payment::getToken
         $suToken = $this->getToken(new \HpsTokenData());
-        if (empty($suToken->tokenValue)) {
+        if (
+            in_array($paymentAction, [
+                \HpsTransactionType::AUTHORIZE,
+                \HpsTransactionType::CHARGE,
+                \HpsTransactionType::VERIFY,
+            ]) && empty($suToken->tokenValue)
+        ) {
             $errorMsg = __('Token error! Please try again.');
         }
 
