@@ -405,27 +405,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $requestedAmount = 0.00,
         $paymentAction = \HpsTransactionType::CHARGE
     ) {
-        $errorMsg = false;
-
-        // # \HPS\Heartland\Model\Payment::getToken
-        $suToken = $this->getToken(new \HpsTokenData());
-        if (
-            in_array($paymentAction, [
-                \HpsTransactionType::AUTHORIZE,
-                \HpsTransactionType::CHARGE,
-                \HpsTransactionType::VERIFY,
-            ]) && empty($suToken->tokenValue)
-        ) {
-            $errorMsg = __('Token error! Please try again.');
-        }
-
-        if ($errorMsg) {
-            // # \Magento\Framework\Exception\LocalizedException::__construct
-            $this->log($errorMsg, '\HPS\Heartland\Model\Payment::validate ');
-            throw new \Magento\Framework\Exception\LocalizedException($errorMsg);
-        }
-        $this->log('validate DONE', '\HPS\Heartland\Model\Payment::validate');
-
         $storeName = substr(
             trim(
                 filter_var($this->storeManagerInterface
