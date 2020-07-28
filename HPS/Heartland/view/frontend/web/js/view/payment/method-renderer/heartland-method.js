@@ -26,7 +26,8 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/model/messages',
         'uiLayout',
-        'Magento_Checkout/js/action/redirect-on-success'
+        'Magento_Checkout/js/action/redirect-on-success',
+        'mage/url'
     ],
     function (
         ko,
@@ -43,7 +44,8 @@ define(
         additionalValidators,
         Messages,
         layout,
-        redirectOnSuccessAction
+        redirectOnSuccessAction,
+        url
     ) {
         'use strict';
         /**
@@ -70,7 +72,7 @@ define(
                     }
 
                     $.ajax({
-                        url: "../heartland/creditcard/get",
+                        url: url.build('heartland/creditcard/get'),
                         showLoader: true,
                         context: $('#SavedCardsTable'),
                         success: function (data) {
@@ -122,7 +124,7 @@ define(
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
                 if ($("#SavedCardsTable tr").length > 1) {
-                    $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                    $.get(url.build('heartland/api/pubkey')) // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success(function (publicKey) {
                             self.hpsShowCcForm(publicKey);
                             self.hpsNotBusy();
@@ -157,7 +159,7 @@ define(
                 var data;
                 $("#saveCardCheck").parent().fadeOut();
                 if (customer.isLoggedIn()) {
-                    $.get("../heartland/creditcard/cansave/").success(function (data) {
+                    $.get(url.build('heartland/creditcard/cansave')).success(function (data) {
                         if (data === '1') {
                             $("#saveCardCheck").parent().fadeIn();
                         } else {
@@ -263,7 +265,7 @@ define(
             },
             Requirecvvexp: function () {
                  var valueElement = document.querySelector('#requirecvvexp');
-                $.get("../heartland/creditcard/requirecvvexpconfig/").success(function (data) {
+                $.get(url.build('heartland/creditcard/requirecvvexpconfig')).success(function (data) {
                    $("#requirecvvexp").val(data);
                 });
             }
