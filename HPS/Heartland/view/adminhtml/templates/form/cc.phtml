@@ -184,7 +184,9 @@ $getCanSaveCards = $block->getCanSaveCards();
         var responseHandlerDef = null;
         var <?php /* @noEscape */ echo $code; ?>;
         require([
-                'jquery'
+                'jquery',
+                'Magento_Ui/js/modal/confirm',
+                'Magento_Ui/js/modal/alert'
             ],
 
             /*
@@ -199,7 +201,7 @@ $getCanSaveCards = $block->getCanSaveCards();
 
             /*browser:true*/
             /*global define*/
-            function ($) {
+            function ($, magentoConfirm, magentoAlert) {
                 'use strict';
                 
                 var hps;
@@ -301,9 +303,32 @@ $getCanSaveCards = $block->getCanSaveCards();
                         <?php /* @noEscape */ echo $code; ?>._HPS_setHssTransaction1(JSON.parse(jsonCode.replace(/\\/g, "")));
                     });
                     $('.hps_deletecard').click(function(){
-                        var tokenValue = $(this).data('token-value');
-                        <?php echo $code; ?>.deleteCard(tokenValue,this.parentNode.parentNode)
-                    });                         
+                        var that = this;
+                        var token = that.getAttribute('data-token-value') || '';
+                        magentoConfirm({
+                            title: 'Delete stored card',
+                            content: 'Are you sure you want to delete the stored card?',
+                            actions: {
+                                confirm: function () {
+                                    return $.ajax({
+                                        url: '<?php /* @noEscape */ echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=' + token,
+                                        showLoader: true,
+                                        context: $('#SavedCardsTable'),
+                                        success: function (data) {
+                                            if (that.parentNode && that.parentNode.parentNode) {
+                                                that.parentNode.parentNode.remove();
+                                            }
+
+                                            magentoAlert({
+                                                title: 'Delete stored card',
+                                                content: 'Your saved card has been removed from our records'
+                                            });
+                                        }
+                                    });
+                                },
+                            }
+                        });
+                    });                      
                 });
                 
             }
