@@ -4,49 +4,63 @@
         /* @noEscape */ echo $code;
         ?>;
     require([
-        'jquery'
+        'jquery',
+        'Magento_Ui/js/modal/confirm',
+        'Magento_Ui/js/modal/alert'
     ],
-            /*
-             *  Heartland payment method model
-             *
-             *  @category    HPS
-             *  @package     HPS_Heartland
-             *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
-             *  @copyright   Heartland (http://heartland.us)
-             *  @license     https://github.com/hps/heartland-magento2-module/blob/master/LICENSE.md
-             */
+        /*
+            *  Heartland payment method model
+            *
+            *  @category    HPS
+            *  @package     HPS_Heartland
+            *  @author      Heartland Developer Portal <EntApp_DevPortal@e-hps.com>
+            *  @copyright   Heartland (http://heartland.us)
+            *  @license     https://github.com/hps/heartland-magento2-module/blob/master/LICENSE.md
+            */
 
-                    /*browser:true*/
-                            /*global define*/
-                                    function ($) {
-                                        'use strict';
-                                        /**
-                                         * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
-                                         * if there is any form of error we disable the payment form
-                                         *
-                                         */
-                                        $(document).ready(function ($) {
-                                            $("#iframes").fadeOut();
-                                                <?php /* @noEscape */ echo $code; ?> = {
+        /*browser:true*/
+        /*global define*/
+        function ($, magentoConfirm, magentoAlert) {
+            'use strict';
+            /**
+                * Get the public key from HPS/Heartland/Controller/Hss/Pubkey.php as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                * if there is any form of error we disable the payment form
+                *
+                */
+            $(document).ready(function ($) {
+                $('#iframes').fadeOut();
 
-                                                deleteCard: function (id, e) {
-                                                    if (confirm('Are you sure you want to delete the stored card?')) {
-                                                        $.ajax({
-                                                            url: "<?php /* @noEscape */ echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=" + id,
-                                                            showLoader: true,
-                                                            context: $('#SavedCardsTable'),
-                                                            success: function (data) {
-                                                                e.remove();
-                                                                alert('Your saved card has been removed from our records ');
-                                                                location.reload();
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            }
+                var $triggers = $('.token-delete-button');
+                $triggers.click(function () {
+                    var that = this;
+                    var token = that.getAttribute('data-token') || '';
+                    magentoConfirm({
+                        title: 'Delete stored card',
+                        content: 'Are you sure you want to delete the stored card?',
+                        actions: {
+                            confirm: function () {
+                                return $.ajax({
+                                    url: '<?php /* @noEscape */ echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=' + token,
+                                    showLoader: true,
+                                    context: $('#SavedCardsTable'),
+                                    success: function (data) {
+                                        if (that.parentNode && that.parentNode.parentNode) {
+                                            that.parentNode.parentNode.remove();
+                                        }
+
+                                        magentoAlert({
+                                            title: 'Delete stored card',
+                                            content: 'Your saved card has been removed from our records'
                                         });
                                     }
-                            );
+                                });
+                            },
+                        }
+                    });
+                });
+            });
+        }
+    );
 </script>
 <table id="SavedCardsTable">
     <caption>Stored Payments for this customer(if any)</caption>
@@ -63,9 +77,11 @@
                     <td width="width:100px" > </td>
                     <th align="left" id="image_holder_<?php /* @noEscape */ echo $token['token_value'] ?>"><?php /* @noEscape */ echo $ccTypeHPS . ' ending in ' . $token['cc_last4']; ?><br />Expiring on <?php /* @noEscape */ echo $token['cc_exp_month'] . '/' . $token['cc_exp_year']; ?><span class="card-type-<?php /* @noEscape */ echo $token['cc_type'] ?>" /></th>
                     <td width="width:50px" >
-                        <input onclick="return <?php /* @noEscape */ echo $code; ?>.deleteCard(<?php /* @noEscape */ echo $token['token_value'] ?>, this.parentNode.parentNode)"
+                        <input class="token-delete-button"
+                               data-token="<?= $token['token_value'] ?>"
                                style="color:red;font-size:
-                               2em;background-color: transparent;border: none" type="button"
+                               2em;background-color: transparent;border: none"
+                               type="button"
                                value="X">
                     </td>
                 </tr>
