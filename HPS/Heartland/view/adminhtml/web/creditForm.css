@@ -115,6 +115,10 @@ div.mage-error[generated]
     right: 10px;
 }
 
+#iframesCardError {
+    color: red;
+}
+
 #iframesCardNumber {width: 100%;}
 #iframesCardNumber {position: relative;}
 #iframesCardNumber  .extra-div-1 {

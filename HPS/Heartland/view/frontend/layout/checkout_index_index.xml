@@ -10,15 +10,6 @@
   -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <head>
-        <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
-
-        <!-- Cert
-        <script src="https://hps.github.io/token/2.1/securesubmit.js" src_type="url" />
-        -->
-        <!-- PROD
-        <script src="https://api2.heartlandportico.com/SecureSubmit.v1/token/2.1/securesubmit.js" src_type="url" />
-        -->
-        <link src="HPS_Heartland/js/view/payment/securesubmit.js" />
         <css  src="HPS_Heartland/creditForm.css" />
 
     </head>

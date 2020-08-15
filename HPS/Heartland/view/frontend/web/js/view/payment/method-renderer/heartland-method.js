@@ -27,7 +27,8 @@ define(
         'Magento_Ui/js/model/messages',
         'uiLayout',
         'Magento_Checkout/js/action/redirect-on-success',
-        'mage/url'
+        'mage/url',
+        'HPS_Heartland/js/view/payment/securesubmit'
     ],
     function (
         ko,
@@ -45,7 +46,8 @@ define(
         Messages,
         layout,
         redirectOnSuccessAction,
-        url
+        url,
+        HPS
     ) {
         'use strict';
         /**
@@ -105,7 +107,6 @@ define(
             },
 
             drawRow: function (rowData) {
-
                 var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
                 var row = $("<tr " + rOnClick + " />");
                 $("#SavedCardsTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
@@ -140,13 +141,13 @@ define(
             },
             hpsNotBusy: function () {
                 $("#checkout-loader-iframeEdition").fadeOut();
-                _HPS_EnablePlaceOrder();
+                HPS.HPS_EnablePlaceOrder();
             },
             hpsShowCcForm: function (publicKey) {
                 if (publicKey ) {
                     var self = this;
                     $("#iframes").fadeIn();
-                    HPS_SecureSubmit(document, Heartland, publicKey);
+                    HPS.HPS_SecureSubmit(document, publicKey);
                     self.hpsGetCanSave();
                 }
 

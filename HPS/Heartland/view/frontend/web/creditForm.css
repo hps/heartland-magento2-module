@@ -160,8 +160,8 @@ div.mage-error[generated]
 #SavedCardsTable .card-type-amex {background-image: url("images/ss-inputcard-amex@2x.png")}
 #SavedCardsTable .card-type-mastercard {background-image: url("images/ss-inputcard-mastercard@2x.png")}
 
-#heartland-frame-cardNumber,
-#heartland-frame-cardExpiration,
-#heartland-frame-cardCvv {
+#iframesCardNumber > iframe,
+#iframesCardExpiration > iframe,
+#iframesCardCvv > iframe {
     min-height: 51px;
 }
