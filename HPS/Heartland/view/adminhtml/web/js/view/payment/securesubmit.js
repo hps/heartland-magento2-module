@@ -10,7 +10,7 @@ define([
         var scripts = document.getElementsByTagName('script');
         var element;
 
-        for (const s in scripts) {
+        for (var s in scripts) {
             if (!scripts.hasOwnProperty(s)) {
                 continue;
             }
