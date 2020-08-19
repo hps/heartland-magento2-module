@@ -8,12 +8,25 @@ define([
     var getImageURL = (function () {
         //build a relative path based on the module location on the configured server
         var scripts = document.getElementsByTagName('script');
-        var element = scripts[scripts.length-1];
+        var element;
+
+        for (const s in scripts) {
+            if (!scripts.hasOwnProperty(s)) {
+                continue;
+            }
+            
+            if (scripts[s].src.indexOf('HPS_Heartland/js/view/payment/securesubmit') === -1) {
+                continue;
+            }
+
+            element = scripts[s];
+        }
+
         if (element !== null) {
             var myScript = element.src.split('/').slice(0, -4).join('/') + '/images/';
             //console.log(myScript);
             return function () {
-                return 'https://hps.github.io/token/gp-1.5.0/images/';
+                return myScript;
             };
         }
     })();
