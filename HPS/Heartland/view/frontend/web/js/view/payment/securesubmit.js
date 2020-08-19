@@ -345,7 +345,7 @@ define([
                         }
                     },
                     // Card CVV
-                    '#secure-payment-field[name="cardCvv"] + .extra-div-1': {
+                    '#secure-payment-field.card-cvv + .extra-div-1': {
                         'display': 'block',
                         'width': '59px',
                         'height': '39px',
@@ -355,6 +355,9 @@ define([
                         'position': 'absolute',
                         'top': '6px',
                         'right': '7px'
+                    },
+                    '#secure-payment-field.card-cvv.card-type-amex + .extra-div-1': {
+                        'background-position': 'bottom'
                     }
                 }
             });
