@@ -86,7 +86,7 @@ define([
         //if (arguments.callee.count > 0 )
         //    return;
         if (document.querySelector('#iframesCardNumber') // dont execute if this doesnt exist
-                && !document.querySelector('#heartland-frame-cardNumber') //dont execute if this exists
+                && !document.querySelector('#iframesCardNumber > iframe') //dont execute if this exists
                 && publicKey) {
             //var addHandler = Heartland.Events.addHandler;
             function enablePlaceOrder(disabled)
