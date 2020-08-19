@@ -47,7 +47,7 @@ define(
         layout,
         redirectOnSuccessAction,
         url,
-        HPS
+        HPS_Heartland
     ) {
         'use strict';
         /**
@@ -141,13 +141,13 @@ define(
             },
             hpsNotBusy: function () {
                 $("#checkout-loader-iframeEdition").fadeOut();
-                HPS.HPS_EnablePlaceOrder();
+                HPS_Heartland.HPS_EnablePlaceOrder();
             },
             hpsShowCcForm: function (publicKey) {
                 if (publicKey ) {
                     var self = this;
                     $("#iframes").fadeIn();
-                    HPS.HPS_SecureSubmit(document, publicKey);
+                    HPS_Heartland.HPS_SecureSubmit(document, publicKey);
                     self.hpsGetCanSave();
                 }
 

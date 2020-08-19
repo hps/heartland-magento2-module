@@ -202,7 +202,7 @@ $getCanSaveCards = $block->getCanSaveCards();
 
             /*browser:true*/
             /*global define*/
-            function ($, magentoConfirm, magentoAlert, HPS) {
+            function ($, magentoConfirm, magentoAlert, HPS_Heartland) {
                 'use strict';
                 
                 var hps;
@@ -262,13 +262,13 @@ $getCanSaveCards = $block->getCanSaveCards();
 
                         hpsNotBusy: function () {
                             $("#checkout-loader-iframeEdition").fadeOut();
-                            HPS.HPS_EnablePlaceOrder()
+                            HPS_Heartland.HPS_EnablePlaceOrder()
                         },
 
                         hpsShowCcForm: function (publicKey) {
                             if (publicKey) {
                                 $("#iframes").fadeIn();
-                                HPS.HPS_SecureSubmit(document, publicKey);
+                                HPS_Heartland.HPS_SecureSubmit(document, publicKey);
                             }
 
                         }
