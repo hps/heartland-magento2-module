@@ -69,21 +69,21 @@ define([
                 $('body').trigger('processStart');
 
                 // manually include submit button
-                const fields = ['submit'];
-                const target = hps.frames['card-number'];
+                var fields = ['submit'];
+                var target = hps.frames['card-number'];
 
-                for (const type in hps.frames) {
+                for (var type in hps.frames) {
                     if (hps.frames.hasOwnProperty(type)) {
                         fields.push(type);
                     }
                 }
 
-                for (const type in hps.frames) {
+                for (var type in hps.frames) {
                     if (!hps.frames.hasOwnProperty(type)) {
                         continue;
                     }
 
-                    const frame = hps.frames[type];
+                    var frame = hps.frames[type];
 
                     if (!frame) {
                         continue;
