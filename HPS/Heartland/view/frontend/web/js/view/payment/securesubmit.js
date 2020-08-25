@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'https://hps.github.io/token/gp-1.5.0/globalpayments.js'
+    'https://hps.github.io/token/gp-1.6.0/globalpayments.js'
 ], function ($, GlobalPayments) {
 
     GlobalPayments = GlobalPayments || window.GlobalPayments;

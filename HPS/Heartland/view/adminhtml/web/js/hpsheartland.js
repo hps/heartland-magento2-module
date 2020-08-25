@@ -14,7 +14,7 @@ define([
     'uiComponent',
     'Magento_Ui/js/modal/alert',
     'Magento_Ui/js/lib/view/utils/dom-observer',
-    'https://hps.github.io/token/gp-1.5.0/globalpayments.js'
+    'https://hps.github.io/token/gp-1.6.0/globalpayments.js'
 ], function ($, Class, alert, domObserver, GlobalPayments) {
     'use strict';
 
