@@ -45,7 +45,7 @@
                                     context: $('#SavedCardsTable'),
                                     success: function (data) {
                                         if (that.parentNode && that.parentNode.parentNode) {
-                                            that.parentNode.parentNode.remove();
+                                            $(that.parentNode.parentNode).remove();
                                         }
 
                                         magentoAlert({
