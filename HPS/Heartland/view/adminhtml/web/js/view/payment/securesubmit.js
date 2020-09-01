@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'https://hps.github.io/token/gp-1.6.0/globalpayments.js'
+    'https://api2.heartlandportico.com/securesubmit.v1/token/gp-1.6.0/globalpayments.js'
 ], function ($, GlobalPayments) {
 
     GlobalPayments = GlobalPayments || window.GlobalPayments;
