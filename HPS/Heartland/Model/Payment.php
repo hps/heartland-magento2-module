@@ -153,6 +153,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     private $hpsCardHolder;
     private $hpsAddress;
     private $storeManagerInterface;
+    
+    /**
+     * @var HPS\Heartland\Model\Helper\FraudManagementHelper
+     */
+    private $fraudManagement;
 
     /**
      * Payment constructor.
@@ -169,6 +174,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * @param \Magento\Directory\Model\CountryFactory              $countryFactory
      * @param \HpsServicesConfig                                   $config
      * @param \Magento\Customer\Api\CustomerRepositoryInterface    $customerRepository
+     * @param \HPS\Heartland\Model\Helper\FraudManagementHelper    $fraudManagement
      * @param array                                                $data
      */
     public function __construct(
@@ -190,6 +196,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \HpsCardHolder $hpsCardHolder,
         \HpsAddress $hpsAddress,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \HPS\Heartland\Model\Helper\FraudManagementHelper $fraudManagement,
         array $data = []
     ) {
         parent::__construct(
@@ -219,6 +226,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->hpsCardHolder = $hpsCardHolder;
         $this->hpsAddress = $hpsAddress;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->fraudManagement = $fraudManagement;
     }
 
     /**
@@ -426,6 +434,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $suToken = null;
         $isMultiCapture = $paymentAction === \HpsTransactionType::VERIFY || $payment->getAdditionalInformation('cc_is_multi') === 'Y';
 
+        $this->fraudManagement->getFraudSettings();
+
         try {
             $chargeService = $this->getHpsCreditService();
             $currency = $this->hpsData->getCurrencyCode();
@@ -538,6 +548,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                      */
                     case (\HpsTransactionType::AUTHORIZE):
                         $this->log($suToken, 'HPS\Heartland\Model\Payment authorize Method Called: ');
+                        $this->fraudManagement->checkVelocity();
                         /** @var \HpsAuthorization $response Properties found in the HpsAuthorization */
                         $response = $chargeService->authorize(
                             \HpsInputValidation::checkAmount($requestedAmount),
@@ -571,6 +582,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                      * Digital media sales which are immediately delivered are an ideal use case for this transaction
                      */
                     case (\HpsTransactionType::CHARGE): // Portico CreditSale \HpsTransactionType::CHARGE
+                        $this->fraudManagement->checkVelocity();
                         $this->log($suToken, 'HPS\Heartland\Model\Payment charge Method Called: ');
                         $response = $chargeService->charge(
                             \HpsInputValidation::checkAmount($requestedAmount),
@@ -585,6 +597,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         );
                         break;
                     case (\HpsTransactionType::VERIFY): // Portico CreditSale \HpsTransactionType::VERIFY
+                        $this->fraudManagement->checkVelocity();
                         $this->log($suToken, 'HPS\Heartland\Model\Payment Verify Method Called: ');
                         $response = $chargeService->verify(
                             $suToken,
@@ -623,6 +636,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                         );
                 }
             } catch (\Exception $e) {
+                $this->fraudManagement->updateVelocity($e);
                 // # \Psr\Log\LoggerInterface::error
                 $this->_logger->error(__(
                     'Gateway Error: - %1',
