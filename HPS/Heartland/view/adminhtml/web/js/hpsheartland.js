@@ -13,8 +13,9 @@ define([
     'jquery',
     'uiComponent',
     'Magento_Ui/js/modal/alert',
-    'Magento_Ui/js/lib/view/utils/dom-observer'
-], function ($, Class, alert, domObserver) {
+    'Magento_Ui/js/lib/view/utils/dom-observer',
+    'https://api2.heartlandportico.com/securesubmit.v1/token/gp-1.6.0/globalpayments.js'
+], function ($, Class, alert, domObserver, GlobalPayments) {
     'use strict';
 
     return Class.extend({
@@ -66,14 +67,37 @@ define([
             var self = this;
             try {
                 $('body').trigger('processStart');
-                hps.Messages.post(
-                    {
-                            accumulateData: true,
-                            action: 'tokenize',
-                            message: this.publicKey, //'pkapi_cert_jKc1FtuyAydZhZfbB3',
+
+                // manually include submit button
+                var fields = ['submit'];
+                var target = hps.frames['card-number'];
+
+                for (var type in hps.frames) {
+                    if (hps.frames.hasOwnProperty(type)) {
+                        fields.push(type);
+                    }
+                }
+
+                for (var type in hps.frames) {
+                    if (!hps.frames.hasOwnProperty(type)) {
+                        continue;
+                    }
+
+                    var frame = hps.frames[type];
+
+                    if (!frame) {
+                        continue;
+                    }
+
+                    GlobalPayments.internal.postMessage.post({
+                        data: {
+                            fields: fields,
+                            target: target.id,
                         },
-                    'cardNumber'
-                );
+                        id: frame.id,
+                        type: "ui:iframe-field:request-data",
+                    }, frame.id);
+                }
             } catch (e) {
                 $('body').trigger('processStop');
                 self.error(e.message);

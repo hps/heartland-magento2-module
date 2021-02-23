@@ -26,7 +26,9 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Ui/js/model/messages',
         'uiLayout',
-        'Magento_Checkout/js/action/redirect-on-success'
+        'Magento_Checkout/js/action/redirect-on-success',
+        'mage/url',
+        'HPS_Heartland/js/view/payment/securesubmit'
     ],
     function (
         ko,
@@ -43,7 +45,9 @@ define(
         additionalValidators,
         Messages,
         layout,
-        redirectOnSuccessAction
+        redirectOnSuccessAction,
+        url,
+        HPS_Heartland
     ) {
         'use strict';
         /**
@@ -70,7 +74,7 @@ define(
                     }
 
                     $.ajax({
-                        url: "../heartland/creditcard/get",
+                        url: url.build('heartland/creditcard/get'),
                         showLoader: true,
                         context: $('#SavedCardsTable'),
                         success: function (data) {
@@ -103,7 +107,6 @@ define(
             },
 
             drawRow: function (rowData) {
-
                 var rOnClick = "onclick='var response" + rowData.token_value + " = {token_value:\"" + rowData.token_value + "\", last_four:\"" + rowData.cc_last4 + "\", card_type:\"" + rowData.cc_type + "\", exp_month:\"" + rowData.cc_exp_month + "\", exp_year:\"" + rowData.cc_exp_year + "\"};document.querySelector(\"#hssCardSelected" + rowData.token_value + "\").checked=true;require([\"jquery\"],function($){$(\"#iframes\").fadeOut();});;_HPS_setHssTransaction(response" + rowData.token_value + ");' title=\"Pay with this card\"";
                 var row = $("<tr " + rOnClick + " />");
                 $("#SavedCardsTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
@@ -122,7 +125,7 @@ define(
                 $("#SelectNewCardHPS").prop('checked', true);
                 self.hpsBusy();
                 if ($("#SavedCardsTable tr").length > 1) {
-                    $.get("../heartland/api/pubkey") // as url configured based on HPS/Heartland/etc/frontend/routes.xml
+                    $.get(url.build('heartland/api/pubkey')) // as url configured based on HPS/Heartland/etc/frontend/routes.xml
                         .success(function (publicKey) {
                             self.hpsShowCcForm(publicKey);
                             self.hpsNotBusy();
@@ -138,13 +141,13 @@ define(
             },
             hpsNotBusy: function () {
                 $("#checkout-loader-iframeEdition").fadeOut();
-                _HPS_EnablePlaceOrder();
+                HPS_Heartland.HPS_EnablePlaceOrder();
             },
             hpsShowCcForm: function (publicKey) {
                 if (publicKey ) {
                     var self = this;
                     $("#iframes").fadeIn();
-                    HPS_SecureSubmit(document, Heartland, publicKey);
+                    HPS_Heartland.HPS_SecureSubmit(document, publicKey);
                     self.hpsGetCanSave();
                 }
 
@@ -157,7 +160,7 @@ define(
                 var data;
                 $("#saveCardCheck").parent().fadeOut();
                 if (customer.isLoggedIn()) {
-                    $.get("../heartland/creditcard/cansave/").success(function (data) {
+                    $.get(url.build('heartland/creditcard/cansave')).success(function (data) {
                         if (data === '1') {
                             $("#saveCardCheck").parent().fadeIn();
                         } else {
@@ -263,7 +266,7 @@ define(
             },
             Requirecvvexp: function () {
                  var valueElement = document.querySelector('#requirecvvexp');
-                $.get("../heartland/creditcard/requirecvvexpconfig/").success(function (data) {
+                $.get(url.build('heartland/creditcard/requirecvvexpconfig')).success(function (data) {
                    $("#requirecvvexp").val(data);
                 });
             }

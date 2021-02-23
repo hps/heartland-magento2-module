@@ -106,6 +106,36 @@
                             <config_path>payment/hps_heartland/debug</config_path>
                         </field>
                     </group>
+
+                    <group id="heartland_fraudManagement" translate="label comment" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    	<label><![CDATA[Fraud Management<i>Fraud Management Settings for Heartland </i>]]></label>
+                    	<frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+                        <attribute type="expanded">1</attribute>
+                    	<fieldset_css>complex fraudmanagement-other-section with-button</fieldset_css>
+                    	<field id="enable_anti_fraud" translate="label" type="select" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="0">
+	                        <label>Enable Anti-Fraud Controls</label>
+	                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                        <config_path>payment/hps_heartland/enable_anti_fraud</config_path>
+	                    </field>
+	                    <field id="fraud_text" translate="label" type="textarea" sortOrder="135" showInDefault="1" showInWebsite="1" showInStore="0">
+	                        <label>Fraud Text</label>
+	                        <depends><field id="enable_anti_fraud">1</field></depends>
+	                        <config_path>payment/hps_heartland/fraud_text</config_path>
+	                        <comment><![CDATA[This is the text that will display to the customer when fraud is detected and the transaction fails.]]></comment>
+	                    </field>
+	                    <field id="fraud_velocity_attempts" translate="label" type="text" sortOrder="136" showInDefault="1" showInWebsite="1" showInStore="0">
+	                        <label>Max Velocity Attempts</label>
+	                        <depends><field id="enable_anti_fraud">1</field></depends>
+	                        <config_path>payment/hps_heartland/fraud_velocity_attempts</config_path>
+	                        <comment><![CDATA[The maximum number of attempts allowed before additional attempts are blocked.]]></comment>
+	                    </field>
+	                    <field id="fraud_velocity_timeout" translate="label" type="text" sortOrder="137" showInDefault="1" showInWebsite="1" showInStore="0">
+	                        <label>Velocity Attempts Timeout</label>
+	                        <depends><field id="enable_anti_fraud">1</field></depends>
+	                        <config_path>payment/hps_heartland/fraud_velocity_timeout</config_path>
+	                        <comment><![CDATA[The amount of time (in minutes) before recent failures are ignored.]]></comment>
+	                    </field>
+               		</group>
                 </group>
             </group>
         </section>

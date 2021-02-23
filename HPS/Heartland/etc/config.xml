@@ -25,6 +25,8 @@
                 <cctypes>AE,VI,MC,DI,JCB</cctypes>
                 <allowspecific>0</allowspecific>
                 <min_order_total>0.50</min_order_total>
+            	<fraud_velocity_attempts>3</fraud_velocity_attempts>
+                <fraud_velocity_timeout>10</fraud_velocity_timeout>  
             </hps_heartland>
         </payment>
     </default>

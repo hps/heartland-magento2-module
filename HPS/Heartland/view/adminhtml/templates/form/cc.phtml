@@ -25,7 +25,7 @@ $getCanSaveCards = $block->getCanSaveCards();
 
 ?>
 
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none">
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none; width:200%">
     
     <table id="SavedCardsTable">
         <tbody>
@@ -184,7 +184,10 @@ $getCanSaveCards = $block->getCanSaveCards();
         var responseHandlerDef = null;
         var <?php /* @noEscape */ echo $code; ?>;
         require([
-                'jquery'
+                'jquery',
+                'Magento_Ui/js/modal/confirm',
+                'Magento_Ui/js/modal/alert',
+                'HPS_Heartland/js/view/payment/securesubmit'
             ],
 
             /*
@@ -199,7 +202,7 @@ $getCanSaveCards = $block->getCanSaveCards();
 
             /*browser:true*/
             /*global define*/
-            function ($) {
+            function ($, magentoConfirm, magentoAlert, HPS_Heartland) {
                 'use strict';
                 
                 var hps;
@@ -215,16 +218,15 @@ $getCanSaveCards = $block->getCanSaveCards();
 
                         _HPS_setHssTransaction1: function (response) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa","cc_exp_month":"2","cc_exp_year":"2025"}                            
                             
-                            if($("#hssCardSelected" + response.token_value.trim()))
-                            {
+                            if ($("#hssCardSelected" + (response.paymentReference || response.token_value).trim())) {
                                 $("#iframes").fadeOut();
-                                $("#hssCardSelected" + response.token_value.trim()).attr('checked', true);
-                                $('#securesubmit_token').val( response.token_value.trim() );
+                                $("#hssCardSelected" + (response.paymentReference || response.token_value).trim()).attr('checked', true);
+                                $('#securesubmit_token').val( (response.paymentReference || response.token_value).trim() );
 
-                                $('#hps_heartland_cc_number').val( response.cc_last4.trim() );
-                                $('#hps_heartland_cc_type').val( response.cc_type.trim() );
-                                $('#hps_heartland_expiration').val( response.cc_exp_month.trim() );
-                                $('#hps_heartland_expiration_yr').val( response.cc_exp_year.trim() );
+                                $('#hps_heartland_cc_number').val( (response.details && response.details.cardLast4 || response.cc_last4).trim() );
+                                $('#hps_heartland_cc_type').val( (response.details && response.details.cardType || response.cc_type).trim() );
+                                $('#hps_heartland_expiration').val( (response.details && response.details.expiryMonth || response.cc_exp_month).trim() );
+                                $('#hps_heartland_expiration_yr').val( (response.details && response.details.expiryYear || response.cc_exp_year).trim() );
                             }
                         },
                         deleteCard: function (id,e) {//{"token_value":"3","cc_last4":"1111","cc_type":"visa",
@@ -260,13 +262,13 @@ $getCanSaveCards = $block->getCanSaveCards();
 
                         hpsNotBusy: function () {
                             $("#checkout-loader-iframeEdition").fadeOut();
-                            _HPS_EnablePlaceOrder()
+                            HPS_Heartland.HPS_EnablePlaceOrder()
                         },
 
                         hpsShowCcForm: function (publicKey) {
                             if (publicKey) {
                                 $("#iframes").fadeIn();
-                                HPS_SecureSubmit($,document, Heartland, publicKey);
+                                HPS_Heartland.HPS_SecureSubmit(document, publicKey);
                             }
 
                         }
@@ -301,9 +303,32 @@ $getCanSaveCards = $block->getCanSaveCards();
                         <?php /* @noEscape */ echo $code; ?>._HPS_setHssTransaction1(JSON.parse(jsonCode.replace(/\\/g, "")));
                     });
                     $('.hps_deletecard').click(function(){
-                        var tokenValue = $(this).data('token-value');
-                        <?php echo $code; ?>.deleteCard(tokenValue,this.parentNode.parentNode)
-                    });                         
+                        var that = this;
+                        var token = that.getAttribute('data-token-value') || '';
+                        magentoConfirm({
+                            title: 'Delete stored card',
+                            content: 'Are you sure you want to delete the stored card?',
+                            actions: {
+                                confirm: function () {
+                                    return $.ajax({
+                                        url: '<?php /* @noEscape */ echo $block->getBaseUrl() ?>/heartland/creditcard/delete?t=' + token,
+                                        showLoader: true,
+                                        context: $('#SavedCardsTable'),
+                                        success: function (data) {
+                                            if (that.parentNode && that.parentNode.parentNode) {
+                                                $(that.parentNode.parentNode).remove();
+                                            }
+
+                                            magentoAlert({
+                                                title: 'Delete stored card',
+                                                content: 'Your saved card has been removed from our records'
+                                            });
+                                        }
+                                    });
+                                },
+                            }
+                        });
+                    });                      
                 });
                 
             }
