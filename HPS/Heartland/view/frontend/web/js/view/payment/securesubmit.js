@@ -258,6 +258,7 @@ define([
 
             GlobalPayments.configure({
                 publicApiKey: publicKey,
+                enableAutocomplete: true
             });
             // Create a new `HPS` object with the necessary configuration
             var hps = GlobalPayments.ui.form({
