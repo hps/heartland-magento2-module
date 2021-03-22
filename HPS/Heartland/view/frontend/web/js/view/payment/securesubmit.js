@@ -360,6 +360,27 @@ define([
             hps.on('token-success', function(r) { responseHandler(hps, r); });
             hps.on('token-error', function(r) { responseHandler(hps, r); });
             hps.on('error', function(r) { responseHandler(hps, r); });
+            hps.on('card-type', function(d) {
+                var brand = 'Unknown';
+                switch (d.cardType) {
+                    case 'amex':
+                        brand = 'American Express';
+                        break;
+                    case 'discover':
+                        brand = 'Discover';
+                        break;
+                    case 'mastercard':
+                        brand = 'Mastercard';
+                        break;
+                    case 'visa':
+                        brand = 'Visa';
+                        break;
+                }
+                var explanation = document.querySelector('#iframesCardNumber-container .card-brand-explanation');
+                if (explanation) {
+                    explanation.innerText = brand + ' card data was entered';
+                }
+            });
 
             // Attach a handler to interrupt the form submission
             $('#iframes').submit(function (e) {

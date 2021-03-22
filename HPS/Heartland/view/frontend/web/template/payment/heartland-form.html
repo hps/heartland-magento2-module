@@ -45,7 +45,14 @@
                 </label>
             </dt>
 
-            <dd><div id="iframesCardNumber"></div></dd>
+            <dd id="iframesCardNumber-container">
+                <div id="iframesCardNumber"></div>
+                <div class="tooltip"></div>
+                <div class="tooltip-content">
+                    <strong>Card Brand</strong><br>
+                    <span class="card-brand-explanation">No card data has been entered.</span>
+                </div>
+            </dd>
 
             <!-- #iframesCardExpiration is the target element for the cardExpiration iframe -->
             <dt>
@@ -61,7 +68,14 @@
                     <span id="iframesCardCvvLabel"><!-- ko i18n: 'Card CVV:'--><!-- /ko --></span>
                 </label>
             </dt>
-            <dd><div id="iframesCardCvv"></div></dd>
+            <dd id="iframesCardCvv-container">
+                <div id="iframesCardCvv"></div>
+                <div class="tooltip"></div>
+                <div class="tooltip-content">
+                    <strong>Security Code</strong><br>
+                    The additional 3 digits on the back of your card. For American Express, it is the additional 4 digits on the front of your card.
+                </div>
+            </dd>
 
             <input id="bValidateButton" type="submit"  /><label style="display: none;"> <input type="checkbox" id="saveCardCheck" /> Save this Card? </label>
              <input type="text" id="requirecvvexp" value="" style="display: none;" data-bind="value: Requirecvvexp()"/>
