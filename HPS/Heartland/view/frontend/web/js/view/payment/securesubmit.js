@@ -14,7 +14,7 @@ define([
             if (!scripts.hasOwnProperty(s)) {
                 continue;
             }
-            
+
             if (scripts[s].src.indexOf('HPS_Heartland/js/view/payment/securesubmit') === -1) {
                 continue;
             }
@@ -204,11 +204,6 @@ define([
                         }
                     });
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
-
-                    try {
-                        _HPS_addClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
-                    } catch (e) {
-                    }
 
                     var errElement = document.querySelector('#iframesCardError');
                     if (errElement) {
