@@ -14,7 +14,7 @@ define([
             if (!scripts.hasOwnProperty(s)) {
                 continue;
             }
-            
+
             if (scripts[s].src.indexOf('HPS_Heartland/js/view/payment/securesubmit') === -1) {
                 continue;
             }
@@ -205,11 +205,6 @@ define([
                     });
                     document.querySelector('#iframes > input[type="submit"]').style.display = 'none';
 
-                    try {
-                        _HPS_addClass(document.querySelector('#iframesCardCvvLabel > span'), 'hideMe');
-                    } catch (e) {
-                    }
-
                     var errElement = document.querySelector('#iframesCardError');
                     if (errElement) {
                         errElement.innerText = '';
@@ -263,6 +258,7 @@ define([
 
             GlobalPayments.configure({
                 publicApiKey: publicKey,
+                enableAutocomplete: true
             });
             // Create a new `HPS` object with the necessary configuration
             var hps = GlobalPayments.ui.form({
@@ -365,6 +361,27 @@ define([
             hps.on('token-success', function(r) { responseHandler(hps, r); });
             hps.on('token-error', function(r) { responseHandler(hps, r); });
             hps.on('error', function(r) { responseHandler(hps, r); });
+            hps.on('card-type', function(d) {
+                var brand = 'Unknown';
+                switch (d.cardType) {
+                    case 'amex':
+                        brand = 'American Express';
+                        break;
+                    case 'discover':
+                        brand = 'Discover';
+                        break;
+                    case 'mastercard':
+                        brand = 'Mastercard';
+                        break;
+                    case 'visa':
+                        brand = 'Visa';
+                        break;
+                }
+                var explanation = document.querySelector('#iframesCardNumber-container .card-brand-explanation');
+                if (explanation) {
+                    explanation.innerText = brand + ' card data was entered';
+                }
+            });
 
             // Attach a handler to interrupt the form submission
             $('#iframes').submit(function (e) {
