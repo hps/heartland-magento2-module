@@ -9,6 +9,7 @@ This project is in ready.
 We have laid out some basic requirements that you should absolutely have before working with this extension:
 
 * Magento v2.1.6+ (at the time of this development effort this was the current release of Magento2)
+* PHP version 8.0 or below. This extension will not work with PHP versions 8.1 or above.
 * Experience in debugging if problems arise.
 * SSH access to server as file system owner of web directory
 * Keys for [Magento connect](https://marketplace.magento.com/customer/accessKeys/list/)
