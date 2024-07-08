@@ -1,14 +1,12 @@
 
 ![image](heartland-logo.png)
-### Welcome to Heartland Magento2 Extension:
-
-This project is in ready.
+### !Important Note! - This extension has not been updated to provide support for the latest versions of Magento / Adobe Commerce. Our go-forward multi-gateway offering can be found [here](https://commercemarketplace.adobe.com/realexpayments-module-payment-gateway.html#description)
 
 ### Prerequisites:
 
 We have laid out some basic requirements that you should absolutely have before working with this extension:
 
-* Magento v2.1.6+ (at the time of this development effort this was the current release of Magento2)
+* Magento v2.1.x (at the time of this development effort this was the current release of Magento2)
 * Experience in debugging if problems arise.
 * SSH access to server as file system owner of web directory
 * Keys for [Magento connect](https://marketplace.magento.com/customer/accessKeys/list/)
