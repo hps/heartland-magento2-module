@@ -1,5 +1,4 @@
-
-![image](heartland-logo.png)
+# **This repository is no longer maintained.**
 ### !Important Note! - This extension has not been updated to provide support for the latest versions of Magento / Adobe Commerce. Our go-forward multi-gateway offering can be found [here](https://commercemarketplace.adobe.com/realexpayments-module-payment-gateway.html#description)
 
 ### Prerequisites:
